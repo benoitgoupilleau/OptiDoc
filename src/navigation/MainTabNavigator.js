@@ -5,18 +5,19 @@ import { createStackNavigator, createBottomTabNavigator } from 'react-navigation
 import TabBarIcon from '../components/TabBarIcon';
 
 import HomeScreen from '../screens/HomeScreen';
-import ProfileScreen from '../screens/ProfileScreen'
+import ProfileScreen from '../screens/ProfileScreen';
+import BusinessScreen from '../screens/BusinessScreen';
 
 const HomeStack = createStackNavigator({
   Home: HomeScreen,
 });
 
 HomeStack.navigationOptions = {
-  tabBarLabel: 'Home',
+  tabBarLabel: 'Actualités',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
-      name="md-home"
+      name="md-paper"
     />
   ),
 };
@@ -26,7 +27,7 @@ const ProfileStack = createStackNavigator({
 });
 
 ProfileStack.navigationOptions = {
-  tabBarLabel: 'Settings',
+  tabBarLabel: 'Paramètres',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -35,8 +36,23 @@ ProfileStack.navigationOptions = {
   ),
 };
 
+const BusinessStack = createStackNavigator({
+  Business: BusinessScreen,
+});
+
+BusinessStack.navigationOptions = {
+  tabBarLabel: 'Affaires',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon
+      focused={focused}
+      name="md-folder-open"
+    />
+  ),
+};
+
 
 export default createBottomTabNavigator({
   HomeStack,
+  BusinessStack,
   ProfileStack
 });

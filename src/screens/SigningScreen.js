@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from 'prop-types';
 import { View, Button, AsyncStorage } from "react-native";
 
 class SignInScreen extends React.Component {
@@ -18,6 +19,10 @@ class SignInScreen extends React.Component {
       </View>
     );
   }
+}
+
+SignInScreen.propTypes = {
+  navigation: PropTypes.object.isRequired
 }
 
 export default SignInScreen;

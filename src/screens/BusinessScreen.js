@@ -4,7 +4,7 @@ import { View, Text } from "react-native";
 import Logout from '../components/Logout';
 import LogoHeader from '../components/LogoHeader'
 
-class ProfileScreen extends React.Component {
+class BusinessScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
       headerTitle: <LogoHeader />,
@@ -15,10 +15,10 @@ class ProfileScreen extends React.Component {
   render() { 
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Text>Profile Screen</Text>
+        <Text>Business Screen</Text>
       </View>
     );
   }
 }
 
-export default ProfileScreen;
+export default BusinessScreen;

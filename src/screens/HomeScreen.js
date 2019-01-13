@@ -1,10 +1,18 @@
 import React from "react";
+import PropTypes from 'prop-types';
 import { View, Text, Button, AsyncStorage} from "react-native";
 
+import Logout from '../components/Logout';
+import LogoHeader from '../components/LogoHeader'
+
 class HomeScreen extends React.Component {
-  static navigationOptions = {
-    title: 'Home'
-  };
+  static navigationOptions = ({ navigation }) => {
+    return {
+      headerTitle: <LogoHeader />,
+      headerRight: <Logout navigation={navigation} />
+    };
+  }
+
 
   signOutAsync = async () => {
     await AsyncStorage.clear();
@@ -19,6 +27,10 @@ class HomeScreen extends React.Component {
       </View>
     );
   }
+}
+
+HomeScreen.propTypes = {
+  navigation: PropTypes.object.isRequired
 }
 
 export default HomeScreen;

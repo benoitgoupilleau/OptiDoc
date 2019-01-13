@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { ActivityIndicator, AsyncStorage, StatusBar, View } from 'react-native';
 
 class AuthLoadingScreen extends React.Component {
@@ -22,6 +23,10 @@ class AuthLoadingScreen extends React.Component {
       </View>
     );
   }
+}
+
+AuthLoadingScreen.propTypes = {
+  navigation: PropTypes.object.isRequired,
 }
 
 export default AuthLoadingScreen;
