@@ -1,21 +1,18 @@
 import React from "react";
 import PropTypes from 'prop-types';
-import { View, Button, AsyncStorage } from "react-native";
+import { View } from "react-native";
+
+import Signin from '../components/Signing';
 
 class SignInScreen extends React.Component {
   static navigationOptions = {
     title: 'Please sign in',
   };
 
-  signInAsync = async () => {
-    await AsyncStorage.setItem('userToken', 'abc');
-    this.props.navigation.navigate('App');
-  };
-
   render() {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Button title="Sign in!" onPress={this.signInAsync} />
+        <Signin navigation={this.props.navigation} />
       </View>
     );
   }
