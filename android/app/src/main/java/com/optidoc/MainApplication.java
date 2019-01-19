@@ -10,6 +10,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import org.pgsqlite.SQLitePluginPackage;
+import com.stonem.mssql.MSSQLPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,6 +29,7 @@ public class MainApplication extends Application implements ReactApplication {
         new MainReactPackage(),
         new RNFtpPackage(),
         new RNGestureHandlerPackage(),
+        new MSSQLPackage(),
         new SQLitePluginPackage()
       );
     }
