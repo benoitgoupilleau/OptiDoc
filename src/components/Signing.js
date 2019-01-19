@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from 'prop-types';
 import styled from 'styled-components'
 import { View, Text, AsyncStorage, TextInput, TouchableOpacity, ToastAndroid } from "react-native";
+import { withNavigation } from 'react-navigation';
 
 const emailRegex = new RegExp(/^[a-zA-Z0-9\.]+@[a-zA-Z0-9]+(\-)?[a-zA-Z0-9]+(\.)?[a-zA-Z0-9]{2,6}?\.[a-zA-Z]{2,6}$/);
 
@@ -82,4 +83,4 @@ Signin.propTypes = {
   navigation: PropTypes.object.isRequired
 }
 
-export default Signin;
+export default withNavigation(Signin);

@@ -12,7 +12,7 @@ class SignInScreen extends React.Component {
   render() {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Signin navigation={this.props.navigation} />
+        <Signin />
       </View>
     );
   }

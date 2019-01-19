@@ -1,6 +1,12 @@
 import React from "react";
 import PropTypes from 'prop-types';
-import { Button, AsyncStorage } from "react-native";
+import styled from 'styled-components';
+import { View, Button, AsyncStorage } from "react-native";
+import { withNavigation } from 'react-navigation';
+
+const Wrapper = styled(View)`
+  margin: 0 20px;
+`;
 
 class Logout extends React.Component {
 
@@ -11,7 +17,9 @@ class Logout extends React.Component {
 
   render() {
     return (
+      <Wrapper>
         <Button title="Déconnexion" onPress={this.signOutAsync} />
+      </Wrapper>
     );
   }
 }
@@ -20,4 +28,4 @@ Logout.propTypes = {
   navigation: PropTypes.object.isRequired
 }
 
-export default Logout;
+export default withNavigation(Logout);

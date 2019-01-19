@@ -2,14 +2,15 @@ import React from "react";
 import { View, Text } from "react-native";
 
 import Logout from '../components/Logout';
-import LogoHeader from '../components/LogoHeader'
+import HeaderTitle from '../components/HeaderTitle'
 
 class BusinessScreen extends React.Component {
-  static navigationOptions = ({ navigation }) => {
-    return {
-      headerTitle: <LogoHeader />,
-      headerRight: <Logout navigation={navigation} />
-    };
+  static navigationOptions = {
+    headerTitle: <HeaderTitle title='hello' />,
+    headerRight: <Logout />,
+    headerStyle: {
+      height: 70
+    }
   }
   
   render() { 

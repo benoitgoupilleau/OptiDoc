@@ -55,4 +55,13 @@ export default createBottomTabNavigator({
   HomeStack,
   BusinessStack,
   ProfileStack
+}, {
+  tabBarOptions: {
+    labelStyle: {
+      fontSize: 20,
+    },
+    style: {
+      height: 70,
+    }
+  }
 });

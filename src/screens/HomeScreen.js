@@ -1,16 +1,18 @@
 import React from "react";
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { View, Text } from "react-native";
 
 import Logout from '../components/Logout';
-import LogoHeader from '../components/LogoHeader'
+import HeaderTitle from '../components/HeaderTitle'
 
 class HomeScreen extends React.Component {
-  static navigationOptions = ({ navigation }) => {
-    return {
-      headerTitle: <LogoHeader />,
-      headerRight: <Logout navigation={navigation} />
-    };
+  static navigationOptions = {
+    headerTitle: <HeaderTitle />,
+    headerRight: <Logout />,
+    headerStyle: {
+      height: 70
+    }
   }
 
   render() {
@@ -26,4 +28,8 @@ HomeScreen.propTypes = {
   navigation: PropTypes.object.isRequired
 }
 
-export default HomeScreen;
+const mapStateToProps = (state) => ({
+  news: state.news.newsList
+})
+
+export default connect(mapStateToProps)(HomeScreen);
