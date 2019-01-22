@@ -19,8 +19,7 @@ const Title = styled(Text)`
 `
 
 
-const HeaderTitle = ({ title, ...rest }) => {
-  console.log({rest});
+const HeaderTitle = ({ title }) => {
   return (
     <Wrapper> 
       <Image
