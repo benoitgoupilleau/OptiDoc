@@ -4,5 +4,6 @@ import { name as appName } from './app.json';
 
 import './src/services/localSql';
 import './src/services/ftp';
+import './src/services/mssql';
 
 AppRegistry.registerComponent(appName, () => App);

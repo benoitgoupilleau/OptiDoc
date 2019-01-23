@@ -1,5 +1,6 @@
 import {
-  LOGOUT
+  LOGOUT,
+  SET_NEWS,
 } from '../actions/types';
 
 const defaultNewsState = {
@@ -8,6 +9,11 @@ const defaultNewsState = {
 
 export default (state = defaultNewsState, action) => {
   switch (action.type) {
+    case SET_NEWS: 
+      return {
+        ...state,
+        newsList: action.news
+      }
     case LOGOUT:
       return { ...defaultNewsState };
     default:
