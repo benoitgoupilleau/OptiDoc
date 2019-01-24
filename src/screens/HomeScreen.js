@@ -1,14 +1,21 @@
 import React from "react";
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 import { connect } from 'react-redux';
-import { ScrollView, View, Text } from "react-native";
+import { ScrollView, Text } from "react-native";
 
 import Logout from '../components/Logout';
 import HeaderTitle from '../components/HeaderTitle'
 import News from '../components/news/News';
+import Main from '../components/Main';
 
 import { getNews } from '../redux/actions/news'
 import { filterNews } from '../redux/selector/news'
+
+const StyledScroll = styled(ScrollView)`
+  background-color: #ededed;
+  padding-bottom: 20px;
+`;
 
 class HomeScreen extends React.Component {
   static navigationOptions = {
@@ -23,24 +30,22 @@ class HomeScreen extends React.Component {
     this.props.getNews();
   }
 
-
-
   render() {
     if (this.props.newsList.length > 0) {
       return (
-        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
-          <ScrollView>
+        <Main>
+          <StyledScroll>
             {this.props.newsList.map(news => (
               <News key={news.ID} title={news.Titre} content={news.Contenu} />
             ))}
-          </ScrollView>
-        </View>
+          </StyledScroll>
+        </Main>
       )
     }
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Main>
         <Text>Home Screen</Text>
-      </View>
+      </Main>
     );
   }
 }

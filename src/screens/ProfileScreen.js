@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { Text } from "react-native";
 
 import Logout from '../components/Logout';
 import HeaderTitle from '../components/HeaderTitle'
+import Main from '../components/Main';
 
 class ProfileScreen extends React.Component {
   static navigationOptions = {
@@ -15,9 +16,9 @@ class ProfileScreen extends React.Component {
   
   render() { 
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Main>
         <Text>Profile Screen</Text>
-      </View>
+      </Main>
     );
   }
 }

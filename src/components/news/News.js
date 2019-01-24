@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { View, Text } from "react-native";
 
 const NewsWrapper = styled(View)`
-  background: #1a1aff;
+  background: #fff;
   border-radius: 5px;
   margin: 20px 20px 0 20px;
   padding: 10px;
@@ -12,14 +12,12 @@ const NewsWrapper = styled(View)`
 `;
 
 const Title = styled(Text)`
-  color: white;
   font-size: 20px;
   font-weight: bold;
   margin: 10px 0;
 `;
 
 const Content = styled(Text)`
-  color: white;
 `;
 
 

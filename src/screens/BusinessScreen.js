@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { Text } from "react-native";
 
 import Logout from '../components/Logout';
 import HeaderTitle from '../components/HeaderTitle'
+import Main from '../components/Main';
 
 class BusinessScreen extends React.Component {
   static navigationOptions = {
@@ -15,9 +16,9 @@ class BusinessScreen extends React.Component {
   
   render() { 
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Main>
         <Text>Business Screen</Text>
-      </View>
+      </Main>
     );
   }
 }
