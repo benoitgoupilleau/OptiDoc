@@ -1,7 +1,8 @@
 import MSSQL, { config } from '../../services/mssql';
 
 import {
-  SET_NEWS
+  SET_NEWS,
+  REFRESH_NEWS
 } from './types';
 
 
@@ -14,4 +15,8 @@ export const getNews = () => dispatch => {
 const setNews = (news) => ({
   type: SET_NEWS,
   news
+})
+
+export const refreshNews = () => ({
+  type: REFRESH_NEWS
 })

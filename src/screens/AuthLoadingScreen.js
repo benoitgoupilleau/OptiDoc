@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ActivityIndicator, AsyncStorage, StatusBar } from 'react-native';
+import { ActivityIndicator, AsyncStorage, StatusBar, View } from 'react-native';
 import Main from '../components/Main';
 
 class AuthLoadingScreen extends React.Component {
@@ -19,8 +19,10 @@ class AuthLoadingScreen extends React.Component {
   render() {
     return (
       <Main>
-        <ActivityIndicator />
-        <StatusBar barStyle="default" />
+        <View>
+          <ActivityIndicator />
+          <StatusBar barStyle="default" />
+        </View>
       </Main>
     );
   }

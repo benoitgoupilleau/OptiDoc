@@ -7,7 +7,9 @@ import { withNavigation } from 'react-navigation';
 const emailRegex = new RegExp(/^[a-zA-Z0-9\.]+@[a-zA-Z0-9]+(\-)?[a-zA-Z0-9]+(\.)?[a-zA-Z0-9]{2,6}?\.[a-zA-Z]{2,6}$/);
 
 const Wrapper = styled(View)`
-  width: 400px;
+  max-width: 400px;
+  width: 80%;
+  min-width: 200px;
 `;
 
 const StyledInput = styled(TextInput)`
