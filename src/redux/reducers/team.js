@@ -1,31 +1,22 @@
 import {
-  LOGOUT,
-  SET_NEWS,
-  REFRESH_NEWS
+  SET_TEAM
 } from '../actions/types';
 
 const defaultState = {
-  newsList: [],
+  teams: [],
   loaded: false,
   refreshing: false
 }
 
 export default (state = defaultState, action) => {
   switch (action.type) {
-    case SET_NEWS: 
+    case SET_TEAM:
       return {
         ...state,
-        newsList: action.news,
+        teams: action.teams,
         loaded: true,
         refreshing: false
       }
-    case REFRESH_NEWS:
-      return {
-        ...state,
-        refreshing: true
-      }
-    case LOGOUT:
-      return { ...defaultState };
     default:
       return state;
   }

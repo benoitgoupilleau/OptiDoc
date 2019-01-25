@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import { ScrollView, Text, RefreshControl } from "react-native";
+import { ScrollView, Text, RefreshControl, ActivityIndicator } from "react-native";
 
 import Logout from '../components/Logout';
 import HeaderTitle from '../components/HeaderTitle'
@@ -50,6 +50,13 @@ class HomeScreen extends React.Component {
   }
 
   render() {
+    if (!this.props.loaded) {
+      return(
+        <Main>
+          <ActivityIndicator/>
+        </Main>
+      )
+    }
     if (this.props.newsList.length > 0) {
       return (
         <Main>
@@ -70,7 +77,7 @@ class HomeScreen extends React.Component {
     }
     return (
       <Main>
-        <Text>Home Screen</Text>
+        <Text>Aucune actualité à afficher</Text>
       </Main>
     );
   }
@@ -81,7 +88,8 @@ HomeScreen.propTypes = {
   newsList: PropTypes.array,
   getNews: PropTypes.func.isRequired,
   refreshing: PropTypes.bool.isRequired,
-  refreshNews: PropTypes.func.isRequired
+  refreshNews: PropTypes.func.isRequired,
+  loaded: PropTypes.bool.isRequired
 }
 
 

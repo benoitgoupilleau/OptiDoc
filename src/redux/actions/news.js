@@ -1,4 +1,4 @@
-import MSSQL, { config } from '../../services/mssql';
+import MSSQL from '../../services/mssql';
 
 import {
   SET_NEWS,
@@ -6,11 +6,9 @@ import {
 } from './types';
 
 
-export const getNews = () => dispatch => {
-    MSSQL.connect(config).then(() => 
-      MSSQL.executeQuery('SELECT * FROM t_Informations').then((res) => dispatch(setNews(res)))
-    )
-  }
+export const getNews = () => dispatch => MSSQL.executeQuery('SELECT * FROM t_Informations')
+  .then((res) => dispatch(setNews(res)))
+  .catch(e => console.log({ getNews: e }))
   
 const setNews = (news) => ({
   type: SET_NEWS,
