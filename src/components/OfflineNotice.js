@@ -1,6 +1,11 @@
 import React, { PureComponent } from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { View, Text, NetInfo, Dimensions } from 'react-native';
+
+import { connectivityChange } from '../redux/actions/offline'
+
 const { width } = Dimensions.get('window');
 
 const Wrapper = styled(View)`
@@ -17,13 +22,6 @@ const Message = styled(Text)`
 `;
 
 class OfflineNotice extends PureComponent {
-  constructor(props){
-    super(props);
-    this.state = {
-      isConnected: true
-    }
-  }
-
   componentDidMount() {
     NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
   }
@@ -32,10 +30,10 @@ class OfflineNotice extends PureComponent {
     NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
   }
 
-  handleConnectivityChange = isConnected => this.setState({ isConnected });
+  handleConnectivityChange = isConnected => this.props.connectivityChange(isConnected);
 
   render() {
-    if (!this.state.isConnected) {
+    if (!this.props.isConnected) {
       return (
         <Wrapper>
           <Message>Vous êtes hors ligne</Message>
@@ -46,5 +44,14 @@ class OfflineNotice extends PureComponent {
   }
 }
 
+const mapStateToProps = state => ({
+  isConnected: state.network.isConnected
+})
 
-export default OfflineNotice;
+OfflineNotice.propTypes = {
+  isConnected: PropTypes.bool.isRequired,
+  connectivityChange: PropTypes.func.isRequired
+}
+
+
+export default connect(mapStateToProps, { connectivityChange })(OfflineNotice);

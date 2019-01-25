@@ -86,7 +86,7 @@ HomeScreen.propTypes = {
 
 
 const mapStateToProps = (state) => ({
-  newsList: filterNews(state.news.newsList),
+  newsList: filterNews([...state.news.newsList]),
   loaded: state.news.loaded,
   refreshing: state.news.refreshing
 })
