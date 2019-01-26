@@ -6,6 +6,7 @@ import AppNavigator from './src/navigation/AppNavigator'
 
 import { store, persistor } from './src/redux/store/store';
 import { connectDb } from './src/services/mssql';
+import { connectFtp } from './src/services/ftp'
 
 export default class App extends React.Component {
   constructor(props) {
@@ -13,7 +14,10 @@ export default class App extends React.Component {
     this.initDb()
   }
 
-  initDb = async () => await connectDb()
+  initDb = async () => {
+    await connectDb();
+    await connectFtp();
+  }
 
   render() {
     return (

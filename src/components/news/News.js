@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { View, Text } from "react-native";
+import { View, Text } from 'react-native';
 
 const NewsWrapper = styled(View)`
   background: #fff;

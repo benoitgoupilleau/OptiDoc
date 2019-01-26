@@ -18,3 +18,11 @@ export const SET_TEAM_RIGHTS = 'SET_TEAM_RIGHTS';
 
 // Business actions
 export const SET_DOCS = 'SET_DOCS';
+export const SET_DOE = 'SET_DOE';
+export const SET_DOE_CHAP = 'SET_DOE_CHAP';
+export const SET_DOE_DOC = 'SET_DOE_DOC';
+export const SET_MODELES = 'SET_MODELES';
+export const SET_PROTO_DMOS = 'SET_PROTO_DMOS';
+export const SET_QMOS = 'SET_QMOS';
+export const SET_QUALIF = 'SET_QUALIF';
+export const SET_SOUD = 'SET_SOUD';

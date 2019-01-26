@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components'
-import { View, Text, TextInput, TouchableOpacity, ToastAndroid } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ToastAndroid } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
 import { login } from '../redux/actions/user'

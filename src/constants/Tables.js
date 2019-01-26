@@ -9,6 +9,6 @@ export default {
   t_modeles: 't_Modeles',
   t_protoDMOS: 't_ProtoDMOS',
   t_qmos: 't_QMOS',
-  t_qualif: 't_Qualifications',
+  t_qualif: 't_Qualif',
   t_soud: 't_Soudures'
 }

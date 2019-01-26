@@ -1,5 +1,5 @@
-import React from "react";
-import { Text } from "react-native";
+import React from 'react';
+import { Text } from 'react-native';
 
 import Logout from '../components/Logout';
 import HeaderTitle from '../components/HeaderTitle'
