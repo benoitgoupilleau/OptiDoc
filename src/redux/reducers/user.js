@@ -6,7 +6,7 @@ import {
 
 const defaultState = {
   id: undefined,
-  bearerToken: undefined,
+  bearerToken: '',
   email: ''
 }
 

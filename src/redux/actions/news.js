@@ -1,4 +1,5 @@
 import MSSQL from '../../services/mssql';
+import Tables from '../../constants/Tables';
 
 import {
   SET_NEWS,
@@ -6,7 +7,7 @@ import {
 } from './types';
 
 
-export const getNews = () => dispatch => MSSQL.executeQuery('SELECT * FROM t_Informations')
+export const getNews = () => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_news}`)
   .then((res) => dispatch(setNews(res)))
   .catch(e => console.log({ getNews: e }))
   

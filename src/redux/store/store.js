@@ -10,6 +10,7 @@ import newsReducer from '../reducers/news';
 import offlineReducer from '../reducers/offline'
 import teamReducer from '../reducers/team';
 import userReducer from '../reducers/user';
+import businessReducer from '../reducers/business';
 
 const composeEnhancers = ENV && ENV === 'dev' ? (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose) : compose;
 
@@ -31,7 +32,8 @@ const rootReducer = combineReducers({
   news: newsReducer,
   network: offlineReducer,
   teams: teamReducer,
-  user: userReducer
+  user: userReducer,
+  business: businessReducer
 });
 
 const pReducer = persistReducer(persistConfig, rootReducer);

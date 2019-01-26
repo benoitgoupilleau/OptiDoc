@@ -10,6 +10,7 @@ import News from '../components/news/News';
 import Main from '../components/Main';
 
 import { getNews, refreshNews } from '../redux/actions/news'
+import { getDocs } from '../redux/actions/business'
 import { filterNews } from '../redux/selector/news'
 
 const StyledScroll = styled(ScrollView)`
@@ -35,6 +36,7 @@ class HomeScreen extends React.Component {
 
   componentDidMount() {
     this.props.getNews();
+    this.props.getDocs();
   }
 
   componentDidUpdate(prevProps) {
@@ -99,4 +101,4 @@ const mapStateToProps = (state) => ({
   refreshing: state.news.refreshing
 })
 
-export default connect(mapStateToProps, { getNews, refreshNews })(HomeScreen);
+export default connect(mapStateToProps, { getNews, refreshNews, getDocs })(HomeScreen);

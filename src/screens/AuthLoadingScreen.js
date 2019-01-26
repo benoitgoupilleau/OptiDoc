@@ -11,7 +11,7 @@ class AuthLoadingScreen extends React.Component {
 
   componentDidMount(){
     const userToken = this.props.token
-    this.props.navigation.navigate(userToken ? 'App' : 'Auth');
+    this.props.navigation.navigate(userToken !== '' ? 'App' : 'Auth');
   }
 
   

@@ -15,6 +15,13 @@ const Wrapper = styled(View)`
   min-width: 200px;
 `;
 
+const Title = styled(Text)`
+  color: blue;
+  font-size: 32px;
+  margin-bottom: 30px;
+  text-align: center;
+`;
+
 const StyledInput = styled(TextInput)`
   border-color: gray;
   border-width: 1px;
@@ -60,6 +67,7 @@ class Signin extends React.Component {
   render() {
     return (
       <Wrapper>
+        <Title>OptiDoc</Title>
         <StyledInput 
           allowFontScaling
           keyboardType="email-address"
