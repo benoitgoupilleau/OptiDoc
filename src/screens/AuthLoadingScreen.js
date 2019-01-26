@@ -1,21 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ActivityIndicator, AsyncStorage } from 'react-native';
+import { connect } from 'react-redux';
+import { ActivityIndicator } from 'react-native';
 import Main from '../components/Main';
 
 class AuthLoadingScreen extends React.Component {
   constructor(props) {
     super(props);
-    this.bootstrapAsync();
   }
 
-  // Fetch the token from storage then navigate to our appropriate place
-  bootstrapAsync = async () => {
-    const userToken = await AsyncStorage.getItem('userToken');
+  componentDidMount(){
+    const userToken = this.props.token
     this.props.navigation.navigate(userToken ? 'App' : 'Auth');
-  };
+  }
 
-  // Render any loading content that you like here
+  
   render() {
     return (
       <Main>
@@ -27,6 +26,11 @@ class AuthLoadingScreen extends React.Component {
 
 AuthLoadingScreen.propTypes = {
   navigation: PropTypes.object.isRequired,
+  token: PropTypes.string.isRequired
 }
 
-export default AuthLoadingScreen;
+const mapStateToProps = state => ({
+  token: state.user.bearerToken
+})
+
+export default connect(mapStateToProps)(AuthLoadingScreen);

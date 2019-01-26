@@ -3,7 +3,8 @@ import Tables from '../../constants/Tables';
 
 import {
   SET_TEAM,
-  REFRESH_TEAM
+  REFRESH_TEAM,
+  SET_TEAM_RIGHTS
 } from './types';
 
 
@@ -18,4 +19,14 @@ const setTeam = (teams) => ({
 
 export const refreshTeam = () => ({
   type: REFRESH_TEAM
+})
+
+
+export const getTeamRight = () => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_teamRights}`)
+  .then((res) => dispatch(setTeamRight(res)))
+  .catch(e => console.log({ getTeamRight: e }))
+
+const setTeamRight = (teamRights) => ({
+  type: SET_TEAM_RIGHTS,
+  teamRights
 })

@@ -1,11 +1,11 @@
 import {
-  SET_TEAM
+  SET_TEAM,
+  SET_TEAM_RIGHTS
 } from '../actions/types';
 
 const defaultState = {
   teams: [],
-  loaded: false,
-  refreshing: false
+  teamRights: [],
 }
 
 export default (state = defaultState, action) => {
@@ -14,8 +14,11 @@ export default (state = defaultState, action) => {
       return {
         ...state,
         teams: action.teams,
-        loaded: true,
-        refreshing: false
+      }
+    case SET_TEAM_RIGHTS:
+      return {
+        ...state,
+        teamRights: action.teamRights
       }
     default:
       return state;

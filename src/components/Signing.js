@@ -1,8 +1,11 @@
 import React from "react";
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import styled from 'styled-components'
-import { View, Text, AsyncStorage, TextInput, TouchableOpacity, ToastAndroid } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ToastAndroid } from "react-native";
 import { withNavigation } from 'react-navigation';
+
+import { login } from '../redux/actions/user'
 
 const emailRegex = new RegExp(/^[a-zA-Z0-9\.]+@[a-zA-Z0-9]+(\-)?[a-zA-Z0-9]+(\.)?[a-zA-Z0-9]{2,6}?\.[a-zA-Z]{2,6}$/);
 
@@ -36,13 +39,12 @@ class Signin extends React.Component {
       email: '',
       password: ''
     }
-    this.getLastUser()
   }
 
-  getLastUser = async () => {
-  const email = await AsyncStorage.getItem('lastUserEmail');
+  componentDidMount(){
+    const email = this.props.email;
     this.setState({ email })
-}
+  }
 
   signInAsync = async () => {
     if (!emailRegex.test(this.state.email)) {
@@ -50,8 +52,7 @@ class Signin extends React.Component {
     } else if (this.state.password === '') {
       return ToastAndroid.showWithGravity('Merci de saisir votre mot de passe', ToastAndroid.SHORT, ToastAndroid.CENTER)
     } else {
-      await AsyncStorage.setItem('lastUserEmail', this.state.email);
-      await AsyncStorage.setItem('userToken', 'abc');
+      this.props.login(this.state.email, 'EQU_20181102195830422', 'abc')
       this.props.navigation.navigate('App');
     }
   };
@@ -82,7 +83,13 @@ class Signin extends React.Component {
 }
 
 Signin.propTypes = {
-  navigation: PropTypes.object.isRequired
+  navigation: PropTypes.object.isRequired,
+  login: PropTypes.func.isRequired,
+  email: PropTypes.string.isRequired
 }
 
-export default withNavigation(Signin);
+const mapStateToProps = state => ({
+  email: state.user.email
+})
+
+export default withNavigation(connect(mapStateToProps, { login })(Signin));

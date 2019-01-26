@@ -9,6 +9,7 @@ import createEncryptor from 'redux-persist-transform-encrypt';
 import newsReducer from '../reducers/news';
 import offlineReducer from '../reducers/offline'
 import teamReducer from '../reducers/team';
+import userReducer from '../reducers/user';
 
 const composeEnhancers = ENV && ENV === 'dev' ? (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose) : compose;
 
@@ -29,7 +30,8 @@ const persistConfig = {
 const rootReducer = combineReducers({
   news: newsReducer,
   network: offlineReducer,
-  teams: teamReducer
+  teams: teamReducer,
+  user: userReducer
 });
 
 const pReducer = persistReducer(persistConfig, rootReducer);
