@@ -7,7 +7,7 @@ import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import createEncryptor from 'redux-persist-transform-encrypt';
 
 import newsReducer from '../reducers/news';
-import offlineReducer from '../reducers/offline'
+import networkReducer from '../reducers/network'
 import teamReducer from '../reducers/team';
 import userReducer from '../reducers/user';
 import businessReducer from '../reducers/business';
@@ -30,7 +30,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   news: newsReducer,
-  network: offlineReducer,
+  network: networkReducer,
   teams: teamReducer,
   user: userReducer,
   business: businessReducer

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import { ScrollView, Text, RefreshControl, ActivityIndicator } from 'react-native';
+import { ScrollView, Text, RefreshControl, ActivityIndicator, Dimensions } from 'react-native';
 
 import Logout from '../components/Logout';
 import HeaderTitle from '../components/HeaderTitle'
@@ -13,9 +13,14 @@ import { getNews, refreshNews } from '../redux/actions/news'
 import { getDocs, getDoe, getDoeChapt, getDoeDoc, getModeles, getProtoDMOS, getQMOS, getQualif, getSoud } from '../redux/actions/business'
 import { filterNews } from '../redux/selector/news'
 
+import Layout from '../constants/Layout';
+
+const { width } = Dimensions.get('window');
+
 const StyledScroll = styled(ScrollView)`
   background-color: #ededed;
-  padding-bottom: 20px;
+  padding-bottom: ${Layout.space.large};
+  width: ${width};
 `;
 
 class HomeScreen extends React.Component {
@@ -37,14 +42,14 @@ class HomeScreen extends React.Component {
   componentDidMount() {
     this.props.getNews();
     this.props.getDocs();
-    this.props.getDoe()
-    this.props.getDoeChapt()
-    this.props.getDoeDoc()
-    this.props.getModeles()
-    this.props.getProtoDMOS()
-    this.props.getQMOS()
-    this.props.getQualif()
-    this.props.getSoud()
+    // this.props.getDoe()
+    // this.props.getDoeChapt()
+    // this.props.getDoeDoc()
+    // this.props.getModeles()
+    // this.props.getProtoDMOS()
+    // this.props.getQMOS()
+    // this.props.getQualif()
+    // this.props.getSoud()
   }
 
   componentDidUpdate(prevProps) {

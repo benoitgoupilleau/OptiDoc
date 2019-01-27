@@ -4,12 +4,13 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { View, Text, NetInfo, Dimensions } from 'react-native';
 
-import { connectivityChange } from '../redux/actions/offline'
+import { connectivityChange } from '../redux/actions/network'
+import Colors from '../constants/Colors';
 
 const { width } = Dimensions.get('window');
 
 const Wrapper = styled(View)`
-  background-color: #b52424;
+  background-color: ${Colors.errorBackground};
   height: 30px;
   justify-content: center;
   align-items: center;
@@ -18,7 +19,7 @@ const Wrapper = styled(View)`
 `;
 
 const Message = styled(Text)`
-  color: #fff;
+  color: ${Colors.errorText};
 `;
 
 class OfflineNotice extends PureComponent {

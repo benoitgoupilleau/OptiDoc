@@ -4,7 +4,8 @@ import {
 } from '../actions/types';
 
 const defaultState = {
-  isConnected: true
+  isConnected: true,
+  mssqlConnected: false,
 }
 
 export default (state = defaultState, action) => {

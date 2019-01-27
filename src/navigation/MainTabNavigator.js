@@ -2,6 +2,7 @@ import React from 'react';
 
 import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
 
+import TabBarLabel from '../components/TabBarLabel'
 import TabBarIcon from '../components/TabBarIcon';
 
 import HomeScreen from '../screens/HomeScreen';
@@ -13,7 +14,12 @@ const HomeStack = createStackNavigator({
 });
 
 HomeStack.navigationOptions = {
-  tabBarLabel: 'Actualités',
+  tabBarLabel: ({ focused }) => (
+    <TabBarLabel
+      focused={focused}
+      title="Actualités"
+    />
+  ),
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -27,7 +33,12 @@ const ProfileStack = createStackNavigator({
 });
 
 ProfileStack.navigationOptions = {
-  tabBarLabel: 'Paramètres',
+  tabBarLabel: ({ focused }) => (
+    <TabBarLabel
+      focused={focused}
+      title="Paramètres"
+    />
+  ),
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -41,7 +52,12 @@ const BusinessStack = createStackNavigator({
 });
 
 BusinessStack.navigationOptions = {
-  tabBarLabel: 'Affaires',
+  tabBarLabel: ({ focused }) => (
+    <TabBarLabel
+      focused={focused}
+      title="Affaires"
+    />
+  ),
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -54,12 +70,9 @@ BusinessStack.navigationOptions = {
 export default createBottomTabNavigator({
   HomeStack,
   BusinessStack,
-  ProfileStack
+  // ProfileStack
 }, {
   tabBarOptions: {
-    labelStyle: {
-      fontSize: 20,
-    },
     style: {
       height: 70,
     }

@@ -8,7 +8,7 @@ import { store, persistor } from './src/redux/store/store';
 import { connectDb } from './src/services/mssql';
 import { connectFtp } from './src/services/ftp'
 
-export default class App extends React.Component {
+class App extends React.Component {
   constructor(props) {
     super(props);
     this.initDb()
@@ -29,3 +29,5 @@ export default class App extends React.Component {
     )
   }
 }
+
+export default App;

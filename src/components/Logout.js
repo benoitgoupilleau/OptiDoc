@@ -5,10 +5,13 @@ import styled from 'styled-components';
 import { View, Button, AsyncStorage } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
+import Colors from '../constants/Colors';
+import Layout from '../constants/Layout'
+
 import { logout } from '../redux/actions/user';
 
 const Wrapper = styled(View)`
-  margin: 0 20px;
+  margin: 0 ${Layout.space.large};
 `;
 
 class Logout extends React.Component {
@@ -22,7 +25,7 @@ class Logout extends React.Component {
   render() {
     return (
       <Wrapper>
-        <Button title="Déconnexion" onPress={this.signOutAsync} />
+        <Button color={Colors.mainColor} title="Déconnexion" onPress={this.signOutAsync} />
       </Wrapper>
     );
   }

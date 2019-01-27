@@ -7,7 +7,8 @@ import {
   SET_PROTO_DMOS,
   SET_QMOS,
   SET_QUALIF,
-  SET_SOUD
+  SET_SOUD,
+  LOGOUT
 } from '../actions/types';
 
 const defaultState = {
@@ -68,6 +69,10 @@ export default (state = defaultState, action) => {
       return {
         ...state,
         soud: action.soud,
+      }
+    case LOGOUT:
+      return {
+        ...defaultState
       }
     default:
       return state;

@@ -5,16 +5,19 @@ import styled from 'styled-components';
 import { View, Text, Image } from 'react-native';
 
 import logo from '../assets/images/logo.png';
+import Colors from '../constants/Colors'
+import Layout from '../constants/Layout'
 
 const Wrapper = styled(View)`
   align-items: center;
   display: flex;
   flex-direction: row;
-  margin: 0 20px;
+  margin: 0 ${Layout.space.large};
 `;
 
 const Title = styled(Text)`
-  font-size: 20px;
+  color: ${Colors.mainColor};
+  font-size: ${Layout.font.medium};
   max-width: 400px;
 `
 

@@ -5,6 +5,9 @@ import styled from 'styled-components'
 import { View, Text, TextInput, TouchableOpacity, ToastAndroid } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
+import Colors from '../constants/Colors'
+import Layout from '../constants/Layout'
+
 import { login } from '../redux/actions/user'
 
 const emailRegex = new RegExp(/^[a-zA-Z0-9\.]+@[a-zA-Z0-9]+(\-)?[a-zA-Z0-9]+(\.)?[a-zA-Z0-9]{2,6}?\.[a-zA-Z]{2,6}$/);
@@ -16,28 +19,32 @@ const Wrapper = styled(View)`
 `;
 
 const Title = styled(Text)`
-  color: blue;
-  font-size: 32px;
-  margin-bottom: 30px;
+  color: ${Colors.mainColor};
+  font-size: ${Layout.font.xlarge};
+  margin-bottom: ${Layout.space.xlarge};
   text-align: center;
 `;
 
 const StyledInput = styled(TextInput)`
   border-color: gray;
   border-width: 1px;
-  font-size: 20px;
+  font-size: ${Layout.font.medium};
   height: 60px;
-  margin-bottom: 20px;
+  margin-bottom: ${Layout.space.large};
 `;
 
 const StyledButton = styled(TouchableOpacity)`
   align-items: center;
-  background-color: #DDDDDD;
+  background-color: ${Colors.mainColor};
   height: 60px;
   text-align: center;
-  padding: 10px;
+  padding: ${Layout.space.medium};
 `;
 
+const StyledText = styled(Text)`
+  color: white;
+  font-size: ${Layout.font.medium};
+`;
 
 class Signin extends React.Component {
   constructor(props) {
@@ -83,7 +90,7 @@ class Signin extends React.Component {
           value={this.state.password}
         />
         <StyledButton onPress={this.signInAsync}>
-          <Text style={{ fontSize: 20 }}>Connexion</Text>
+          <StyledText>Connexion</StyledText>
         </StyledButton>
       </Wrapper>
     );

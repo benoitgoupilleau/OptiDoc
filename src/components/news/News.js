@@ -3,21 +3,26 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { View, Text } from 'react-native';
 
+import Colors from '../../constants/Colors';
+import Layout from '../../constants/Layout';
+
 const NewsWrapper = styled(View)`
-  background: #fff;
+  background: ${Colors.antiBackground};
   border-radius: 5px;
-  margin: 20px 20px 0 20px;
-  padding: 10px;
+  margin: ${Layout.space.large} ${Layout.space.large} 0 ${Layout.space.large};
+  padding: ${Layout.space.medium};
   text-align: left;
 `;
 
 const Title = styled(Text)`
-  font-size: 20px;
+  color: ${Colors.secondColor};
+  font-size: ${Layout.font.medium};
   font-weight: bold;
-  margin: 10px 0;
+  margin: ${Layout.space.medium} 0;
 `;
 
 const Content = styled(Text)`
+  color: ${Colors.thirdColor};
 `;
 
 
