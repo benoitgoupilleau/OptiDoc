@@ -4,13 +4,13 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { View, Text, NetInfo, Dimensions } from 'react-native';
 
-import { connectivityChange } from '../redux/actions/network'
+import { connectivityChange, connectDb } from '../redux/actions/network'
 import Colors from '../constants/Colors';
 
 const { width } = Dimensions.get('window');
 
 const Wrapper = styled(View)`
-  background-color: ${Colors.errorBackground};
+  background-color: ${props => props.error ? Colors.errorBackground : Colors.warningBackground};
   height: 30px;
   justify-content: center;
   align-items: center;
@@ -19,40 +19,65 @@ const Wrapper = styled(View)`
 `;
 
 const Message = styled(Text)`
-  color: ${Colors.errorText};
+  color: ${props => props.error ? Colors.errorText : Colors.warningText};
 `;
 
 class OfflineNotice extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.interval = undefined;
+  }
+
   componentDidMount() {
     NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
   }
 
   componentWillUnmount() {
     NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
+    clearInterval(this.interval)
   }
 
-  handleConnectivityChange = isConnected => this.props.connectivityChange(isConnected);
+  handleConnectivityChange = isConnected => {
+    this.props.connectivityChange(isConnected);
+    if (isConnected) {
+      this.props.connectDb();
+    }
+  }
 
   render() {
     if (!this.props.isConnected) {
+      clearInterval(this.interval);
+      return (
+        <Wrapper error>
+          <Message error>Vous êtes hors ligne</Message>
+        </Wrapper>
+      );
+    } else if (this.props.mssqlFailed) {
+      this.interval = setInterval(() => {
+        this.props.connectDb();
+      }, 2000);
       return (
         <Wrapper>
-          <Message>Vous êtes hors ligne</Message>
+          <Message>Connexion impossible à la base de données</Message>
         </Wrapper>
       );
     }
+    clearInterval(this.interval)
     return null;
   }
 }
 
 const mapStateToProps = state => ({
-  isConnected: state.network.isConnected
+  isConnected: state.network.isConnected,
+  mssqlFailed: state.network.mssqlConnectionFailed,
 })
 
 OfflineNotice.propTypes = {
   isConnected: PropTypes.bool.isRequired,
-  connectivityChange: PropTypes.func.isRequired
+  mssqlFailed: PropTypes.bool.isRequired,
+  connectivityChange: PropTypes.func.isRequired,
+  connectDb: PropTypes.func.isRequired
 }
 
 
-export default connect(mapStateToProps, { connectivityChange })(OfflineNotice);
+export default connect(mapStateToProps, { connectivityChange, connectDb })(OfflineNotice);

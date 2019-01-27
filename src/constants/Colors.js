@@ -14,6 +14,8 @@ export default {
   tabBar: '#fefefe',
   errorBackground: 'red',
   errorText: 'white',
+  warningBackground: '#ffba00',
+  warningText: 'white',
   noticeBackground: mainColor,
   noticeText: 'white',
 };

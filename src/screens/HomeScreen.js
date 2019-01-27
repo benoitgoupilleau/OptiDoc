@@ -10,7 +10,8 @@ import News from '../components/news/News';
 import Main from '../components/Main';
 
 import { getNews, refreshNews } from '../redux/actions/news'
-import { getDocs, getDoe, getDoeChapt, getDoeDoc, getModeles, getProtoDMOS, getQMOS, getQualif, getSoud } from '../redux/actions/business'
+import { getDocs } from '../redux/actions/business'
+import { getTeam, getTeamRight } from '../redux/actions/team'
 import { filterNews } from '../redux/selector/news'
 
 import Layout from '../constants/Layout';
@@ -40,16 +41,16 @@ class HomeScreen extends React.Component {
   }
 
   componentDidMount() {
-    this.props.getNews();
-    this.props.getDocs();
-    // this.props.getDoe()
-    // this.props.getDoeChapt()
-    // this.props.getDoeDoc()
-    // this.props.getModeles()
-    // this.props.getProtoDMOS()
-    // this.props.getQMOS()
-    // this.props.getQualif()
-    // this.props.getSoud()
+    if (this.props.mssqlConnected){
+      this.props.getNews();
+      this.props.getDocs();
+      if (!this.props.teamLoaded) {
+        this.props.getTeam();
+      }
+      if (!this.props.teamRightsLoaded) {
+        this.props.getTeamRight();
+      }
+    } 
   }
 
   componentDidUpdate(prevProps) {
@@ -102,16 +103,25 @@ HomeScreen.propTypes = {
   navigation: PropTypes.object.isRequired,
   newsList: PropTypes.array,
   getNews: PropTypes.func.isRequired,
+  getDocs: PropTypes.func.isRequired,
+  getTeam: PropTypes.func.isRequired,
+  getTeamRight: PropTypes.func.isRequired,
   refreshing: PropTypes.bool.isRequired,
   refreshNews: PropTypes.func.isRequired,
-  loaded: PropTypes.bool.isRequired
+  loaded: PropTypes.bool.isRequired,
+  mssqlConnected: PropTypes.bool.isRequired,
+  teamLoaded: PropTypes.bool.isRequired,
+  teamRightsLoaded: PropTypes.bool.isRequired,
 }
 
 
 const mapStateToProps = (state) => ({
   newsList: filterNews([...state.news.newsList]),
   loaded: state.news.loaded,
-  refreshing: state.news.refreshing
+  refreshing: state.news.refreshing,
+  mssqlConnected: state.network.mssqlConnected,
+  teamLoaded: state.teams.teamLoaded,
+  teamRightsLoaded: state.teams.teamRightsLoaded,
 })
 
-export default connect(mapStateToProps, { getNews, refreshNews, getDocs, getDoe, getDoeChapt, getDoeDoc, getModeles, getProtoDMOS, getQMOS, getQualif, getSoud })(HomeScreen);
+export default connect(mapStateToProps, { getNews, refreshNews, getDocs, getTeam, getTeamRight })(HomeScreen);

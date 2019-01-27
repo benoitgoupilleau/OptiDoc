@@ -9,6 +9,8 @@ export const REFRESH_NEWS = 'REFRESH_NEWS';
 
 // Network actions
 export const UPDATE_NET_STATUS = 'UPDATE_NET_STATUS';
+export const MSSQL_CONNECTED = 'MSSQL_CONNECTED'
+export const MSSQL_FAILED = 'MSSQL_FAILED'
 
 // Team actions
 export const SET_TEAM = 'SET_TEAM';

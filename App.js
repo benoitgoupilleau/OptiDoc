@@ -5,7 +5,6 @@ import { PersistGate } from 'redux-persist/lib/integration/react';
 import AppNavigator from './src/navigation/AppNavigator'
 
 import { store, persistor } from './src/redux/store/store';
-import { connectDb } from './src/services/mssql';
 import { connectFtp } from './src/services/ftp'
 
 class App extends React.Component {
@@ -15,7 +14,6 @@ class App extends React.Component {
   }
 
   initDb = async () => {
-    await connectDb();
     await connectFtp();
   }
 

@@ -1,7 +1,6 @@
 import {
   SET_TEAM,
-  SET_TEAM_RIGHTS,
-  LOGOUT
+  SET_TEAM_RIGHTS
 } from '../actions/types';
 
 const defaultState = {
@@ -24,10 +23,6 @@ export default (state = defaultState, action) => {
         ...state,
         teamRights: action.teamRights,
         teamRightsLoaded: true
-      }
-    case LOGOUT:
-      return {
-        ...defaultState
       }
     default:
       return state;
