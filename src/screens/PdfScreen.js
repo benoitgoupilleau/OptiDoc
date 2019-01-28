@@ -1,10 +1,9 @@
-/* global require */
 import React from 'react';
 import RNFS from 'react-native-fs';
 import { connect } from 'react-redux';
 import Pdf from 'react-native-pdf';
 import PropTypes from 'prop-types';
-import { Dimensions, Text } from 'react-native';
+import { Dimensions, Text, ActivityIndicator } from 'react-native';
 
 import Logout from '../components/Logout';
 import HeaderTitle from '../components/HeaderTitle'
@@ -31,10 +30,10 @@ class PdfScreen extends React.Component {
       `${rootDir}/${this.props.userId}/${Dossier1}/${type}/${ID}.${Extension}`;
     if (filePath !== '') {
       const source = { uri: filePath};
-      console.log({source})
       return (
         <Main>
           <Pdf
+            activityIndicator={<ActivityIndicator />}
             source={source}
             style={{
               flex: 1,
