@@ -5,6 +5,8 @@ import styled from 'styled-components'
 import { View, Text, TextInput, TouchableOpacity, ToastAndroid } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
+import Logout from './Logout';
+
 import Colors from '../constants/Colors'
 import Layout from '../constants/Layout'
 
@@ -93,6 +95,7 @@ class Signin extends React.Component {
         <StyledButton onPress={this.signInAsync}>
           <StyledText>Connexion</StyledText>
         </StyledButton>
+        {this.props.locked && <Logout title="Forcer la déconnexion" />}
       </Wrapper>
     );
   }

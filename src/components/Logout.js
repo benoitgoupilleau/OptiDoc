@@ -11,7 +11,7 @@ import Layout from '../constants/Layout'
 import { logout } from '../redux/actions/user';
 
 const Wrapper = styled(View)`
-  margin: 0 ${Layout.space.large};
+  margin: ${Layout.space.large};
 `;
 
 class Logout extends React.Component {
@@ -39,16 +39,21 @@ class Logout extends React.Component {
   render() {
     return (
       <Wrapper>
-        <Button color={Colors.mainColor} title="Déconnexion" onPress={this.signOut} />
+        <Button color={Colors.mainColor} title={this.props.title} onPress={this.signOut} />
       </Wrapper>
     );
   }
 }
 
 Logout.propTypes = {
+  title: PropTypes.string,
   navigation: PropTypes.object.isRequired,
   logout: PropTypes.func.isRequired,
   hasEditFiles: PropTypes.bool.isRequired
+}
+
+Logout.defaultProps = {
+  title: 'Déconnexion'
 }
 
 const mapStateToProps = state => ({

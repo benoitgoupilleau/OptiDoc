@@ -10,7 +10,10 @@ import {
 } from './types';
 
 export const connectDb = () => dispatch => MSSQL.connect(config)
-  .then(() => dispatch(dbSuccess()))
+  .then(() => {
+    dispatch(dbSuccess())
+    dispatch(connectFtp())
+  })
   .catch(e => {
     console.log({ connectDb: e })
     return dispatch(dbFailed())

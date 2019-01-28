@@ -19,13 +19,12 @@ const  AuthLoadingScreen = (props) => {
     connectFtp,
     navigation
   } = props
-
-  if (!ftpConnected && !ftpConnectionFailed) {
-    connectFtp();
-  }
   if (!mssqlConnected && !mssqlConnectionFailed) {
     connectDb();
   } else {
+    if (!ftpConnected && !ftpConnectionFailed) {
+      connectFtp();
+    }
     if (teamLoaded && teamRightsLoaded) {
       navigation.navigate(token !== '' ? 'App' : 'Auth');
     } else {

@@ -43,7 +43,6 @@ class OfflineNotice extends PureComponent {
     this.props.connectivityChange(isConnected);
     if (isConnected) {
       this.props.connectDb();
-      this.props.connectFtp();
     }
   }
 
