@@ -5,27 +5,13 @@ import { PersistGate } from 'redux-persist/lib/integration/react';
 import AppNavigator from './src/navigation/AppNavigator'
 
 import { store, persistor } from './src/redux/store/store';
-import { connectFtp } from './src/services/ftp'
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.initDb()
-  }
-
-  initDb = async () => {
-    await connectFtp();
-  }
-
-  render() {
-    return (
-      <Provider store={store} >
-        <PersistGate loading={<ActivityIndicator />}persistor={persistor}>
-          <AppNavigator />
-        </PersistGate>
-      </Provider>
-    )
-  }
-}
+const App = () => (
+  <Provider store={store} >
+    <PersistGate loading={<ActivityIndicator />} persistor={persistor}>
+      <AppNavigator />
+    </PersistGate>
+  </Provider>
+);
 
 export default App;

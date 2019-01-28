@@ -20,7 +20,7 @@ class PdfScreen extends React.Component {
   render() {
     const filePath = this.props.navigation.getParam('filePath', '')
     if (filePath !== '') {
-      const source = require(filePath);
+      const source = { uri: filePath};
       console.log({source})
       return (
         <Main>

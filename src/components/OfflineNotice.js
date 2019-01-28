@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { View, Text, NetInfo, Dimensions } from 'react-native';
 
-import { connectivityChange, connectDb } from '../redux/actions/network'
+import { connectivityChange, connectDb, connectFtp } from '../redux/actions/network'
 import Colors from '../constants/Colors';
 
 const { width } = Dimensions.get('window');
@@ -25,7 +25,8 @@ const Message = styled(Text)`
 class OfflineNotice extends PureComponent {
   constructor(props) {
     super(props);
-    this.interval = undefined;
+    this.dbInterval = undefined;
+    this.ftpInterval = undefined
   }
 
   componentDidMount() {
@@ -34,26 +35,29 @@ class OfflineNotice extends PureComponent {
 
   componentWillUnmount() {
     NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
-    clearInterval(this.interval)
+    clearInterval(this.dbInterval);
+    clearInterval(this.ftpInterval);
   }
 
   handleConnectivityChange = isConnected => {
     this.props.connectivityChange(isConnected);
     if (isConnected) {
       this.props.connectDb();
+      this.props.connectFtp();
     }
   }
 
   render() {
     if (!this.props.isConnected) {
-      clearInterval(this.interval);
+      clearInterval(this.dbInterval);
+      clearInterval(this.ftpInterval);
       return (
         <Wrapper error>
           <Message error>Vous êtes hors ligne</Message>
         </Wrapper>
       );
     } else if (this.props.mssqlFailed) {
-      this.interval = setInterval(() => {
+      this.dbInterval = setInterval(() => {
         this.props.connectDb();
       }, 2000);
       return (
@@ -61,8 +65,18 @@ class OfflineNotice extends PureComponent {
           <Message>Connexion impossible à la base de données</Message>
         </Wrapper>
       );
+    } else if (this.props.ftpFailed) {
+      this.ftpInterval = setInterval(() => {
+        this.props.connectFtp();
+      }, 2000);
+      return (
+        <Wrapper>
+          <Message>Connexion impossible au ftp</Message>
+        </Wrapper>
+      );
     }
-    clearInterval(this.interval)
+    clearInterval(this.dbInterval);
+    clearInterval(this.ftpInterval);
     return null;
   }
 }
@@ -70,14 +84,17 @@ class OfflineNotice extends PureComponent {
 const mapStateToProps = state => ({
   isConnected: state.network.isConnected,
   mssqlFailed: state.network.mssqlConnectionFailed,
+  ftpFailed: state.network.ftpConnectionFailed
 })
 
 OfflineNotice.propTypes = {
   isConnected: PropTypes.bool.isRequired,
   mssqlFailed: PropTypes.bool.isRequired,
+  ftpFailed: PropTypes.bool.isRequired,
   connectivityChange: PropTypes.func.isRequired,
-  connectDb: PropTypes.func.isRequired
+  connectDb: PropTypes.func.isRequired,
+  connectFtp: PropTypes.func.isRequired
 }
 
 
-export default connect(mapStateToProps, { connectivityChange, connectDb })(OfflineNotice);
+export default connect(mapStateToProps, { connectivityChange, connectDb, connectFtp })(OfflineNotice);

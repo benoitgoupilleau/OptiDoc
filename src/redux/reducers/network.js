@@ -2,13 +2,17 @@ import { REHYDRATE } from 'redux-persist';
 import {
   UPDATE_NET_STATUS,
   MSSQL_CONNECTED,
-  MSSQL_FAILED
+  MSSQL_FAILED,
+  FTP_CONNECTED,
+  FTP_FAILED
 } from '../actions/types';
 
 const defaultState = {
   isConnected: true,
   mssqlConnected: false,
-  mssqlConnectionFailed: false
+  mssqlConnectionFailed: false,
+  ftpConnected: false,
+  ftpConnectionFailed: false
 }
 
 export default (state = defaultState, action) => {
@@ -33,6 +37,18 @@ export default (state = defaultState, action) => {
         ...state,
         mssqlConnected: false,
         mssqlConnectionFailed: true
+      }
+    case FTP_CONNECTED:
+      return {
+        ...state,
+        ftpConnected: true,
+        ftpConnectionFailed: false
+      }
+    case FTP_FAILED:
+      return {
+        ...state,
+        ftpConnected: false,
+        ftpConnectionFailed: true
       }
     default:
       return state;

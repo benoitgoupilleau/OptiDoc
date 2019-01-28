@@ -4,17 +4,32 @@ import { connect } from 'react-redux';
 import { ActivityIndicator } from 'react-native';
 import Main from '../components/Main';
 
-import { connectDb } from '../redux/actions/network'
+import { connectDb, connectFtp } from '../redux/actions/network'
 
 const  AuthLoadingScreen = (props) => {
-  const { token, mssqlConnected, mssqlConnectionFailed, teamLoaded, teamRightsLoaded } = props
+  const {
+    token,
+    mssqlConnected,
+    mssqlConnectionFailed,
+    teamLoaded,
+    teamRightsLoaded,
+    connectDb,
+    ftpConnected,
+    ftpConnectionFailed,
+    connectFtp,
+    navigation
+  } = props
+
+  if (!ftpConnected && !ftpConnectionFailed) {
+    connectFtp();
+  }
   if (!mssqlConnected && !mssqlConnectionFailed) {
-    props.connectDb();
+    connectDb();
   } else {
     if (teamLoaded && teamRightsLoaded) {
-      props.navigation.navigate(token !== '' ? 'App' : 'Auth');
+      navigation.navigate(token !== '' ? 'App' : 'Auth');
     } else {
-      props.navigation.navigate('Auth');
+      navigation.navigate('Auth');
     }
   }
   return (
@@ -31,7 +46,10 @@ AuthLoadingScreen.propTypes = {
   mssqlConnectionFailed: PropTypes.bool.isRequired,
   teamLoaded: PropTypes.bool.isRequired,
   teamRightsLoaded: PropTypes.bool.isRequired,
-  connectDb: PropTypes.func.isRequired
+  connectDb: PropTypes.func.isRequired,
+  ftpConnected: PropTypes.bool.isRequired,
+  ftpConnectionFailed: PropTypes.bool.isRequired,
+  connectFtp: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => ({
@@ -40,6 +58,8 @@ const mapStateToProps = state => ({
   mssqlConnectionFailed: state.network.mssqlConnectionFailed,
   teamLoaded: state.teams.teamLoaded,
   teamRightsLoaded: state.teams.teamRightsLoaded,
+  ftpConnected: state.network.ftpConnected,
+  ftpConnectionFailed: state.network.ftpConnectionFailed,
 })
 
-export default connect(mapStateToProps, { connectDb })(AuthLoadingScreen);
+export default connect(mapStateToProps, { connectDb, connectFtp })(AuthLoadingScreen);

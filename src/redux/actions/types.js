@@ -11,6 +11,8 @@ export const REFRESH_NEWS = 'REFRESH_NEWS';
 export const UPDATE_NET_STATUS = 'UPDATE_NET_STATUS';
 export const MSSQL_CONNECTED = 'MSSQL_CONNECTED'
 export const MSSQL_FAILED = 'MSSQL_FAILED'
+export const FTP_CONNECTED = 'FTP_CONNECTED'
+export const FTP_FAILED = 'FTP_FAILED'
 
 // Team actions
 export const SET_TEAM = 'SET_TEAM';
