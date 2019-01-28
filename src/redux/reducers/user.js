@@ -7,7 +7,10 @@ import {
 const defaultState = {
   id: undefined,
   bearerToken: '',
-  email: ''
+  email: '',
+  downloadedBusiness: [],
+  editedDocs: [],
+  locked: false
 }
 
 export default (state = defaultState, action) => {

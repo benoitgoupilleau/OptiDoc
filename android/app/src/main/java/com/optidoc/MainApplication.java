@@ -3,6 +3,9 @@ package com.optidoc;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.oblador.vectoricons.VectorIconsPackage;
+import com.RNFetchBlob.RNFetchBlobPackage;
+import org.wonday.pdf.RCTPdfView;
 import com.reactlibrary.RNFtpPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.facebook.react.ReactNativeHost;
@@ -26,6 +29,9 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
         new MainReactPackage(),
+        new RNFetchBlobPackage(),
+        new VectorIconsPackage(),
+        new RCTPdfView(),
         new RNFtpPackage(),
         new RNGestureHandlerPackage(),
         new MSSQLPackage()

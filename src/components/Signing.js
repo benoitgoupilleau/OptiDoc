@@ -81,6 +81,7 @@ class Signin extends React.Component {
           onChangeText={(email) => this.setState({ email })}
           placeholder="Email"
           value={this.state.email}
+          editable={!this.props.locked}
         />
         <StyledInput
           allowFontScaling
@@ -100,11 +101,13 @@ class Signin extends React.Component {
 Signin.propTypes = {
   navigation: PropTypes.object.isRequired,
   login: PropTypes.func.isRequired,
-  email: PropTypes.string.isRequired
+  email: PropTypes.string.isRequired,
+  locked: PropTypes.bool.isRequired
 }
 
 const mapStateToProps = state => ({
-  email: state.user.email
+  email: state.user.email,
+  locked: state.user.locked
 })
 
 export default withNavigation(connect(mapStateToProps, { login })(Signin));

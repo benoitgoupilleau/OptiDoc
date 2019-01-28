@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { View, Button, AsyncStorage } from 'react-native';
+import { View, Button, AsyncStorage, Alert } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
 import Colors from '../constants/Colors';
@@ -15,6 +15,20 @@ const Wrapper = styled(View)`
 `;
 
 class Logout extends React.Component {
+  signOut = () => {
+    if (this.props.hasEditFiles) {
+      Alert.alert(
+        'Etes-vous sûr de vouloir vous déconnecter?',
+        'Vous avez encore des fichiers modifiés en local. Ces modifications seront perdues',
+        [
+          { text: 'Annuler'},
+          { text: 'Oui', onPress: this.signOutAsync },
+        ],
+      )
+    } else {
+      this.signOutAsync();
+    }
+  }
 
   signOutAsync = async () => {
     await AsyncStorage.removeItem('userToken');
@@ -25,7 +39,7 @@ class Logout extends React.Component {
   render() {
     return (
       <Wrapper>
-        <Button color={Colors.mainColor} title="Déconnexion" onPress={this.signOutAsync} />
+        <Button color={Colors.mainColor} title="Déconnexion" onPress={this.signOut} />
       </Wrapper>
     );
   }
@@ -33,7 +47,12 @@ class Logout extends React.Component {
 
 Logout.propTypes = {
   navigation: PropTypes.object.isRequired,
-  logout: PropTypes.func.isRequired
+  logout: PropTypes.func.isRequired,
+  hasEditFiles: PropTypes.bool.isRequired
 }
 
-export default withNavigation(connect(null, { logout })(Logout));
+const mapStateToProps = state => ({
+  hasEditFiles: state.user.editedDocs.length > 0
+})
+
+export default withNavigation(connect(mapStateToProps, { logout })(Logout));

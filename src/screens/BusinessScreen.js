@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, ScrollView, Dimensions } from 'react-native';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import Logout from '../components/Logout';
@@ -42,11 +43,17 @@ class BusinessScreen extends React.Component {
     }
     return (
       <Main>
-        <Text>Business Screen</Text>
+        <Text>Aucune affaire disponible</Text>
       </Main>
     );
   }
 }
+
+BusinessScreen.propTypes = {
+  businesses: PropTypes.array.isRequired,
+  docs: PropTypes.object.isRequired
+}
+
 
 const mapStateToProps = ({ user, teams, business }) => {
   const businesses = listAffaires([...teams.teamRights], user.id)

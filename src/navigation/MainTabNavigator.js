@@ -8,6 +8,7 @@ import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import BusinessScreen from '../screens/BusinessScreen';
+import PdfScreen from '../screens/PdfScreen';
 
 const HomeStack = createStackNavigator({
   Home: HomeScreen,
@@ -49,6 +50,7 @@ ProfileStack.navigationOptions = {
 
 const BusinessStack = createStackNavigator({
   Business: BusinessScreen,
+  Pdf: PdfScreen
 });
 
 BusinessStack.navigationOptions = {
