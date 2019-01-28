@@ -6,6 +6,7 @@ import { View, Text } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Document from './Document'
+import { downloadBusiness } from '../../redux/actions/user'
 
 import Colors from '../../constants/Colors';
 import Layout from '../../constants/Layout'
@@ -55,7 +56,7 @@ const PrepSection = styled(Text)`
   padding: ${Layout.space.medium};
 `;
 
-const Business = ({ title, prep, rea, downloadedBusiness }) => (
+const Business = ({ title, prep, rea, downloadedBusiness, downloadBusiness, userId }) => (
   <BusinessWrapper>
     <MainSection>
       <Title>{title}</Title>
@@ -69,12 +70,12 @@ const Business = ({ title, prep, rea, downloadedBusiness }) => (
           name={"md-cloud-download"}
           size={30}
           color={Colors.secondColor}
-          onPress={() => console.log('md-cloud-download clicked')}
+          onPress={() => downloadBusiness(userId, title, prep, rea)}
         />
       }
     </MainSection>
     <PrepSection>Préparation</PrepSection>
-    {prep.map(p => <Document key={p.ID} title={p.FileName} type="prep"/>)}
+    {prep.map(p => <Document key={p.ID} {...p} type="Prep"/>)}
     <ReaSection>
       <Section>Réalisation</Section>
       <Ionicons
@@ -84,7 +85,7 @@ const Business = ({ title, prep, rea, downloadedBusiness }) => (
         onPress={() => console.log('md-add clicked')}
       />
     </ReaSection>
-    {rea.map(r => <Document key={r.ID} title={r.FileName} type="rea"/>)}
+    {rea.map(r => <Document key={r.ID} {...r} type="Rea"/>)}
   </BusinessWrapper>
 );
 
@@ -92,7 +93,9 @@ Business.propTypes = {
   title: PropTypes.string.isRequired,
   prep: PropTypes.array,
   rea: PropTypes.array,
-  downloadedBusiness: PropTypes.array.isRequired
+  downloadedBusiness: PropTypes.array.isRequired,
+  downloadBusiness: PropTypes.func.isRequired,
+  userId: PropTypes.string.isRequired
 }
 
 Business.defaultProps = {
@@ -101,7 +104,8 @@ Business.defaultProps = {
 }
 
 const mapStateToProps = state => ({
-  downloadedBusiness: state.user.downloadedBusiness
+  downloadedBusiness: state.user.downloadedBusiness,
+  userId: state.user.id
 })
 
-export default connect(mapStateToProps)(Business);
+export default connect(mapStateToProps, { downloadBusiness })(Business);

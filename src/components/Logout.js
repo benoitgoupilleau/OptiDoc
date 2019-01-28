@@ -32,7 +32,7 @@ class Logout extends React.Component {
 
   signOutAsync = async () => {
     await AsyncStorage.removeItem('userToken');
-    this.props.logout();
+    this.props.logout(this.props.userId);
     this.props.navigation.navigate('Auth');
   };
 
@@ -49,7 +49,8 @@ Logout.propTypes = {
   title: PropTypes.string,
   navigation: PropTypes.object.isRequired,
   logout: PropTypes.func.isRequired,
-  hasEditFiles: PropTypes.bool.isRequired
+  hasEditFiles: PropTypes.bool.isRequired,
+  userId: PropTypes.string.isRequired
 }
 
 Logout.defaultProps = {
@@ -57,7 +58,8 @@ Logout.defaultProps = {
 }
 
 const mapStateToProps = state => ({
-  hasEditFiles: state.user.editedDocs.length > 0
+  hasEditFiles: state.user.editedDocs.length > 0,
+  userId: state.user.id
 })
 
 export default withNavigation(connect(mapStateToProps, { logout })(Logout));

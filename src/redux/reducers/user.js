@@ -1,7 +1,8 @@
 import omit from 'lodash.omit';
 import {
   LOGIN,
-  LOGOUT
+  LOGOUT,
+  BUSINESS_DOWNLOADED
 } from '../actions/types';
 
 const defaultState = {
@@ -27,6 +28,13 @@ export default (state = defaultState, action) => {
         ...state,
         ...omit(defaultState, 'email')
       }
+    case BUSINESS_DOWNLOADED: {
+      const currentBusiness = [...state.downloadedBusiness, action.id];
+      return {
+        ...state,
+        downloadedBusiness: currentBusiness
+      }
+    } 
     default:
       return state;
   }

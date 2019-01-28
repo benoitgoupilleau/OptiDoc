@@ -17,11 +17,11 @@ const Title = styled(Text)`
   font-size: ${Layout.font.medium};
 `;
 
-const Document = ({ title, type, navigation }) => (
+const Document = ({ FileName, type, navigation, ID, Dossier3, Extension, Dossier1 }) => (
   <DocumentWrapper
-    onPress={() => navigation.navigate('Pdf', { title, filePath: '' })}
+    onPress={() => navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type })}
   >
-    <Title>{title}</Title>
+    <Title>{FileName}</Title>
     {type === 'rea' &&
       <Ionicons
         name={"md-create"}
@@ -33,7 +33,11 @@ const Document = ({ title, type, navigation }) => (
 );
 
 Document.propTypes = {
-  title: PropTypes.string.isRequired,
+  FileName: PropTypes.string.isRequired,
+  ID: PropTypes.string.isRequired,
+  Dossier3: PropTypes.string.isRequired,
+  Extension: PropTypes.string.isRequired,
+  Dossier1: PropTypes.string.isRequired,
   type: PropTypes.string,
   navigation: PropTypes.object.isRequired,
 }

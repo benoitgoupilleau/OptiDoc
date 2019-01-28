@@ -1,6 +1,7 @@
 // User action
 export const LOGIN = 'LOGIN';
 export const LOGOUT = 'LOGOUT';
+export const BUSINESS_DOWNLOADED = 'BUSINESS_DOWNLOADED'
 
 // News actions
 export const SET_NEWS = 'SET_NEWS';

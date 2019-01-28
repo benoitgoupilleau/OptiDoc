@@ -12,7 +12,6 @@ import {
 export const connectDb = () => dispatch => MSSQL.connect(config)
   .then(() => {
     dispatch(dbSuccess())
-    dispatch(connectFtp())
   })
   .catch(e => {
     console.log({ connectDb: e })
@@ -35,12 +34,7 @@ export const connectivityChange = (isConnected) => ({
 })
 
 
-export const connectFtp = () => dispatch => FTP.login(FTP_USERNAME, FTP_PASSWORD)
-  .then(() => dispatch(ftpSuccess()))
-  .catch(e => {
-    console.log({ connectFtp: e })
-    return dispatch(ftpFailed())
-  })
+export const connectFtp = () => dispatch => dispatch(ftpSuccess())
 
 const ftpSuccess = () => ({
   type: FTP_CONNECTED
