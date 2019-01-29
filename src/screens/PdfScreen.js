@@ -12,6 +12,12 @@ import Main from '../components/Main';
 const rootDir = RNFS.DocumentDirectoryPath;
 
 class PdfScreen extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      loading: true
+    }
+  }
   static navigationOptions = ({navigation}) => ({
     headerTitle: <HeaderTitle title={navigation.getParam('title', '')}/>,
     headerRight: <Logout />,
@@ -19,6 +25,12 @@ class PdfScreen extends React.Component {
       height: 70
     }
   })
+
+  componentDidMount() {
+    setTimeout(() => {
+      this.setState({loading: false})
+    }, 500);
+  }
 
   render() {
     const ID = this.props.navigation.getParam('ID', '')
@@ -28,26 +40,34 @@ class PdfScreen extends React.Component {
     const type = this.props.navigation.getParam('type', 'Prep')
     const filePath = (ID === '' || Dossier3 === '' || Extension === '' || Dossier1 === '') ? '' :
       `${rootDir}/${this.props.userId}/${Dossier1}/${type}/${ID}.${Extension}`;
-    if (filePath !== '') {
-      const source = { uri: filePath};
+    if (this.state.loading) {
       return (
         <Main>
-          <Pdf
-            activityIndicator={<ActivityIndicator />}
-            source={source}
-            style={{
-              flex: 1,
-              width: Dimensions.get('window').width
-            }}
-          />
+          <ActivityIndicator />
+        </Main>
+      );
+    } else {
+      if (filePath !== '') {
+        const source = { uri: filePath };
+        return (
+          <Main>
+            <Pdf
+              source={source}
+              style={{
+                flex: 1,
+                width: Dimensions.get('window').width
+              }}
+            />
+          </Main>
+        );
+      }
+      return (
+        <Main>
+          <Text>Document introuvable</Text>
         </Main>
       );
     }
-    return (
-      <Main>
-        <Text>Document introuvable</Text>
-      </Main>
-    );
+      
     
   }
 }
