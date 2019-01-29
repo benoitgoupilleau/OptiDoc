@@ -2,6 +2,8 @@
 export const LOGIN = 'LOGIN';
 export const LOGOUT = 'LOGOUT';
 export const BUSINESS_DOWNLOADED = 'BUSINESS_DOWNLOADED'
+export const DOWNLOADING_BUSINESS = 'DOWNLOADING_BUSINESS'
+export const CANCEL_DOWNLOAD = 'CANCEL_DOWNLOAD'
 
 // News actions
 export const SET_NEWS = 'SET_NEWS';

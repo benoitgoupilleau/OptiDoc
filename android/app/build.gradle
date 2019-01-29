@@ -140,6 +140,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-file-viewer')
     compile project(':rn-fetch-blob')
     compile project(':react-native-vector-icons')
     compile project(':react-native-pdf')

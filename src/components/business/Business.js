@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { View, Text } from 'react-native';
+import { View, Text, ActivityIndicator } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Document from './Document'
@@ -57,44 +57,61 @@ const PrepSection = styled(Text)`
   padding: ${Layout.space.medium};
 `;
 
-const Business = ({ title, prep, rea, downloadedBusiness, downloadBusiness, userId }) => (
-  <BusinessWrapper>
-    <MainSection>
-      <Title>{title}</Title>
-      {downloadedBusiness.includes(title) ?
+class Business extends React.Component {
+  displayIcon = () => {
+    const { title, prep, rea, downloadedBusiness, downloadBusiness, userId, loadingBusiness } = this.props;
+    if (loadingBusiness.includes(title)) {
+      return <ActivityIndicator />
+    } else if (downloadedBusiness.includes(title)) {
+      return (
         <Ionicons
           name={"md-phone-portrait"}
           size={30}
           color={Colors.secondColor}
-        /> : 
-        <Ionicons
-          name={"md-cloud-download"}
-          size={30}
-          color={Colors.secondColor}
-          onPress={() => downloadBusiness(userId, title, prep, rea)}
         />
-      }
-    </MainSection>
-    <PrepSection>Préparation</PrepSection>
-    {prep.map(p => <Document key={p.ID} {...p} type={Folder.prep}/>)}
-    <ReaSection>
-      <Section>Réalisation</Section>
+      );
+    }
+    return (
       <Ionicons
-        name={"md-add"}
-        size={26}
-        color={Colors.mainColor}
-        onPress={() => console.log('md-add clicked')}
+        name={"md-cloud-download"}
+        size={30}
+        color={Colors.secondColor}
+        onPress={() => downloadBusiness(userId, title, prep, rea)}
       />
-    </ReaSection>
-    {rea.map(r => <Document key={r.ID} {...r} type={Folder.rea}/>)}
-  </BusinessWrapper>
-);
+    )
+  }
+
+  render() {
+    const { title, prep, rea } = this.props;
+    return (
+      <BusinessWrapper>
+        <MainSection>
+          <Title>{title}</Title>
+          {this.displayIcon()}
+        </MainSection>
+        <PrepSection>Préparation</PrepSection>
+        {prep.map(p => <Document key={p.ID} {...p} type={Folder.prep} prep={prep} rea={rea} />)}
+        <ReaSection>
+          <Section>Réalisation</Section>
+          <Ionicons
+            name={"md-add"}
+            size={26}
+            color={Colors.mainColor}
+            onPress={() => console.log('md-add clicked')}
+          />
+        </ReaSection>
+        {rea.map(r => <Document key={r.ID} {...r} type={Folder.rea} prep={prep} rea={rea} />)}
+      </BusinessWrapper>
+    );
+  }
+}
 
 Business.propTypes = {
   title: PropTypes.string.isRequired,
   prep: PropTypes.array,
   rea: PropTypes.array,
   downloadedBusiness: PropTypes.array.isRequired,
+  loadingBusiness: PropTypes.array.isRequired,
   downloadBusiness: PropTypes.func.isRequired,
   userId: PropTypes.string.isRequired
 }
@@ -106,6 +123,7 @@ Business.defaultProps = {
 
 const mapStateToProps = state => ({
   downloadedBusiness: state.user.downloadedBusiness,
+  loadingBusiness: state.user.loadingBusiness,
   userId: state.user.id
 })
 

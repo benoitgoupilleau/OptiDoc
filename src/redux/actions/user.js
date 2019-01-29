@@ -4,7 +4,9 @@ import { FTP_USERNAME, FTP_PASSWORD } from 'react-native-dotenv';
 import {
   LOGIN,
   LOGOUT,
-  BUSINESS_DOWNLOADED
+  BUSINESS_DOWNLOADED,
+  DOWNLOADING_BUSINESS,
+  CANCEL_DOWNLOAD
 } from './types';
 
 import Folder from '../../constants/Folder'
@@ -24,7 +26,9 @@ export const logout = (userId) => dispatch => RNFS.unlink(`${rootDir}/${userId}`
   .then(() => dispatch({type: LOGOUT}))
   .catch(() => dispatch({ type: LOGOUT }))
 
-export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => RNFS.mkdir(`${rootDir}/${userId}/${businessId}`)
+export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
+  dispatch(downloading(businessId))
+  return RNFS.mkdir(`${rootDir}/${userId}/${businessId}`)
   .then(async () => {
     await FTP.login(FTP_USERNAME, FTP_PASSWORD);
     if (prep.length > 0) {
@@ -44,9 +48,21 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => R
     await FTP.logout()
     return dispatch(businessDownloaded(businessId))
   }).catch(async (e) => {
+    dispatch(cancelDownload(businessId))
     await FTP.logout()
     console.log({ downloadBusiness: e})
   })
+}
+
+const cancelDownload = (id) => ({
+  type: CANCEL_DOWNLOAD,
+  id
+})
+
+const downloading = (id) => ({
+  type: DOWNLOADING_BUSINESS,
+  id
+})
 
 const businessDownloaded = (id) => ({
   type: BUSINESS_DOWNLOADED,

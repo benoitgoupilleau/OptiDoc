@@ -75,7 +75,7 @@ class OfflineNotice extends PureComponent {
       this.props.getDocs()
       this.props.getTeam()
       this.props.getTeamRight()
-    }, 1000 * 60 * 5); // refresh every 5min
+    }, 1000 * 60 * 30); // refresh every 30min
     clearInterval(this.dbInterval);
     return null;
   }

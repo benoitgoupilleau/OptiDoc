@@ -5,7 +5,9 @@ import jwt from 'react-native-pure-jwt';
 import {
   LOGIN,
   LOGOUT,
-  BUSINESS_DOWNLOADED
+  BUSINESS_DOWNLOADED,
+  DOWNLOADING_BUSINESS,
+  CANCEL_DOWNLOAD
 } from '../actions/types';
 
 const defaultState = {
@@ -15,6 +17,7 @@ const defaultState = {
   lastName: '',
   firstName: '',
   downloadedBusiness: [],
+  loadingBusiness: [],
   editedDocs: [],
   locked: false
 }
@@ -38,7 +41,7 @@ export default (state = defaultState, action) => {
       }
       return {
         ...state,
-        ...action.payload.user
+        ...omit(action.payload.user, 'loadingBusiness')
       }
     }
     case LOGIN:
@@ -55,11 +58,29 @@ export default (state = defaultState, action) => {
         ...state,
         ...omit(defaultState, 'email')
       }
-    case BUSINESS_DOWNLOADED: {
-      const currentBusiness = [...state.downloadedBusiness, action.id];
+    case DOWNLOADING_BUSINESS: {
+      const currentBusiness = [...state.loadingBusiness, action.id];
       return {
         ...state,
-        downloadedBusiness: currentBusiness
+        loadingBusiness: currentBusiness
+      }
+    }
+    case BUSINESS_DOWNLOADED: {
+      const currentBusiness = [...state.downloadedBusiness, action.id];
+      const downloading = [...state.loadingBusiness];
+      const indexToRemove = downloading.findIndex(el => el === action.id);
+      return {
+        ...state,
+        downloadedBusiness: currentBusiness,
+        loadingBusiness: [...downloading.slice(0, indexToRemove), ...downloading.slice(indexToRemove+1)]
+      }
+    }
+    case CANCEL_DOWNLOAD: {
+      const downloading = [...state.loadingBusiness];
+      const indexToRemove = downloading.findIndex(el => el === action.id);
+      return {
+        ...state,
+        loadingBusiness: [...downloading.slice(0, indexToRemove), ...downloading.slice(indexToRemove + 1)]
       }
     } 
     default:
