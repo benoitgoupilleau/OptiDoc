@@ -44,12 +44,8 @@ class HomeScreen extends React.Component {
     if (this.props.mssqlConnected){
       this.props.getNews();
       this.props.getDocs();
-      if (!this.props.teamLoaded) {
-        this.props.getTeam();
-      }
-      if (!this.props.teamRightsLoaded) {
-        this.props.getTeamRight();
-      }
+      this.props.getTeam();
+      this.props.getTeamRight();
     } 
   }
 

@@ -2,7 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components'
-import { View, Text, TextInput, TouchableOpacity, ToastAndroid } from 'react-native';
+import { JWT_SECRET, JWT_EXPIRE, ENV } from 'react-native-dotenv';
+import jwt from 'react-native-pure-jwt'
+import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
 import Logout from './Logout';
@@ -43,6 +45,12 @@ const StyledButton = styled(TouchableOpacity)`
   padding: ${Layout.space.medium};
 `;
 
+const Message = styled(Text)`
+  text-align: center;
+  font-style: italic;
+  padding-bottom: ${Layout.space.small};
+`;
+
 const StyledText = styled(Text)`
   color: white;
   font-size: ${Layout.font.medium};
@@ -63,13 +71,25 @@ class Signin extends React.Component {
   }
 
   signInAsync = async () => {
-    if (!emailRegex.test(this.state.email)) {
-      return ToastAndroid.showWithGravity('Adresse email invalide', ToastAndroid.SHORT, ToastAndroid.CENTER)
-    } else if (this.state.password === '') {
-      return ToastAndroid.showWithGravity('Merci de saisir votre mot de passe', ToastAndroid.SHORT, ToastAndroid.CENTER)
+    if (!this.props.teamLoaded) {
+      Alert.alert('Connexion Impossible', 'Merci de réessayer plus tard', [{ text: 'Ok' }]);
     } else {
-      this.props.login(this.state.email, 'EQU_20181102195830422', 'abc')
-      this.props.navigation.navigate('App');
+      if (!emailRegex.test(this.state.email)) {
+        Alert.alert('Identifiants incorrects', 'Adresse email invalide', [{ text: 'Ok' }]);
+      } else if (this.state.password === '') {
+        Alert.alert('Identifiants incorrects', 'Merci de saisir votre mot de passe', [{ text: 'Ok' }]);
+      } else {
+
+        const users = this.props.teams.filter(t => (t.Statut === 'Actif' && t.Mail === this.state.email && ((ENV && ENV === 'dev') || t.Mdp === this.state.password)));
+        if (users.length > 0) {
+          const addTime = parseInt(JWT_EXPIRE, 10);
+          const token = await jwt.sign({ iss: users[0].ID, exp: new Date().getTime() + addTime * 1000 }, JWT_SECRET, { alg: 'hs256'});
+          this.props.login(this.state.email, users[0], token)
+          this.props.navigation.navigate('App');
+        } else {
+          Alert.alert('Identifiants incorrects', 'Merci de vérifier votre email et mot de passe', [{ text: 'Ok' }]);
+        }
+      }
     }
   };
 
@@ -92,6 +112,7 @@ class Signin extends React.Component {
           secureTextEntry
           value={this.state.password}
         />
+        <Message>Mot de passe oublié ? Merci de contacter votre administrateur</Message>
         <StyledButton onPress={this.signInAsync}>
           <StyledText>Connexion</StyledText>
         </StyledButton>
@@ -105,12 +126,16 @@ Signin.propTypes = {
   navigation: PropTypes.object.isRequired,
   login: PropTypes.func.isRequired,
   email: PropTypes.string.isRequired,
-  locked: PropTypes.bool.isRequired
+  locked: PropTypes.bool.isRequired,
+  teamLoaded: PropTypes.bool.isRequired,
+  teams: PropTypes.array.isRequired
 }
 
 const mapStateToProps = state => ({
   email: state.user.email,
-  locked: state.user.locked
+  locked: state.user.locked,
+  teams: state.teams.teams,
+  teamLoaded: state.teams.teamLoaded
 })
 
 export default withNavigation(connect(mapStateToProps, { login })(Signin));

@@ -19,6 +19,7 @@ export default {
   space: {
     xlarge: '30px',
     large: '20px',
-    medium: '10px'
+    medium: '10px',
+    small: '5px'
   }
 };

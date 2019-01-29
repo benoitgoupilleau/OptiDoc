@@ -143,6 +143,7 @@ dependencies {
     compile project(':rn-fetch-blob')
     compile project(':react-native-vector-icons')
     compile project(':react-native-pdf')
+    compile project(':react-native-pure-jwt')
     compile project(':react-native-ftp')
     compile project(':react-native-gesture-handler')
     compile project(':react-native-fs')

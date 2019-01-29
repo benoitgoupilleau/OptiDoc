@@ -11,11 +11,13 @@ import Folder from '../../constants/Folder'
 
 const rootDir = RNFS.DocumentDirectoryPath;
 
-export const login = (email, id, bearerToken) => ({
+export const login = (email, user, bearerToken) => ({
   type: LOGIN,
   email,
   bearerToken,
-  id,
+  id: user.ID,
+  lastName: user.Nom,
+  firstName: user.Prenom
 }) 
 
 export const logout = (userId) => dispatch => RNFS.unlink(`${rootDir}/${userId}`)
