@@ -6,6 +6,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { withNavigation } from 'react-navigation';
 
 import Layout from '../../constants/Layout';
+import Folder from '../../constants/Folder'
 
 const DocumentWrapper = styled(TouchableOpacity)`
   margin: ${Layout.space.medium};
@@ -22,7 +23,7 @@ const Document = ({ FileName, type, navigation, ID, Dossier3, Extension, Dossier
     onPress={() => navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type })}
   >
     <Title>{FileName}</Title>
-    {type === 'rea' &&
+    {type === Folder.rea &&
       <Ionicons
         name={"md-create"}
         size={26}
@@ -43,7 +44,7 @@ Document.propTypes = {
 }
 
 Document.defaultProps = {
-  type: 'prep'
+  type: Folder.prep
 }
 
 export default withNavigation(Document);

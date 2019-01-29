@@ -10,6 +10,7 @@ import { downloadBusiness } from '../../redux/actions/user'
 
 import Colors from '../../constants/Colors';
 import Layout from '../../constants/Layout'
+import Folder from '../../constants/Folder'
 
 const BusinessWrapper = styled(View)`
   background: ${Colors.antiBackground};
@@ -75,7 +76,7 @@ const Business = ({ title, prep, rea, downloadedBusiness, downloadBusiness, user
       }
     </MainSection>
     <PrepSection>Préparation</PrepSection>
-    {prep.map(p => <Document key={p.ID} {...p} type="Prep"/>)}
+    {prep.map(p => <Document key={p.ID} {...p} type={Folder.prep}/>)}
     <ReaSection>
       <Section>Réalisation</Section>
       <Ionicons
@@ -85,7 +86,7 @@ const Business = ({ title, prep, rea, downloadedBusiness, downloadBusiness, user
         onPress={() => console.log('md-add clicked')}
       />
     </ReaSection>
-    {rea.map(r => <Document key={r.ID} {...r} type="Rea"/>)}
+    {rea.map(r => <Document key={r.ID} {...r} type={Folder.rea}/>)}
   </BusinessWrapper>
 );
 

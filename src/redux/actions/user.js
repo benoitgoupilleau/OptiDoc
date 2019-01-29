@@ -1,4 +1,3 @@
-/* global Promise */
 import RNFS from 'react-native-fs';
 import FTP from '../../services/ftp';
 import { FTP_USERNAME, FTP_PASSWORD } from 'react-native-dotenv';
@@ -7,6 +6,8 @@ import {
   LOGOUT,
   BUSINESS_DOWNLOADED
 } from './types';
+
+import Folder from '../../constants/Folder'
 
 const rootDir = RNFS.DocumentDirectoryPath;
 
@@ -25,17 +26,17 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => R
   .then(async () => {
     await FTP.login(FTP_USERNAME, FTP_PASSWORD);
     if (prep.length > 0) {
-      await RNFS.mkdir(`${rootDir}/${userId}/${businessId}/Prep`);
+      await RNFS.mkdir(`${rootDir}/${userId}/${businessId}/${Folder.prep}`);
       for (let i = 0; i < prep.length; i += 1) {
         await FTP.downloadFile(`./${businessId}/Preparation/${prep[i].Dossier3}/${prep[i].ID}.${prep[i].Extension}`,
-          `${rootDir}/${userId}/${businessId}/Prep`)
+          `${rootDir}/${userId}/${businessId}/${Folder.prep}`)
       }
     }
     if (rea.length > 0) {
-      await RNFS.mkdir(`${rootDir}/${userId}/${businessId}/Rea`);
+      await RNFS.mkdir(`${rootDir}/${userId}/${businessId}/${Folder.rea}`);
       for (let i = 0; i < rea.length; i += 1) {
         await FTP.downloadFile(`./${businessId}/Realisation/${rea[i].Dossier3}/${rea[i].ID}.${rea[i].Extension}`,
-          `${rootDir}/${userId}/${businessId}/Rea`)
+          `${rootDir}/${userId}/${businessId}/${Folder.rea}`)
       }
     }
     await FTP.logout()

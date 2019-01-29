@@ -8,6 +8,7 @@ import { Dimensions, Text, ActivityIndicator } from 'react-native';
 import Logout from '../components/Logout';
 import HeaderTitle from '../components/HeaderTitle'
 import Main from '../components/Main';
+import Folder from '../constants/Folder'
 
 const rootDir = RNFS.DocumentDirectoryPath;
 
@@ -37,7 +38,7 @@ class PdfScreen extends React.Component {
     const Dossier3 = this.props.navigation.getParam('Dossier3', '')
     const Extension = this.props.navigation.getParam('Extension', '')
     const Dossier1 = this.props.navigation.getParam('Dossier1', '')
-    const type = this.props.navigation.getParam('type', 'Prep')
+    const type = this.props.navigation.getParam('type', Folder.prep)
     const filePath = (ID === '' || Dossier3 === '' || Extension === '' || Dossier1 === '') ? '' :
       `${rootDir}/${this.props.userId}/${Dossier1}/${type}/${ID}.${Extension}`;
     if (this.state.loading) {

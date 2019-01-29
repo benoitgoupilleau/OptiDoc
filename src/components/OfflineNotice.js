@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { View, Text, NetInfo, Dimensions } from 'react-native';
 
-import { connectivityChange, connectDb, connectFtp } from '../redux/actions/network'
+import { connectivityChange, connectDb } from '../redux/actions/network'
 import Colors from '../constants/Colors';
 
 const { width } = Dimensions.get('window');
@@ -26,7 +26,6 @@ class OfflineNotice extends PureComponent {
   constructor(props) {
     super(props);
     this.dbInterval = undefined;
-    this.ftpInterval = undefined
   }
 
   componentDidMount() {
@@ -36,7 +35,6 @@ class OfflineNotice extends PureComponent {
   componentWillUnmount() {
     NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
     clearInterval(this.dbInterval);
-    clearInterval(this.ftpInterval);
   }
 
   handleConnectivityChange = isConnected => {
@@ -49,7 +47,6 @@ class OfflineNotice extends PureComponent {
   render() {
     if (!this.props.isConnected) {
       clearInterval(this.dbInterval);
-      clearInterval(this.ftpInterval);
       return (
         <Wrapper error>
           <Message error>Vous êtes hors ligne</Message>
@@ -64,18 +61,8 @@ class OfflineNotice extends PureComponent {
           <Message>Connexion impossible à la base de données</Message>
         </Wrapper>
       );
-    } else if (this.props.ftpFailed) {
-      this.ftpInterval = setInterval(() => {
-        this.props.connectFtp();
-      }, 2000);
-      return (
-        <Wrapper>
-          <Message>Connexion impossible au ftp</Message>
-        </Wrapper>
-      );
     }
     clearInterval(this.dbInterval);
-    clearInterval(this.ftpInterval);
     return null;
   }
 }
@@ -83,17 +70,14 @@ class OfflineNotice extends PureComponent {
 const mapStateToProps = state => ({
   isConnected: state.network.isConnected,
   mssqlFailed: state.network.mssqlConnectionFailed,
-  ftpFailed: state.network.ftpConnectionFailed
 })
 
 OfflineNotice.propTypes = {
   isConnected: PropTypes.bool.isRequired,
   mssqlFailed: PropTypes.bool.isRequired,
-  ftpFailed: PropTypes.bool.isRequired,
   connectivityChange: PropTypes.func.isRequired,
   connectDb: PropTypes.func.isRequired,
-  connectFtp: PropTypes.func.isRequired
 }
 
 
-export default connect(mapStateToProps, { connectivityChange, connectDb, connectFtp })(OfflineNotice);
+export default connect(mapStateToProps, { connectivityChange, connectDb })(OfflineNotice);
