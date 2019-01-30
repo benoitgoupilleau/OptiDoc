@@ -1,12 +1,14 @@
 import RNFS from 'react-native-fs';
 import FTP from '../../services/ftp';
 import { FTP_USERNAME, FTP_PASSWORD } from 'react-native-dotenv';
+import FileViewer from 'react-native-file-viewer';
 import {
   LOGIN,
   LOGOUT,
   BUSINESS_DOWNLOADED,
   DOWNLOADING_BUSINESS,
-  CANCEL_DOWNLOAD
+  CANCEL_DOWNLOAD,
+  EDIT_FILE,
 } from './types';
 
 import Folder from '../../constants/Folder'
@@ -68,3 +70,11 @@ const businessDownloaded = (id) => ({
   type: BUSINESS_DOWNLOADED,
   id
 })
+
+export const editFile = (fileId, filePath) => {
+  FileViewer.open(filePath, { showOpenWithDialog: true });
+  return ({
+    type: EDIT_FILE,
+    fileId
+  })
+}

@@ -1,16 +1,31 @@
 import React from 'react';
 import RNFS from 'react-native-fs';
 import { connect } from 'react-redux';
+import styled from 'styled-components';
 import Pdf from 'react-native-pdf';
 import PropTypes from 'prop-types';
-import { Dimensions, Text, ActivityIndicator } from 'react-native';
+import { Dimensions, Text, ActivityIndicator, View, TouchableOpacity } from 'react-native';
 
 import Logout from '../components/Logout';
 import HeaderTitle from '../components/HeaderTitle'
 import Main from '../components/Main';
+
+import { editFile } from '../redux/actions/user'
+
 import Folder from '../constants/Folder'
+import Colors from '../constants/Colors';
 
 const rootDir = RNFS.DocumentDirectoryPath;
+
+const Edit = styled(TouchableOpacity)`
+  align-items: center;
+  background-color: ${Colors.mainColor};
+  height: 30px;
+`
+
+const EditText = styled(Text)`
+  color: white;
+`;
 
 class PdfScreen extends React.Component {
   constructor(props) {
@@ -52,13 +67,18 @@ class PdfScreen extends React.Component {
         const source = { uri: filePath };
         return (
           <Main>
-            <Pdf
-              source={source}
-              style={{
-                flex: 1,
-                width: Dimensions.get('window').width
-              }}
-            />
+            <View>
+              {type === Folder.rea && (<Edit onPress={() => this.props.editFile(ID, filePath)}>
+                <EditText>Modifier</EditText>
+              </Edit>)}
+              <Pdf
+                source={source}
+                style={{
+                  flex: 1,
+                  width: Dimensions.get('window').width
+                }}
+              />
+            </View>
           </Main>
         );
       }
@@ -75,11 +95,12 @@ class PdfScreen extends React.Component {
 
 PdfScreen.propTypes = {
   navigation: PropTypes.object.isRequired,
-  userId: PropTypes.string.isRequired
+  userId: PropTypes.string.isRequired,
+  editFile: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => ({
   userId: state.user.id
 })
 
-export default connect(mapStateToProps)(PdfScreen);
+export default connect(mapStateToProps, { editFile })(PdfScreen);

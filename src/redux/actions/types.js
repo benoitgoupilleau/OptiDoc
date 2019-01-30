@@ -4,6 +4,7 @@ export const LOGOUT = 'LOGOUT';
 export const BUSINESS_DOWNLOADED = 'BUSINESS_DOWNLOADED'
 export const DOWNLOADING_BUSINESS = 'DOWNLOADING_BUSINESS'
 export const CANCEL_DOWNLOAD = 'CANCEL_DOWNLOAD'
+export const EDIT_FILE = 'EDIT_FILE';
 
 // News actions
 export const SET_NEWS = 'SET_NEWS';

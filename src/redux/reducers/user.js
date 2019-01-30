@@ -7,7 +7,8 @@ import {
   LOGOUT,
   BUSINESS_DOWNLOADED,
   DOWNLOADING_BUSINESS,
-  CANCEL_DOWNLOAD
+  CANCEL_DOWNLOAD,
+  EDIT_FILE
 } from '../actions/types';
 
 const defaultState = {
@@ -82,7 +83,14 @@ export default (state = defaultState, action) => {
         ...state,
         loadingBusiness: [...downloading.slice(0, indexToRemove), ...downloading.slice(indexToRemove + 1)]
       }
-    } 
+    }
+    case EDIT_FILE:{
+      const currentFiles = [...state.editedDocs, action.fileId];
+      return {
+        ...state,
+        editedDocs: currentFiles
+      }
+    }
     default:
       return state;
   }
