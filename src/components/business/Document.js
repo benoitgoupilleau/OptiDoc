@@ -7,7 +7,7 @@ import pick from 'lodash.pick';
 import RNFS from 'react-native-fs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { withNavigation } from 'react-navigation';
-import { downloadBusiness, editFile, uploadFile, uploadingFile  } from '../../redux/actions/user'
+import { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile  } from '../../redux/actions/user'
 
 import Layout from '../../constants/Layout';
 import Folder from '../../constants/Folder';
@@ -78,8 +78,15 @@ class Document extends React.Component {
   onCreate = () => {
 
   }
-  onCancel = () => {
-
+  onCancel = async () => {
+    const { type, ID, Extension, Dossier1, userId, isNew, ServerPath } = this.props;
+    const filePath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
+    await RNFS.unlink(filePath);
+    
+    if (!isNew) {
+      this.props.removeFromEdit(ID);
+      this.props.downLoadOneFile(ServerPath, `${rootDir}/${userId}/${Dossier1}/${type}`)
+    }
   }
 
   render() {
@@ -134,6 +141,7 @@ Document.propTypes = {
   Dossier3: PropTypes.string.isRequired,
   Extension: PropTypes.string.isRequired,
   Dossier1: PropTypes.string.isRequired,
+  ServerPath: PropTypes.string.isRequired,
   type: PropTypes.string,
   navigation: PropTypes.object.isRequired,
   loadingBusiness: PropTypes.array.isRequired,
@@ -147,6 +155,8 @@ Document.propTypes = {
   uploadingDocs: PropTypes.array.isRequired,
   uploadingFile: PropTypes.func.isRequired,
   uploadFile: PropTypes.func.isRequired,
+  removeFromEdit: PropTypes.func.isRequired,
+  downLoadOneFile: PropTypes.func.isRequired,
   isNew: PropTypes.bool,
 }
 
@@ -165,4 +175,4 @@ const mapStateToProps = state => ({
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
 })
 
-export default withNavigation(connect(mapStateToProps, { downloadBusiness, editFile, uploadFile, uploadingFile })(Document));
+export default withNavigation(connect(mapStateToProps, { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile })(Document));

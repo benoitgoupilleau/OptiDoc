@@ -14,7 +14,7 @@ import {
   DOWNLOADING_MODELE,
   CANCEL_DOWNLOAD_MODELE,
   MODELE_DOWNLOADED,
-  UPLOADED_FILE,
+  REMOVE_EDIT_FILE,
   UPLOADING_FILE
 } from './types';
 
@@ -145,11 +145,18 @@ export const uploadFile = (filePath, file, remoteDir) => async (dispatch) => FTP
     .then(() => {
       //MSSQL update
       return MSSQL.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}' WHERE ID='${file.ID}'`)
-        .then(() => dispatch(uploadedFile(file.ID)))
+        .then(() => dispatch(removeFromEdit(file.ID)))
     }))
   .catch((e) => console.log({ uploadFile: e }))
 
-const uploadedFile = (id) => ({
-  type: UPLOADED_FILE,
+export const removeFromEdit = (id) => ({
+  type: REMOVE_EDIT_FILE,
   id
 })
+
+export const downLoadOneFile = (serverPath, localPath) => async () => {
+  await FTP.login(FTP_USERNAME, FTP_PASSWORD);
+  await FTP.downloadFile(serverPath,localPath)
+  await FTP.logout()
+  return true
+}
