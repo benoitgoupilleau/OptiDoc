@@ -2,6 +2,8 @@ import RNFS from 'react-native-fs';
 import FTP from '../../services/ftp';
 import { FTP_USERNAME, FTP_PASSWORD } from 'react-native-dotenv';
 import FileViewer from 'react-native-file-viewer';
+import MSSQL from '../../services/mssql';
+
 import {
   LOGIN,
   LOGOUT,
@@ -12,10 +14,12 @@ import {
   DOWNLOADING_MODELE,
   CANCEL_DOWNLOAD_MODELE,
   MODELE_DOWNLOADED,
-  UPLOADED_FILE
+  UPLOADED_FILE,
+  UPLOADING_FILE
 } from './types';
 
 import Folder from '../../constants/Folder'
+import Tables from '../../constants/Tables';
 
 const rootDir = RNFS.DocumentDirectoryPath;
 
@@ -131,10 +135,18 @@ const downloadModele = () => ({
   type: DOWNLOADING_MODELE
 })
 
+export const uploadingFile = (fileId) => ({
+  type: UPLOADING_FILE,
+  fileId
+})
 
-export const uploadFile = (filePath, file) => async (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
-  .then(() => FTP.uploadFile(filePath, `./${file.ServerPath}`)
-    .then(() => dispatch(uploadedFile(file.ID))))
+export const uploadFile = (filePath, file, remoteDir) => async (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
+  .then(() => FTP.uploadFile(filePath, remoteDir)
+    .then(() => {
+      //MSSQL update
+      return MSSQL.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}' WHERE ID='${file.ID}'`)
+        .then(() => dispatch(uploadedFile(file.ID)))
+    }))
   .catch((e) => console.log({ uploadFile: e }))
 
 const uploadedFile = (id) => ({

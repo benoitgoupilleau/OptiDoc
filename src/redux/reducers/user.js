@@ -11,7 +11,9 @@ import {
   EDIT_FILE,
   DOWNLOADING_MODELE,
   CANCEL_DOWNLOAD_MODELE,
-  MODELE_DOWNLOADED
+  MODELE_DOWNLOADED,
+  UPLOADED_FILE,
+  UPLOADING_FILE
 } from '../actions/types';
 
 const defaultState = {
@@ -23,6 +25,7 @@ const defaultState = {
   downloadedBusiness: [],
   loadingBusiness: [],
   editedDocs: [],
+  uploadingDocs: [],
   locked: false,
   modeleDownloaded: 'no',
 }
@@ -89,11 +92,33 @@ export default (state = defaultState, action) => {
       }
     }
     case EDIT_FILE:{
-      const currentFiles = [...state.editedDocs, action.fileId];
+      const currentFiles = [...state.editedDocs];
+      if (!currentFiles.includes(action.fileId)) currentFiles.push(action.fileId)
       return {
         ...state,
         editedDocs: currentFiles,
         locked: true
+      }
+    }
+    case UPLOADING_FILE: {
+      const currentFiles = [...state.uploadingDocs];
+      if (!currentFiles.includes(action.fileId)) currentFiles.push(action.fileId)
+      return {
+        ...state,
+        uploadingDocs: currentFiles
+      }
+    }
+    case UPLOADED_FILE: {
+      const currentFiles = [...state.editedDocs];
+      const indexToRemove = currentFiles.findIndex(el => el === action.id);
+      const newFiles = [...currentFiles.slice(0, indexToRemove), ...currentFiles.slice(indexToRemove+1)]
+      const currentUpload = [...state.uploadingDocs];
+      const indexUpload = currentUpload.findIndex(el => el === action.id);
+      return {
+        ...state,
+        editedDocs: newFiles,
+        locked: (newFiles.length > 0),
+        uploadingDocs: [...currentUpload.slice(0, indexUpload), ...currentUpload.slice(indexUpload + 1)]
       }
     }
     case DOWNLOADING_MODELE:

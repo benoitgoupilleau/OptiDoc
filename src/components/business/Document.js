@@ -2,15 +2,17 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { TouchableOpacity, Text, View } from 'react-native';
+import { TouchableOpacity, Text, View, ActivityIndicator } from 'react-native';
+import pick from 'lodash.pick';
 import RNFS from 'react-native-fs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { withNavigation } from 'react-navigation';
-import { downloadBusiness, editFile } from '../../redux/actions/user'
+import { downloadBusiness, editFile, uploadFile, uploadingFile  } from '../../redux/actions/user'
 
 import Layout from '../../constants/Layout';
 import Folder from '../../constants/Folder';
-import Colors from '../../constants/Colors'
+import Colors from '../../constants/Colors';
+import Tables from '../../constants/Tables';
 
 const rootDir = RNFS.DocumentDirectoryPath;
 
@@ -54,17 +56,34 @@ class Document extends React.Component {
       this.props.downloadBusiness(userId, Dossier1, prep, rea, modeleDocs)
     }
   }
-
   onUpload = () => {
-
+    const { type, ID, Extension, Dossier1, userId, Dossier3 } = this.props;
+    const filePath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
+    const file = pick(this.props, Tables.docField);
+    const remoteDir = `./${Dossier1}/Realisation${Dossier3 !== '' ? `/${Dossier3}` : ''}`
+    const userName = this.props.firstName + ' ' + this.props.lastName;
+    const now = new Date();
+    const date = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
+    const fileToUpLoad = {
+      ...file,
+      UpLoadedOn: date,
+      UpdatedOn: date,
+      UpdatedBy: userName,
+      UpLoadedBy: userName
+    }
+    this.props.uploadingFile(ID);
+    this.props.uploadFile(filePath, fileToUpLoad, remoteDir);
   }
 
+  onCreate = () => {
+
+  }
   onCancel = () => {
 
   }
 
   render() {
-    const { FileName, type, navigation, ID, Dossier3, Extension, Dossier1, editedDocs } = this.props;
+    const { FileName, type, navigation, ID, Dossier3, Extension, Dossier1, editedDocs, isNew, uploadingDocs} = this.props;
     return (
       <DocumentWrapper
         onPress={() => navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type })}
@@ -76,7 +95,7 @@ class Document extends React.Component {
           />
           <Title>{FileName}</Title>
         </File>
-        {type === Folder.rea &&
+        {type === Folder.rea && 
           <IconsWrapper>
             {editedDocs.includes(ID) && (
               <EditIcons>
@@ -86,12 +105,13 @@ class Document extends React.Component {
                   color="red"
                   onPress={this.onCancel}
                 />
+                {!uploadingDocs.includes(ID) ?
                 <Icons
                   name="md-cloud-upload"
                   size={26}
                   color={Colors.secondColor}
-                  onPress={this.onUpload}
-                />
+                  onPress={() => (isNew ? this.onCreate() : this.onUpload())}
+                /> : <ActivityIndicator style={{ paddingLeft: 10, paddingRight: 10 }}/>}
               </EditIcons>
             )}
             <Icons
@@ -109,6 +129,8 @@ class Document extends React.Component {
 Document.propTypes = {
   FileName: PropTypes.string.isRequired,
   ID: PropTypes.string.isRequired,
+  firstName: PropTypes.string.isRequired,
+  lastName: PropTypes.string.isRequired,
   Dossier3: PropTypes.string.isRequired,
   Extension: PropTypes.string.isRequired,
   Dossier1: PropTypes.string.isRequired,
@@ -121,18 +143,26 @@ Document.propTypes = {
   rea: PropTypes.array.isRequired,
   modeleDocs: PropTypes.array.isRequired,
   editFile: PropTypes.func.isRequired,
-  editedDocs: PropTypes.array.isRequired
+  editedDocs: PropTypes.array.isRequired,
+  uploadingDocs: PropTypes.array.isRequired,
+  uploadingFile: PropTypes.func.isRequired,
+  uploadFile: PropTypes.func.isRequired,
+  isNew: PropTypes.bool,
 }
 
 Document.defaultProps = {
-  type: Folder.prep
+  type: Folder.prep,
+  isNew: false
 }
 
 const mapStateToProps = state => ({
   loadingBusiness: state.user.loadingBusiness,
   editedDocs: state.user.editedDocs,
+  uploadingDocs: state.user.uploadingDocs,
   userId: state.user.id,
+  lastName: state.user.lastName,
+  firstName: state.user.firstName,
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
 })
 
-export default withNavigation(connect(mapStateToProps, { downloadBusiness, editFile })(Document));
+export default withNavigation(connect(mapStateToProps, { downloadBusiness, editFile, uploadFile, uploadingFile })(Document));

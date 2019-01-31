@@ -10,5 +10,32 @@ export default {
   t_protoDMOS: 't_ProtoDMOS',
   t_qmos: 't_QMOS',
   t_qualif: 't_Qualif',
-  t_soud: 't_Soudures'
+  t_soud: 't_Soudures',
+  docField: [
+    'LocalPath',
+    'Prepared',
+    'PreparedOn',
+    'PageNumber',
+    'ReviewedOn',
+    'PreparedBy',
+    'Revisable',
+    'Size',
+    'CreatedBy',
+    'Dossier2',
+    'UpLoadedOn',
+    'FileName',
+    'CreatedOn',
+    'Dossier1',
+    'ID',
+    'UpdatedOn',
+    'UpdatedBy',
+    'Commentaire',
+    'Dossier3',
+    'ServerPath',
+    'ReviewedBy',
+    'Extension',
+    'Reviewed',
+    'Locked',
+    'UpLoadedBy'
+  ]
 }
