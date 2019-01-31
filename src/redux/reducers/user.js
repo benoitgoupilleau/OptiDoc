@@ -8,7 +8,10 @@ import {
   BUSINESS_DOWNLOADED,
   DOWNLOADING_BUSINESS,
   CANCEL_DOWNLOAD,
-  EDIT_FILE
+  EDIT_FILE,
+  DOWNLOADING_MODELE,
+  CANCEL_DOWNLOAD_MODELE,
+  MODELE_DOWNLOADED
 } from '../actions/types';
 
 const defaultState = {
@@ -20,7 +23,8 @@ const defaultState = {
   downloadedBusiness: [],
   loadingBusiness: [],
   editedDocs: [],
-  locked: false
+  locked: false,
+  modeleDownloaded: 'no',
 }
 
 const checkToken = async (token) => {
@@ -88,9 +92,25 @@ export default (state = defaultState, action) => {
       const currentFiles = [...state.editedDocs, action.fileId];
       return {
         ...state,
-        editedDocs: currentFiles
+        editedDocs: currentFiles,
+        locked: true
       }
     }
+    case DOWNLOADING_MODELE:
+      return {
+        ...state,
+        modeleDownloaded: 'in progress'
+      }
+    case CANCEL_DOWNLOAD_MODELE:
+      return {
+        ...state,
+        modeleDownloaded: 'no'
+      }
+    case MODELE_DOWNLOADED:
+      return {
+        ...state,
+        modeleDownloaded: 'yes'
+      }
     default:
       return state;
   }

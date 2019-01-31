@@ -1,13 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Text, View, Button, ScrollView, Image, CameraRoll, PermissionsAndroid, TouchableOpacity } from 'react-native';
+import { Text, View, TextInput, ScrollView, Image, CameraRoll, PermissionsAndroid, TouchableOpacity } from 'react-native';
 import styled from 'styled-components'
 
 import Logout from '../components/Logout';
 import HeaderTitle from '../components/HeaderTitle'
 import Modele from '../components/business/Modele';
-
-import { getModeleHierarchy } from '../redux/selector/business';
 
 import Layout from '../constants/Layout'
 import Colors from '../constants/Colors'
@@ -52,10 +50,35 @@ const ModeleList = styled(Selector)`
   flex-flow: row wrap;
 `;
 
-const Separator = styled(View)`
-  height: 2px;
-  background-color: ${Colors.thirdColor};
+const ButtonWrapper = styled(View)`
+  align-items: center;
+`;
+
+const StyledButton = styled(TouchableOpacity)`
+  align-items: center;
+  background-color: ${props => props.disabled ? Colors.thirdColor : Colors.mainColor};
+  height: 40px;
   margin: 10px 0;
+  padding: ${Layout.space.small};
+  text-align: center;
+  width: 200px;
+`;
+
+const StyledText = styled(Text)`
+  color: white;
+  font-size: ${Layout.font.small};
+`;
+
+const Separator = styled(View)`
+  background-color: ${Colors.thirdColor};
+  height: 2px;
+  margin: 20px 0;
+`;
+
+const Comment = styled(TextInput)`
+  width: 100%;
+  border-color: ${Colors.thirdColor};
+  border-width: 1px;
 `;
 
 class AddFileScreen extends React.Component {
@@ -64,7 +87,9 @@ class AddFileScreen extends React.Component {
     this.state = {
       Dossier2: 'PV',
       photos: [],
-      FileName: ''
+      FileName: '',
+      image: '',
+      comment: ''
     }
   } 
   static navigationOptions = {
@@ -107,7 +132,7 @@ class AddFileScreen extends React.Component {
 
   getPhotos = () => {
     CameraRoll.getPhotos({
-      first: 20,
+      first: 10,
       assetType: 'Photos',
     })
       .then(r => {
@@ -132,13 +157,13 @@ class AddFileScreen extends React.Component {
         <Selector>
           <Option
             isSelected={this.state.Dossier2 === 'PV'}
-            onPress={() => this.setState({ Dossier2: 'PV' })}
+            onPress={() => this.setState({ Dossier2: 'PV', FileName: '' })}
           >
             <OptionText isSelected={this.state.Dossier2 === 'PV'}>PV</OptionText>
           </Option>
           <Option
             isSelected={this.state.Dossier2 === 'DMOS'}
-            onPress={() => this.setState({ Dossier2: 'DMOS' })}
+            onPress={() => this.setState({ Dossier2: 'DMOS', FileName: '' })}
           >
             <OptionText isSelected={this.state.Dossier2 === 'DMOS'}>DMOS</OptionText>
           </Option>
@@ -148,10 +173,29 @@ class AddFileScreen extends React.Component {
             <Modele key={m.ID} FileName={m.FileName} handleSelect={() => this.handleSelectModele(m.FileName)} selected={this.state.FileName === m.FileName}/>))
           }
         </ModeleList>
+        <ButtonWrapper>
+          <StyledButton disabled={this.state.FileName === ''} onPress={() => console.log('Create')}>
+            <StyledText>Créer le fichier</StyledText>
+          </StyledButton>
+        </ButtonWrapper>
         <Separator />
         <Section>A partir d'une photo</Section>
         <View>
-          <Button title="Load Images" onPress={this.handleButtonPress} />
+          <StyledButton onPress={this.handleButtonPress}>
+            <StyledText>Charger les images</StyledText>
+          </StyledButton>
+          <Text>Commentaire obligatoire pour la photo :</Text>
+          <Comment 
+            multiline={true}
+            onChangeText={(comment) => this.setState({ comment })}
+            value={this.state.comment}
+            returnKeyType="done"
+          />
+          <ButtonWrapper>
+            <StyledButton disabled={this.state.image === '' || this.state.comment === ''} onPress={() => console.log('Create')}>
+              <StyledText>Créer le fichier</StyledText>
+            </StyledButton>
+          </ButtonWrapper>
           <ScrollView>
             {this.state.photos.map((p, i) => {
               return (
@@ -174,7 +218,6 @@ class AddFileScreen extends React.Component {
 
 const mapStateToProps = state => ({
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
-  hierarchy: getModeleHierarchy(state.business.docs)
 })
 
 export default connect(mapStateToProps)(AddFileScreen);

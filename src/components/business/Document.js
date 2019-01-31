@@ -45,13 +45,13 @@ const Icons = styled(Ionicons)`
 
 class Document extends React.Component {
   onEdit = async () => {
-    const { type, ID, Extension, Dossier1, userId, loadingBusiness, prep, rea } = this.props;
+    const { type, ID, Extension, Dossier1, userId, loadingBusiness, prep, rea, modeleDocs } = this.props;
     const filePath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
     const fileExists = await RNFS.exists(filePath);
     if (fileExists) {
       this.props.editFile(ID, filePath)
     } else if (!loadingBusiness.includes(Dossier1)) {
-      this.props.downloadBusiness(userId, Dossier1, prep, rea)
+      this.props.downloadBusiness(userId, Dossier1, prep, rea, modeleDocs)
     }
   }
 
@@ -119,6 +119,7 @@ Document.propTypes = {
   userId: PropTypes.string.isRequired,
   prep: PropTypes.array.isRequired,
   rea: PropTypes.array.isRequired,
+  modeleDocs: PropTypes.array.isRequired,
   editFile: PropTypes.func.isRequired,
   editedDocs: PropTypes.array.isRequired
 }
@@ -130,7 +131,8 @@ Document.defaultProps = {
 const mapStateToProps = state => ({
   loadingBusiness: state.user.loadingBusiness,
   editedDocs: state.user.editedDocs,
-  userId: state.user.id
+  userId: state.user.id,
+  modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
 })
 
 export default withNavigation(connect(mapStateToProps, { downloadBusiness, editFile })(Document));

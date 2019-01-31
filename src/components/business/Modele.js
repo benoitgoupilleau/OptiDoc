@@ -8,14 +8,15 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Layout from '../../constants/Layout';
 
 const ModeleWrapper = styled(TouchableOpacity)`
-  margin: ${Layout.space.medium};
+  margin: ${Layout.space.small};
   flex-direction: row;
   justify-content: space-between;
-  flex: auto;
+  width: 350px;
 `;
 
 const Title = styled(Text)`
-  font-size: ${Layout.font.medium};
+  font-size: ${Layout.font.small};
+  ${props => props.selected && 'color: black;'}
 `;
 
 const Icons = styled(Ionicons)`
@@ -26,7 +27,7 @@ const Modele = ({ FileName, handleSelect, selected }) => (
   <ModeleWrapper
     onPress={handleSelect}
   > 
-    <Title>{FileName}</Title>
+    <Title selected={selected} >{FileName}</Title>
     {selected && 
       <Icons
         color="green"

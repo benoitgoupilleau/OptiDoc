@@ -104,6 +104,7 @@ class Signin extends React.Component {
           placeholder="Email"
           value={this.state.email}
           editable={!this.props.locked}
+          returnKeyType="next"
         />
         <StyledInput
           allowFontScaling
@@ -111,6 +112,7 @@ class Signin extends React.Component {
           placeholder="Mot de passe"
           secureTextEntry
           value={this.state.password}
+          returnKeyType="done"
         />
         <Message>Mot de passe oublié ? Merci de contacter votre administrateur</Message>
         <StyledButton onPress={this.signInAsync}>

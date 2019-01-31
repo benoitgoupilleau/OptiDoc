@@ -9,6 +9,9 @@ import {
   DOWNLOADING_BUSINESS,
   CANCEL_DOWNLOAD,
   EDIT_FILE,
+  DOWNLOADING_MODELE,
+  CANCEL_DOWNLOAD_MODELE,
+  MODELE_DOWNLOADED,
 } from './types';
 
 import Folder from '../../constants/Folder'
@@ -28,7 +31,7 @@ export const logout = (userId) => dispatch => RNFS.unlink(`${rootDir}/${userId}`
   .then(() => dispatch({type: LOGOUT}))
   .catch(() => dispatch({ type: LOGOUT }))
 
-export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
+export const downloadBusiness = (userId, businessId, prep, rea, modeleDocs) => dispatch => {
   dispatch(downloading(businessId))
   return RNFS.mkdir(`${rootDir}/${userId}/${businessId}`)
   .then(async () => {
@@ -36,21 +39,34 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
     if (prep.length > 0) {
       await RNFS.mkdir(`${rootDir}/${userId}/${businessId}/${Folder.prep}`);
       for (let i = 0; i < prep.length; i += 1) {
-        await FTP.downloadFile(`./${businessId}/Preparation/${prep[i].Dossier3}/${prep[i].ID}.${prep[i].Extension}`,
+        await FTP.downloadFile(`./${prep[i].ServerPath}`,
           `${rootDir}/${userId}/${businessId}/${Folder.prep}`)
       }
     }
     if (rea.length > 0) {
       await RNFS.mkdir(`${rootDir}/${userId}/${businessId}/${Folder.rea}`);
       for (let i = 0; i < rea.length; i += 1) {
-        await FTP.downloadFile(`./${businessId}/Realisation/${rea[i].Dossier3}/${rea[i].ID}.${rea[i].Extension}`,
+        await FTP.downloadFile(`./${rea[i].ServerPath}`,
           `${rootDir}/${userId}/${businessId}/${Folder.rea}`)
       }
+    }
+    if (modeleDocs.length > 0) {
+      dispatch(downloadModele())
+      await RNFS.mkdir(`${rootDir}/${userId}/${Folder.modeleDocs}`);
+      for (let i = 0; i < modeleDocs.length; i += 1) {
+        const fileExists = await RNFS.exists(`${rootDir}/${userId}/${Folder.modeleDocs}/${modeleDocs[i].ID}.${modeleDocs[i].Extension}`)
+        if (!fileExists) {
+          await FTP.downloadFile(`./${modeleDocs[i].ServerPath}`,
+            `${rootDir}/${userId}/${Folder.modeleDocs}`)
+        }
+      }
+      dispatch(modeleDownloaded())
     }
     await FTP.logout()
     return dispatch(businessDownloaded(businessId))
   }).catch(async (e) => {
     dispatch(cancelDownload(businessId))
+    dispatch(cancelDownloadModel())
     await FTP.logout()
     console.log({ downloadBusiness: e})
   })
@@ -78,3 +94,38 @@ export const editFile = (fileId, filePath) => {
     fileId
   })
 }
+
+export const downloadModels = (userId, modeleDocs) => dispatch => {
+  return RNFS.mkdir(`${rootDir}/${userId}/${Folder.modeleDocs}`)
+    .then(async () => {
+      await FTP.login(FTP_USERNAME, FTP_PASSWORD);
+      if (modeleDocs.length > 0) {
+        dispatch(downloadModele())
+        for (let i = 0; i < modeleDocs.length; i += 1) {
+          const fileExists = await RNFS.exists(`${rootDir}/${userId}/${Folder.modeleDocs}/${modeleDocs[i].ID}.${modeleDocs[i].Extension}`)
+          if (!fileExists) {
+            await FTP.downloadFile(`./Modele/${modeleDocs[i].Dossier2}${modeleDocs[i].Dossier3 !== '' && `/${modeleDocs[i].Dossier3}`}/${modeleDocs[i].ID}.${modeleDocs[i].Extension}`,
+              `${rootDir}/${userId}/${Folder.modeleDocs}`)
+          }
+        }
+      }
+      await FTP.logout()
+      return dispatch(modeleDownloaded())
+    }).catch(async (e) => {
+      dispatch(cancelDownloadModel())
+      await FTP.logout()
+      console.log({ downloadModels: e })
+    })
+}
+
+const modeleDownloaded = () => ({
+  type: MODELE_DOWNLOADED
+})
+
+const cancelDownloadModel = () => ({
+  type: CANCEL_DOWNLOAD_MODELE
+})
+
+const downloadModele = () => ({
+  type: DOWNLOADING_MODELE
+})

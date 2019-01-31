@@ -1,4 +1,5 @@
 export default {
   rea: 'Rea',
-  prep: 'Prep'
+  prep: 'Prep',
+  modeleDocs: 'Modele'
 }

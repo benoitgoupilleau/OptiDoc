@@ -60,7 +60,7 @@ const PrepSection = styled(Text)`
 
 class Business extends React.Component {
   displayIcon = () => {
-    const { title, prep, rea, downloadedBusiness, downloadBusiness, userId, loadingBusiness } = this.props;
+    const { title, prep, rea, downloadedBusiness, downloadBusiness, userId, loadingBusiness, modeleDocs } = this.props;
     if (loadingBusiness.includes(title)) {
       return <ActivityIndicator />
     } else if (downloadedBusiness.includes(title)) {
@@ -77,7 +77,7 @@ class Business extends React.Component {
         name={"md-cloud-download"}
         size={30}
         color={Colors.secondColor}
-        onPress={() => downloadBusiness(userId, title, prep, rea)}
+        onPress={() => downloadBusiness(userId, title, prep, rea, modeleDocs)}
       />
     )
   }
@@ -111,6 +111,7 @@ Business.propTypes = {
   title: PropTypes.string.isRequired,
   prep: PropTypes.array,
   rea: PropTypes.array,
+  modeleDocs: PropTypes.array.isRequired,
   downloadedBusiness: PropTypes.array.isRequired,
   loadingBusiness: PropTypes.array.isRequired,
   downloadBusiness: PropTypes.func.isRequired,
@@ -126,7 +127,8 @@ Business.defaultProps = {
 const mapStateToProps = state => ({
   downloadedBusiness: state.user.downloadedBusiness,
   loadingBusiness: state.user.loadingBusiness,
-  userId: state.user.id
+  userId: state.user.id,
+  modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
 })
 
 export default withNavigation(connect(mapStateToProps, { downloadBusiness })(Business));
