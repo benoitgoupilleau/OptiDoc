@@ -6,7 +6,7 @@ import { View, Text, NetInfo, Dimensions } from 'react-native';
 
 import { connectivityChange, connectDb } from '../redux/actions/network';
 import { getNews } from '../redux/actions/news'
-import { getDocs } from '../redux/actions/business'
+import { getDocs, getModeles } from '../redux/actions/business'
 import { getTeam, getTeamRight } from '../redux/actions/team'
 
 import Colors from '../constants/Colors';
@@ -73,6 +73,7 @@ class OfflineNotice extends PureComponent {
     this.refreshInterval = setInterval(() => {
       this.props.getNews()
       this.props.getDocs()
+      this.props.getModeles()
       this.props.getTeam()
       this.props.getTeamRight()
     }, 1000 * 60 * 30); // refresh every 30min
@@ -104,6 +105,7 @@ export default connect(mapStateToProps, {
   connectDb,
   getNews,
   getDocs,
+  getModeles,
   getTeam,
   getTeamRight
 })(OfflineNotice);

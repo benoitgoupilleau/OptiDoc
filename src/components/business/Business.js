@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { View, Text, ActivityIndicator } from 'react-native';
+import { withNavigation } from 'react-navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Document from './Document'
@@ -82,7 +83,7 @@ class Business extends React.Component {
   }
 
   render() {
-    const { title, prep, rea } = this.props;
+    const { title, prep, rea, navigation } = this.props;
     return (
       <BusinessWrapper>
         <MainSection>
@@ -97,7 +98,7 @@ class Business extends React.Component {
             name={"md-add"}
             size={26}
             color={Colors.mainColor}
-            onPress={() => console.log('md-add clicked')}
+            onPress={() => navigation.navigate('Add', { affaire: title })}
           />
         </ReaSection>
         {rea.map(r => <Document key={r.ID} {...r} type={Folder.rea} prep={prep} rea={rea} />)}
@@ -113,7 +114,8 @@ Business.propTypes = {
   downloadedBusiness: PropTypes.array.isRequired,
   loadingBusiness: PropTypes.array.isRequired,
   downloadBusiness: PropTypes.func.isRequired,
-  userId: PropTypes.string.isRequired
+  userId: PropTypes.string.isRequired,
+  navigation: PropTypes.object.isRequired,
 }
 
 Business.defaultProps = {
@@ -127,4 +129,4 @@ const mapStateToProps = state => ({
   userId: state.user.id
 })
 
-export default connect(mapStateToProps, { downloadBusiness })(Business);
+export default withNavigation(connect(mapStateToProps, { downloadBusiness })(Business));

@@ -12,6 +12,7 @@ If you don't have git install, follow those instructions: https://fr.atlassian.c
     - Run `npm install`
 
 4. Run project in a simulator or your own device
+    - Rename the file ".env.sample" into ".env" and update the value for the db and ftp server
     - You need to have a device ready. For that follow those instructions: https://facebook.github.io/react-native/docs/getting-started#preparing-the-android-device
     - In your terminal, navigate to the project folder in your terminal (Optidoc). You will need 2 terminal windows.
     - Run `npm start`
