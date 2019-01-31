@@ -18,6 +18,7 @@ const Wrapper = styled(View)`
 const Title = styled(Text)`
   color: ${Colors.mainColor};
   font-size: ${Layout.font.medium};
+  padding-left: 5px;
   max-width: 400px;
 `
 
@@ -25,10 +26,10 @@ const Title = styled(Text)`
 const HeaderTitle = ({ title }) => {
   return (
     <Wrapper> 
-      <Image
+      {logo && <Image
         source={logo}
-        style={{ width: 200, height: 50 }}
-      />
+        style={{ width: 95, height: 50 }}
+      />}
       {title.length > 0 && <Title>{title}</Title> }
     </Wrapper>
   );

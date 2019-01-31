@@ -12,6 +12,7 @@ import {
   DOWNLOADING_MODELE,
   CANCEL_DOWNLOAD_MODELE,
   MODELE_DOWNLOADED,
+  UPLOADED_FILE
 } from './types';
 
 import Folder from '../../constants/Folder'
@@ -104,7 +105,7 @@ export const downloadModels = (userId, modeleDocs) => dispatch => {
         for (let i = 0; i < modeleDocs.length; i += 1) {
           const fileExists = await RNFS.exists(`${rootDir}/${userId}/${Folder.modeleDocs}/${modeleDocs[i].ID}.${modeleDocs[i].Extension}`)
           if (!fileExists) {
-            await FTP.downloadFile(`./Modele/${modeleDocs[i].Dossier2}${modeleDocs[i].Dossier3 !== '' && `/${modeleDocs[i].Dossier3}`}/${modeleDocs[i].ID}.${modeleDocs[i].Extension}`,
+            await FTP.downloadFile(`./${modeleDocs[i].ServerPath}`,
               `${rootDir}/${userId}/${Folder.modeleDocs}`)
           }
         }
@@ -128,4 +129,15 @@ const cancelDownloadModel = () => ({
 
 const downloadModele = () => ({
   type: DOWNLOADING_MODELE
+})
+
+
+export const uploadFile = (filePath, file) => async (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
+  .then(() => FTP.uploadFile(filePath, `./${file.ServerPath}`)
+    .then(() => dispatch(uploadedFile(file.ID))))
+  .catch((e) => console.log({ uploadFile: e }))
+
+const uploadedFile = (id) => ({
+  type: UPLOADED_FILE,
+  id
 })

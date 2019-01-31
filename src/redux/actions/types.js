@@ -8,6 +8,7 @@ export const EDIT_FILE = 'EDIT_FILE';
 export const MODELE_DOWNLOADED = 'MODELE_DOWNLOADED';
 export const DOWNLOADING_MODELE = 'DOWNLOADING_MODELE';
 export const CANCEL_DOWNLOAD_MODELE = 'CANCEL_DOWNLOAD_MODELE'
+export const UPLOADED_FILE = 'UPLOADED_FILE';
 
 // News actions
 export const SET_NEWS = 'SET_NEWS';
