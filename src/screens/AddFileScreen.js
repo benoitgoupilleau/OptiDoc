@@ -75,6 +75,12 @@ const Separator = styled(View)`
   margin: 20px 0;
 `;
 
+const FileNameInput = styled(TextInput)`
+  width: 100%;
+  border-color: ${Colors.thirdColor};
+  border-width: 1px;
+`;
+
 const Comment = styled(TextInput)`
   width: 100%;
   border-color: ${Colors.thirdColor};
@@ -89,7 +95,9 @@ class AddFileScreen extends React.Component {
       photos: [],
       FileName: '',
       image: '',
-      comment: ''
+      comment: '',
+      FileNameFinal: '',
+      pictureName: ''
     }
   } 
   static navigationOptions = {
@@ -145,7 +153,7 @@ class AddFileScreen extends React.Component {
   };
 
   handleSelectModele = (FileName) => {
-    this.setState({ FileName })
+    this.setState({ FileName, FileNameFinal: FileName })
   }
 
   render() {
@@ -174,6 +182,11 @@ class AddFileScreen extends React.Component {
           }
         </ModeleList>
         <ButtonWrapper>
+          <FileNameInput
+            placeholder="Nom du fichier"
+            onChangeText={(FileNameFinal) => this.setState({ FileNameFinal })}
+            value={this.state.FileNameFinal}
+          />
           <StyledButton disabled={this.state.FileName === ''} onPress={() => console.log('Create')}>
             <StyledText>Créer le fichier</StyledText>
           </StyledButton>
@@ -182,8 +195,13 @@ class AddFileScreen extends React.Component {
         <Section>A partir d'une photo</Section>
         <View>
           <StyledButton onPress={this.handleButtonPress}>
-            <StyledText>Charger les images</StyledText>
+            <StyledText>Charger les photos</StyledText>
           </StyledButton>
+          <FileNameInput
+            placeholder="Nom du fichier"
+            onChangeText={(pictureName) => this.setState({ pictureName })}
+            value={this.state.pictureName}
+          />
           <Text>Commentaire obligatoire pour la photo :</Text>
           <Comment 
             multiline={true}
