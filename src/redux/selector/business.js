@@ -15,3 +15,13 @@ export const listDocs = (docs, businesses) => {
   }
   return docList;
 }
+
+export const listNewDocs = (docs, businesses) => {
+  const docList = {}
+  for (let i = 0; i < businesses.length; i += 1) {
+    const affaire = businesses[i]
+    const newDocs = docs.filter(d => (d.Dossier1 === affaire))
+    docList[affaire] = newDocs;
+  }
+  return docList;
+}

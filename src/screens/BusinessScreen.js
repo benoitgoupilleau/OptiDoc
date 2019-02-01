@@ -14,7 +14,7 @@ import Business from '../components/business/Business'
 import Layout from '../constants/Layout'
 import Colors from '../constants/Colors';
 
-import { listAffaires, listDocs } from '../redux/selector/business'
+import { listAffaires, listDocs, listNewDocs } from '../redux/selector/business'
 
 const { width } = Dimensions.get('window');
 
@@ -53,49 +53,51 @@ class BusinessScreen extends React.Component {
     if (this.props.businesses.length > 0) {
       return (
         <Main>
-          <Legend>
-            <LegendItem>
-              <Icons
-                name="md-create"
-                size={26}
-              />
-              <Text>Modifier</Text>
-            </LegendItem>
-            <LegendItem>
-              <Icons
-                name="md-cloud-upload"
-                size={26}
-                color={Colors.secondColor}
-              />
-              <Text>Envoyer</Text>
-            </LegendItem>
-            <LegendItem>
-              <Icons
-                name="md-close"
-                size={26}
-                color="red"
-              />
-              <Text>Annuler les modifications locales</Text>
-            </LegendItem>
-            <LegendItem>
-              <Icons
-                name="md-checkbox-outline"
-                size={26}
-              />
-              <Text>Non Préparé</Text>
-            </LegendItem>
-            <LegendItem>
-              <Icons
-                name="md-checkbox-outline"
-                size={26}
-                color="green"
-              />
-              <Text>Préparé</Text>
-            </LegendItem>
-          </Legend>
-          <StyledScroll>
-            {this.props.businesses.map(b => <Business key={b} title={b} prep={this.props.docs[b].prep} rea={this.props.docs[b].rea} />)}
-          </StyledScroll>
+          <View>
+            <Legend>
+              <LegendItem>
+                <Icons
+                  name="md-create"
+                  size={26}
+                />
+                <Text>Modifier</Text>
+              </LegendItem>
+              <LegendItem>
+                <Icons
+                  name="md-cloud-upload"
+                  size={26}
+                  color={Colors.secondColor}
+                />
+                <Text>Envoyer</Text>
+              </LegendItem>
+              <LegendItem>
+                <Icons
+                  name="md-close"
+                  size={26}
+                  color="red"
+                />
+                <Text>Annuler les modifications locales</Text>
+              </LegendItem>
+              <LegendItem>
+                <Icons
+                  name="md-checkbox-outline"
+                  size={26}
+                />
+                <Text>Non Préparé</Text>
+              </LegendItem>
+              <LegendItem>
+                <Icons
+                  name="md-checkbox-outline"
+                  size={26}
+                  color="green"
+                />
+                <Text>Préparé</Text>
+              </LegendItem>
+            </Legend>
+            <StyledScroll>
+              {this.props.businesses.map(b => <Business key={b} title={b} prep={this.props.docs[b].prep} rea={this.props.docs[b].rea} newDocs={this.props.newDocs[b]} />)}
+            </StyledScroll>
+          </View>
         </Main>
       );
     }
@@ -116,9 +118,11 @@ BusinessScreen.propTypes = {
 const mapStateToProps = ({ user, teams, business }) => {
   const businesses = listAffaires([...teams.teamRights], user.id)
   const docs = listDocs(business.docs, businesses)
+  const newDocs = listNewDocs(business.newDocs, businesses)
   return ({
     businesses,
-    docs
+    docs,
+    newDocs
   })
 }
 

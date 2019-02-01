@@ -92,6 +92,11 @@ const businessDownloaded = (id) => ({
   id
 })
 
+export const editPrepare = (fileId) => ({
+  type: EDIT_FILE,
+  fileId
+})
+
 export const editFile = (fileId, filePath) => {
   FileViewer.open(filePath, { showOpenWithDialog: true });
   return ({
@@ -144,7 +149,7 @@ export const uploadFile = (filePath, file, remoteDir) => async (dispatch) => FTP
   .then(() => FTP.uploadFile(filePath, remoteDir)
     .then(() => {
       //MSSQL update
-      return MSSQL.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}' WHERE ID='${file.ID}'`)
+      return MSSQL.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}' WHERE ID='${file.ID}'`)
         .then(() => dispatch(removeFromEdit(file.ID)))
     }))
   .catch((e) => console.log({ uploadFile: e }))

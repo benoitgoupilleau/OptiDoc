@@ -44,7 +44,7 @@ export default (state = defaultState, action) => {
       let omitToken = {}
       let omitLoading = {}
       if (action.payload && action.payload.user && action.payload.user.bearerToken) {
-        unValidToken = checkToken(action.payload.user.bearerToken);
+        unValidToken = !checkToken(action.payload.user.bearerToken);
         omitToken = { ...omit(action.payload.user, 'bearerToken') }
         omitLoading = { ...omit(action.payload.user, 'loadingBusiness') }
       }

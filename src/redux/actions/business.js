@@ -4,6 +4,7 @@ import Tables from '../../constants/Tables';
 import {
   SET_DOCS,
   SET_MODELES,
+  UPDATE_PREPARE
 } from './types';
 
 
@@ -23,4 +24,11 @@ export const getModeles = () => dispatch => MSSQL.executeQuery(`SELECT * FROM ${
 const setModeles = (modeles) => ({
   type: SET_MODELES,
   modeles
+})
+
+export const updatePrepared = (fileId, Prepared, PreparedOn) => ({
+  type: UPDATE_PREPARE,
+  fileId,
+  Prepared,
+  PreparedOn
 })

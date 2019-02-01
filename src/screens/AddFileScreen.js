@@ -1,14 +1,22 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Text, View, TextInput, ScrollView, Image, CameraRoll, PermissionsAndroid, TouchableOpacity } from 'react-native';
+import { Text, View, TextInput, ScrollView, Dimensions, CameraRoll, PermissionsAndroid, TouchableOpacity } from 'react-native';
 import styled from 'styled-components'
 
 import Logout from '../components/Logout';
 import HeaderTitle from '../components/HeaderTitle'
 import Modele from '../components/business/Modele';
+import Picture from '../components/business/Picture';
 
 import Layout from '../constants/Layout'
 import Colors from '../constants/Colors'
+
+const { width } = Dimensions.get('window');
+
+const StyledScroll = styled(ScrollView)`
+  width: ${width};
+  padding-bottom: ${Layout.space.large};
+`;
 
 const Wrapper = styled(View)`
   padding: 40px;
@@ -87,6 +95,11 @@ const Comment = styled(TextInput)`
   border-width: 1px;
 `;
 
+const ListPicture = styled(View)`
+  margin: 10px 0;
+  flex-flow: row wrap;
+`;
+
 class AddFileScreen extends React.Component {
   constructor(props) {
     super(props)
@@ -97,8 +110,10 @@ class AddFileScreen extends React.Component {
       image: '',
       comment: '',
       FileNameFinal: '',
-      pictureName: ''
+      pictureName: '',
+      pictureNameFinal: props.Dossier1
     }
+    this.handleButtonPress()
   } 
   static navigationOptions = {
     headerTitle: <HeaderTitle title="Ajouter un document"/>,
@@ -140,7 +155,7 @@ class AddFileScreen extends React.Component {
 
   getPhotos = () => {
     CameraRoll.getPhotos({
-      first: 10,
+      first: 8,
       assetType: 'Photos',
     })
       .then(r => {
@@ -154,6 +169,18 @@ class AddFileScreen extends React.Component {
 
   handleSelectModele = (FileName) => {
     this.setState({ FileName, FileNameFinal: FileName })
+  }
+
+  handleSelectPicture = (pictureName) => {
+    this.setState({ pictureName })
+  }
+
+  onCreateFile = () => {
+    
+  }
+
+  onCreatePicture = () => {
+
   }
 
   render() {
@@ -199,8 +226,8 @@ class AddFileScreen extends React.Component {
           </StyledButton>
           <FileNameInput
             placeholder="Nom du fichier"
-            onChangeText={(pictureName) => this.setState({ pictureName })}
-            value={this.state.pictureName}
+            onChangeText={(pictureNameFinal) => this.setState({ pictureNameFinal })}
+            value={this.state.pictureNameFinal}
           />
           <Text>Commentaire obligatoire pour la photo :</Text>
           <Comment 
@@ -210,24 +237,22 @@ class AddFileScreen extends React.Component {
             returnKeyType="done"
           />
           <ButtonWrapper>
-            <StyledButton disabled={this.state.image === '' || this.state.comment === ''} onPress={() => console.log('Create')}>
+            <StyledButton disabled={this.state.pictureName === '' || this.state.comment === ''} onPress={() => console.log('Create')}>
               <StyledText>Créer le fichier</StyledText>
             </StyledButton>
           </ButtonWrapper>
-          <ScrollView>
-            {this.state.photos.map((p, i) => {
-              return (
-                <Image
-                  key={i}
-                  style={{
-                    width: 300,
-                    height: 100,
-                  }}
-                  source={{ uri: p.node.image.uri }}
-                />
-              );
-            })}
-          </ScrollView>
+          <ListPicture>
+            <StyledScroll showsVerticalScrollIndicator scrollEnabled >
+              <View>
+                {this.state.photos.map((p) => <Picture
+                  key={p.node.image.uri}
+                  p={p}
+                  handleSelect={() => this.handleSelectPicture(p.node.image.uri)}
+                  selected={this.state.pictureName === p.node.image.uri}
+                /> )}
+              </View>
+            </StyledScroll>
+          </ListPicture>
         </View>
       </Wrapper>
     );

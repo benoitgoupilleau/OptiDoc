@@ -46,7 +46,7 @@ const Icons = styled(Ionicons)`
   padding: 0 10px;
 `;
 
-class Document extends React.Component {
+class NewDocument extends React.Component {
   onEdit = async () => {
     const { type, ID, Extension, Dossier1, userId, loadingBusiness, prep, rea, modeleDocs } = this.props;
     const filePath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
@@ -149,7 +149,7 @@ class Document extends React.Component {
   } 
 }
 
-Document.propTypes = {
+NewDocument.propTypes = {
   FileName: PropTypes.string.isRequired,
   ID: PropTypes.string.isRequired,
   firstName: PropTypes.string.isRequired,
@@ -176,7 +176,7 @@ Document.propTypes = {
   isNew: PropTypes.bool,
 }
 
-Document.defaultProps = {
+NewDocument.defaultProps = {
   type: Folder.prep,
   isNew: false
 }
