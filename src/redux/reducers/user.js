@@ -40,16 +40,23 @@ const checkToken = async (token) => {
 export default (state = defaultState, action) => {
   switch (action.type) {
     case REHYDRATE: {
-      const unValidToken = (!action.payload || !action.payload.user || !action.payload.user.bearerToken || !checkToken(action.payload.user.bearerToken));
+      let unValidToken = false;
+      let omitToken = {}
+      let omitLoading = {}
+      if (action.payload && action.payload.user && action.payload.user.bearerToken) {
+        unValidToken = checkToken(action.payload.user.bearerToken);
+        omitToken = { ...omit(action.payload.user, 'bearerToken') }
+        omitLoading = { ...omit(action.payload.user, 'loadingBusiness') }
+      }
       if (unValidToken) {
         return {
           ...state,
-          ...omit(action.payload.user, 'bearerToken')
+          ...omitToken
         }
       }
       return {
         ...state,
-        ...omit(action.payload.user, 'loadingBusiness')
+        ...omitLoading
       }
     }
     case LOGIN:
@@ -80,7 +87,7 @@ export default (state = defaultState, action) => {
       return {
         ...state,
         downloadedBusiness: currentBusiness,
-        loadingBusiness: [...downloading.slice(0, indexToRemove), ...downloading.slice(indexToRemove+1)]
+        loadingBusiness: [...downloading.slice(0, indexToRemove), ...downloading.slice(indexToRemove + 1)]
       }
     }
     case CANCEL_DOWNLOAD: {
@@ -91,7 +98,7 @@ export default (state = defaultState, action) => {
         loadingBusiness: [...downloading.slice(0, indexToRemove), ...downloading.slice(indexToRemove + 1)]
       }
     }
-    case EDIT_FILE:{
+    case EDIT_FILE: {
       const currentFiles = [...state.editedDocs];
       if (!currentFiles.includes(action.fileId)) currentFiles.push(action.fileId)
       return {
@@ -111,7 +118,7 @@ export default (state = defaultState, action) => {
     case REMOVE_EDIT_FILE: {
       const currentFiles = [...state.editedDocs];
       const indexToRemove = currentFiles.findIndex(el => el === action.id);
-      const newFiles = [...currentFiles.slice(0, indexToRemove), ...currentFiles.slice(indexToRemove+1)]
+      const newFiles = [...currentFiles.slice(0, indexToRemove), ...currentFiles.slice(indexToRemove + 1)]
       const currentUpload = [...state.uploadingDocs];
       const indexUpload = currentUpload.findIndex(el => el === action.id);
       return {
