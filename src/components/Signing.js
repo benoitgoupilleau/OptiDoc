@@ -4,8 +4,9 @@ import { connect } from 'react-redux';
 import styled from 'styled-components'
 import { JWT_SECRET, JWT_EXPIRE, ENV } from 'react-native-dotenv';
 import jwt from 'react-native-pure-jwt'
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
 import { withNavigation } from 'react-navigation';
+import logo from '../assets/images/logo.png';
 
 import Logout from './Logout';
 
@@ -96,6 +97,12 @@ class Signin extends React.Component {
   render() {
     return (
       <Wrapper>
+        <View style={{ alignItems : 'center' }}>
+          <Image
+            source={logo}
+            style={{ width: 300, height: 200 }}
+          />
+        </View>
         <Title>OptiDoc</Title>
         <StyledInput 
           allowFontScaling

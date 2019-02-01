@@ -90,7 +90,7 @@ class Document extends React.Component {
   }
 
   render() {
-    const { FileName, type, navigation, ID, Dossier3, Extension, Dossier1, editedDocs, isNew, uploadingDocs} = this.props;
+    const { FileName, type, navigation, ID, Dossier3, Extension, Dossier1, editedDocs, isNew, uploadingDocs, Reviewed, Prepared} = this.props;
     return (
       <DocumentWrapper
         onPress={() => navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type })}
@@ -122,10 +122,16 @@ class Document extends React.Component {
               </EditIcons>
             )}
             <Icons
+              name="md-checkbox-outline"
+              size={26}
+              color={Prepared === 'O' && "green"}
+              onPress={this.onPrepare}
+            />
+            {Reviewed === 'N' && <Icons
               name="md-create"
               size={26}
               onPress={this.onEdit}
-            />
+            />}
           </IconsWrapper>
         }
       </DocumentWrapper>
