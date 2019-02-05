@@ -1,22 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Text, View, TextInput, ScrollView, Dimensions, CameraRoll, PermissionsAndroid, TouchableOpacity } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity } from 'react-native';
 import styled from 'styled-components'
 
 import Logout from '../components/Logout';
 import HeaderTitle from '../components/HeaderTitle'
 import Modele from '../components/business/Modele';
-import Picture from '../components/business/Picture';
 
 import Layout from '../constants/Layout'
 import Colors from '../constants/Colors'
-
-const { width } = Dimensions.get('window');
-
-const StyledScroll = styled(ScrollView)`
-  width: ${width};
-  padding-bottom: ${Layout.space.large};
-`;
 
 const Wrapper = styled(View)`
   padding: 40px;
@@ -77,27 +69,10 @@ const StyledText = styled(Text)`
   font-size: ${Layout.font.small};
 `;
 
-const Separator = styled(View)`
-  background-color: ${Colors.thirdColor};
-  height: 2px;
-  margin: 20px 0;
-`;
-
 const FileNameInput = styled(TextInput)`
   width: 100%;
   border-color: ${Colors.thirdColor};
   border-width: 1px;
-`;
-
-const Comment = styled(TextInput)`
-  width: 100%;
-  border-color: ${Colors.thirdColor};
-  border-width: 1px;
-`;
-
-const ListPicture = styled(View)`
-  margin: 10px 0;
-  flex-flow: row wrap;
 `;
 
 class AddFileScreen extends React.Component {
@@ -105,15 +80,10 @@ class AddFileScreen extends React.Component {
     super(props)
     this.state = {
       Dossier2: 'PV',
-      photos: [],
       FileName: '',
-      image: '',
       comment: '',
       FileNameFinal: '',
-      pictureName: '',
-      pictureNameFinal: props.Dossier1
     }
-    this.handleButtonPress()
   } 
   static navigationOptions = {
     headerTitle: <HeaderTitle title="Ajouter un document"/>,
@@ -123,64 +93,12 @@ class AddFileScreen extends React.Component {
     }
   }
 
-  handleButtonPress = async () => {
-    const isAuthorised = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
-    if (isAuthorised) {
-      this.getPhotos();
-    } else {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-          {
-            title: "Optidoc demande d'acccès aux photos",
-            message:
-              "Optidoc a besoin d'accéder à vos photos " +
-              "pour que vous puissiez les importer dans l'application.",
-            buttonNeutral: 'Plus tard',
-            buttonNegative: 'Annuler',
-            buttonPositive: 'Autoriser',
-          },
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          this.getPhotos();
-        } else {
-          console.log('permission denied');
-        }
-      } catch (err) {
-        console.warn(err);
-      }
-    }
-    
-  }
-
-  getPhotos = () => {
-    CameraRoll.getPhotos({
-      first: 8,
-      assetType: 'Photos',
-    })
-      .then(r => {
-        this.setState({ photos: r.edges });
-      })
-      .catch((err) => {
-        console.log({err})
-        //Error Loading Images
-      });
-  };
-
   handleSelectModele = (FileName) => {
     this.setState({ FileName, FileNameFinal: FileName })
   }
 
-  handleSelectPicture = (pictureName) => {
-    this.setState({ pictureName })
-  }
-
   onCreateFile = () => {
     
-  }
-
-  onCreatePicture = () => {
-
   }
 
   render() {
@@ -188,7 +106,7 @@ class AddFileScreen extends React.Component {
     return (
       <Wrapper>
         <Title>{title}</Title>
-        <Section>A partir d'un modèle</Section>
+        <Section>Sélectionner un modèle</Section>
         <Selector>
           <Option
             isSelected={this.state.Dossier2 === 'PV'}
@@ -218,42 +136,6 @@ class AddFileScreen extends React.Component {
             <StyledText>Créer le fichier</StyledText>
           </StyledButton>
         </ButtonWrapper>
-        <Separator />
-        <Section>A partir d'une photo</Section>
-        <View>
-          <StyledButton onPress={this.handleButtonPress}>
-            <StyledText>Charger les photos</StyledText>
-          </StyledButton>
-          <FileNameInput
-            placeholder="Nom du fichier"
-            onChangeText={(pictureNameFinal) => this.setState({ pictureNameFinal })}
-            value={this.state.pictureNameFinal}
-          />
-          <Text>Commentaire obligatoire pour la photo :</Text>
-          <Comment 
-            multiline={true}
-            onChangeText={(comment) => this.setState({ comment })}
-            value={this.state.comment}
-            returnKeyType="done"
-          />
-          <ButtonWrapper>
-            <StyledButton disabled={this.state.pictureName === '' || this.state.comment === ''} onPress={() => console.log('Create')}>
-              <StyledText>Créer le fichier</StyledText>
-            </StyledButton>
-          </ButtonWrapper>
-          <ListPicture>
-            <StyledScroll showsVerticalScrollIndicator scrollEnabled >
-              <View>
-                {this.state.photos.map((p) => <Picture
-                  key={p.node.image.uri}
-                  p={p}
-                  handleSelect={() => this.handleSelectPicture(p.node.image.uri)}
-                  selected={this.state.pictureName === p.node.image.uri}
-                /> )}
-              </View>
-            </StyledScroll>
-          </ListPicture>
-        </View>
       </Wrapper>
     );
   }

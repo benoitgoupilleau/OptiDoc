@@ -25,7 +25,8 @@ const StyledScroll = styled(ScrollView)`
 `;
 
 const Legend = styled(View)`
-  flex-direction: row;
+  align-items: center;
+  flex-flow: row wrap;
   padding: 5px 0;
 `;
 
@@ -55,6 +56,7 @@ class BusinessScreen extends React.Component {
         <Main>
           <View>
             <Legend>
+              <Text style={{paddingLeft: 5, paddingRight: 5}}>Légende : </Text>
               <LegendItem>
                 <Icons
                   name="md-create"
@@ -116,7 +118,7 @@ BusinessScreen.propTypes = {
 
 
 const mapStateToProps = ({ user, teams, business }) => {
-  const businesses = listAffaires([...teams.teamRights], user.id)
+  const businesses = listAffaires([...teams.teamRights], user.id_employe)
   const docs = listDocs(business.docs, businesses)
   const newDocs = listNewDocs(business.newDocs, businesses)
   return ({

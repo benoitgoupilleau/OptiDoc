@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { TouchableOpacity, Text, View, ActivityIndicator } from 'react-native';
+import { TouchableOpacity, Text, View, ActivityIndicator, Dimensions, PermissionsAndroid } from 'react-native';
 import pick from 'lodash.pick';
 import RNFS from 'react-native-fs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -16,6 +16,7 @@ import Colors from '../../constants/Colors';
 import Tables from '../../constants/Tables';
 
 const rootDir = RNFS.DocumentDirectoryPath;
+const { width } = Dimensions.get('window');
 
 const DocumentWrapper = styled(TouchableOpacity)`
   margin: ${Layout.space.medium};
@@ -30,6 +31,7 @@ const File = styled(View)`
 
 const Title = styled(Text)`
   font-size: ${Layout.font.medium};
+  max-width: ${width/2}px;
 `;
 
 const IconsWrapper = styled(View)`
@@ -50,6 +52,7 @@ class Document extends React.Component {
   onEdit = async () => {
     const { type, ID, Extension, Dossier1, userId, loadingBusiness, prep, rea, modeleDocs } = this.props;
     const filePath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
+    console.log({filePath})
     const fileExists = await RNFS.exists(filePath);
     if (fileExists) {
       this.props.editFile(ID, filePath)
@@ -62,7 +65,7 @@ class Document extends React.Component {
     const filePath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
     const file = pick(this.props, Tables.docField);
     const remoteDir = `./${Dossier1}/Realisation${Dossier3 !== '' ? `/${Dossier3}` : ''}`
-    const userName = this.props.firstName + ' ' + this.props.lastName;
+    const userName = this.props.name;
     const now = new Date();
     const date = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
     const fileToUpLoad = {
@@ -97,8 +100,37 @@ class Document extends React.Component {
       this.props.downLoadOneFile(ServerPath, `${rootDir}/${userId}/${Dossier1}/${type}`)
     }
   }
-
+  test = async () => {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+      {
+        title: "Optidoc demande d'acccès aux photos",
+        message:
+          "Optidoc a besoin d'accéder à vos photos " +
+          "pour que vous puissiez les importer dans l'application.",
+        buttonNeutral: 'Plus tard',
+        buttonNegative: 'Annuler',
+        buttonPositive: 'Autoriser',
+      },
+    );
+    const fileExists = await RNFS.exists("/data/user/0/com.samsung.android.spdfnote/files/DOC_20181113211703466.pdf");
+    console.log({fileExists})
+    console.log({ExternalStorageDirectoryPath: RNFS.ExternalStorageDirectoryPath})
+    RNFS.readDir("/storage/emulated/0/Write on PDF") // On Android, use "RNFS.DocumentDirectoryPath" (MainBundlePath is not defined)
+      .then((result) => {
+        console.log('GOT RESULT', result);
+      })
+      .catch(e => console.log({e}))
+      RNFS.readDir("/storage/emulated/0/Documents") // On Android, use "RNFS.DocumentDirectoryPath" (MainBundlePath is not defined)
+      .then((result) => {
+        console.log('GOT RESULT', result);
+      })
+      .catch(e => console.log({e}))
+  }
+  //"/storage/emulated/0/Write on PDF/DOC_20181113211511735.pdf"
   render() {
+    
+    this.test();
     const { FileName, type, navigation, ID, Dossier3, Extension, Dossier1, editedDocs, isNew, uploadingDocs, Reviewed, Prepared} = this.props;
     return (
       <DocumentWrapper
@@ -152,8 +184,7 @@ class Document extends React.Component {
 Document.propTypes = {
   FileName: PropTypes.string.isRequired,
   ID: PropTypes.string.isRequired,
-  firstName: PropTypes.string.isRequired,
-  lastName: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
   Dossier3: PropTypes.string.isRequired,
   Extension: PropTypes.string.isRequired,
   Dossier1: PropTypes.string.isRequired,
@@ -186,8 +217,7 @@ const mapStateToProps = state => ({
   editedDocs: state.user.editedDocs,
   uploadingDocs: state.user.uploadingDocs,
   userId: state.user.id,
-  lastName: state.user.lastName,
-  firstName: state.user.firstName,
+  name: state.user.name,
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
 })
 

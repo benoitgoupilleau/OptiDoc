@@ -4,6 +4,8 @@ export default {
   t_teamRights: 't_TeamCorres',
   t_docs: 't_Documents',
   t_modeles: 't_Modeles',
+  t_users: 't_Utilisateurs',
+  t_business: 'v_AffairesVisiblesDepuisAndroid',
   docField: [
     'LocalPath',
     'Prepared',

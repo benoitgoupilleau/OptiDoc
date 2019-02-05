@@ -23,13 +23,13 @@ import Tables from '../../constants/Tables';
 
 const rootDir = RNFS.DocumentDirectoryPath;
 
-export const login = (email, user, bearerToken) => ({
+export const login = (userName, user, bearerToken) => ({
   type: LOGIN,
-  email,
+  userName,
   bearerToken,
   id: user.ID,
-  lastName: user.Nom,
-  firstName: user.Prenom
+  id_employe: user.ID_Employe,
+  name: user.Nom
 }) 
 
 export const logout = (userId) => dispatch => RNFS.unlink(`${rootDir}/${userId}`)

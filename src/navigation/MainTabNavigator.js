@@ -9,6 +9,7 @@ import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import AddFileScreen from '../screens/AddFileScreen';
 import BusinessScreen from '../screens/BusinessScreen';
+import ListBusinessScreen from '../screens/ListBusinessScreen';
 import PdfScreen from '../screens/PdfScreen';
 
 const HomeStack = createStackNavigator({
@@ -59,7 +60,26 @@ BusinessStack.navigationOptions = {
   tabBarLabel: ({ focused }) => (
     <TabBarLabel
       focused={focused}
-      title="Affaires"
+      title="Mes Affaires"
+    />
+  ),
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon
+      focused={focused}
+      name="md-folder-open"
+    />
+  ),
+};
+
+const ListBusinessStack = createStackNavigator({
+  Business: ListBusinessScreen,
+});
+
+ListBusinessStack.navigationOptions = {
+  tabBarLabel: ({ focused }) => (
+    <TabBarLabel
+      focused={focused}
+      title="Affaires actives"
     />
   ),
   tabBarIcon: ({ focused }) => (
@@ -73,6 +93,7 @@ BusinessStack.navigationOptions = {
 
 export default createBottomTabNavigator({
   HomeStack,
+  ListBusinessStack,
   BusinessStack,
   // ProfileStack
 }, {

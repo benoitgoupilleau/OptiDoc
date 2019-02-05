@@ -18,10 +18,10 @@ import {
 
 const defaultState = {
   id: undefined,
+  id_employe: undefined,
   bearerToken: '',
-  email: '',
-  lastName: '',
-  firstName: '',
+  userName: '',
+  name: '',
   downloadedBusiness: [],
   loadingBusiness: [],
   editedDocs: [],
@@ -62,16 +62,16 @@ export default (state = defaultState, action) => {
     case LOGIN:
       return {
         ...state,
-        email: action.email,
+        userName: action.userName,
         bearerToken: action.bearerToken,
         id: action.id,
-        lastName: action.lastName,
-        firstName: action.firstName
+        id_employe: action.id_employe,
+        name: action.name,
       }
     case LOGOUT:
       return {
         ...state,
-        ...omit(defaultState, 'email')
+        ...omit(defaultState, 'userName')
       }
     case DOWNLOADING_BUSINESS: {
       const currentBusiness = [...state.loadingBusiness, action.id];

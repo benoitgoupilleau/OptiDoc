@@ -62,7 +62,7 @@ class NewDocument extends React.Component {
     const filePath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
     const file = pick(this.props, Tables.docField);
     const remoteDir = `./${Dossier1}/Realisation${Dossier3 !== '' ? `/${Dossier3}` : ''}`
-    const userName = this.props.firstName + ' ' + this.props.lastName;
+    const userName = this.props.name;
     const now = new Date();
     const date = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
     const fileToUpLoad = {
@@ -152,8 +152,7 @@ class NewDocument extends React.Component {
 NewDocument.propTypes = {
   FileName: PropTypes.string.isRequired,
   ID: PropTypes.string.isRequired,
-  firstName: PropTypes.string.isRequired,
-  lastName: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
   Dossier3: PropTypes.string.isRequired,
   Extension: PropTypes.string.isRequired,
   Dossier1: PropTypes.string.isRequired,
@@ -186,8 +185,7 @@ const mapStateToProps = state => ({
   editedDocs: state.user.editedDocs,
   uploadingDocs: state.user.uploadingDocs,
   userId: state.user.id,
-  lastName: state.user.lastName,
-  firstName: state.user.firstName,
+  name: state.user.name,
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
 })
 

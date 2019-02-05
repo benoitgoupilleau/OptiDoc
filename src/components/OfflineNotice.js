@@ -2,12 +2,9 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { View, Text, NetInfo, Dimensions } from 'react-native';
+import { View, Text, NetInfo, Dimensions, TouchableOpacity } from 'react-native';
 
 import { connectivityChange, connectDb } from '../redux/actions/network';
-import { getNews } from '../redux/actions/news'
-import { getDocs, getModeles } from '../redux/actions/business'
-import { getTeam, getTeamRight } from '../redux/actions/team'
 
 import Colors from '../constants/Colors';
 
@@ -27,20 +24,12 @@ const Message = styled(Text)`
 `;
 
 class OfflineNotice extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.dbInterval = undefined;
-    this.refreshInterval = undefined;
-  }
-
   componentDidMount() {
     NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
   }
 
   componentWillUnmount() {
     NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
-    clearInterval(this.dbInterval);
-    clearInterval(this.refreshInterval)
   }
 
   handleConnectivityChange = isConnected => {
@@ -52,32 +41,20 @@ class OfflineNotice extends PureComponent {
 
   render() {
     if (!this.props.isConnected) {
-      clearInterval(this.dbInterval);
-      clearInterval(this.refreshInterval)
       return (
         <Wrapper error>
-          <Message error>Vous êtes hors ligne</Message>
+            <Message error>Vous êtes hors ligne</Message>
         </Wrapper>
       );
     } else if (this.props.mssqlFailed) {
-      clearInterval(this.refreshInterval)
-      this.dbInterval = setInterval(() => {
-        this.props.connectDb();
-      }, 2000); // Retry every 2s
       return (
         <Wrapper>
-          <Message>Connexion impossible à la base de données</Message>
+          <TouchableOpacity onPress={this.props.connectDb} >
+            <Message>Connexion impossible à la base de données. Réessayer</Message>
+          </TouchableOpacity>
         </Wrapper>
       );
     }
-    this.refreshInterval = setInterval(() => {
-      this.props.getNews()
-      this.props.getDocs()
-      this.props.getModeles()
-      this.props.getTeam()
-      this.props.getTeamRight()
-    }, 1000 * 60 * 30); // refresh every 30min
-    clearInterval(this.dbInterval);
     return null;
   }
 }
@@ -93,19 +70,7 @@ OfflineNotice.propTypes = {
   mssqlFailed: PropTypes.bool.isRequired,
   connectivityChange: PropTypes.func.isRequired,
   connectDb: PropTypes.func.isRequired,
-  getNews: PropTypes.func.isRequired,
-  getDocs: PropTypes.func.isRequired,
-  getTeam: PropTypes.func.isRequired,
-  getTeamRight: PropTypes.func.isRequired,
 }
 
 
-export default connect(mapStateToProps, {
-  connectivityChange,
-  connectDb,
-  getNews,
-  getDocs,
-  getModeles,
-  getTeam,
-  getTeamRight
-})(OfflineNotice);
+export default connect(mapStateToProps, { connectivityChange, connectDb })(OfflineNotice);

@@ -1,17 +1,19 @@
 import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { TouchableOpacity, Text } from 'react-native';
+import { TouchableOpacity, Text, Dimensions } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 
 import Layout from '../../constants/Layout';
 
+const { width } = Dimensions.get('window');
+
 const ModeleWrapper = styled(TouchableOpacity)`
   margin: ${Layout.space.small};
   flex-direction: row;
   justify-content: space-between;
-  width: 350px;
+  width: ${Math.round(width/2)-50}px;
 `;
 
 const Title = styled(Text)`

@@ -24,8 +24,6 @@ export default (state = defaultState, action) => {
         ...state,
         refreshing: true
       }
-    case LOGOUT:
-      return { ...defaultState };
     default:
       return state;
   }

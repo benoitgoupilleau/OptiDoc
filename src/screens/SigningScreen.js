@@ -5,9 +5,6 @@ import Main from '../components/Main';
 import Signin from '../components/Signing';
 
 class SignInScreen extends React.Component {
-  static navigationOptions = {
-    title: 'Please sign in',
-  };
 
   render() {
     return (

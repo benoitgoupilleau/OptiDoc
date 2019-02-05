@@ -4,7 +4,8 @@ import Tables from '../../constants/Tables';
 import {
   SET_DOCS,
   SET_MODELES,
-  UPDATE_PREPARE
+  UPDATE_PREPARE,
+  SET_BUSINESS
 } from './types';
 
 
@@ -31,4 +32,13 @@ export const updatePrepared = (fileId, Prepared, PreparedOn) => ({
   fileId,
   Prepared,
   PreparedOn
+})
+
+export const getBusiness = () => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_business}`)
+  .then((res) => dispatch(setBusiness(res)))
+  .catch(e => console.log({ getBusiness: e }))
+
+const setBusiness = (business) => ({
+  type: SET_BUSINESS,
+  business
 })

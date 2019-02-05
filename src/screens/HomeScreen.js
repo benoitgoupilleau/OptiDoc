@@ -10,8 +10,8 @@ import News from '../components/news/News';
 import Main from '../components/Main';
 
 import { getNews, refreshNews } from '../redux/actions/news'
-import { getDocs, getModeles } from '../redux/actions/business'
-import { getTeam, getTeamRight } from '../redux/actions/team'
+import { getDocs, getModeles, getBusiness } from '../redux/actions/business'
+import { getTeam, getTeamRight, getUser } from '../redux/actions/team'
 import { filterNews } from '../redux/selector/news'
 
 import Layout from '../constants/Layout';
@@ -44,8 +44,10 @@ class HomeScreen extends React.Component {
     if (this.props.mssqlConnected){
       this.props.getNews();
       this.props.getDocs();
+      this.props.getBusiness()
       this.props.getModeles()
       this.props.getTeam();
+      this.props.getUser()
       this.props.getTeamRight();
     } 
   }
@@ -117,8 +119,9 @@ const mapStateToProps = (state) => ({
   loaded: state.news.loaded,
   refreshing: state.news.refreshing,
   mssqlConnected: state.network.mssqlConnected,
+  usersLoaded: state.teams.usersLoaded,
   teamLoaded: state.teams.teamLoaded,
   teamRightsLoaded: state.teams.teamRightsLoaded,
 })
 
-export default connect(mapStateToProps, { getNews, refreshNews, getDocs, getModeles, getTeam, getTeamRight })(HomeScreen);
+export default connect(mapStateToProps, { getNews, refreshNews, getDocs, getModeles, getBusiness, getTeam, getUser, getTeamRight })(HomeScreen);

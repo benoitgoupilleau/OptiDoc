@@ -1,14 +1,15 @@
 import {
   SET_DOCS,
   SET_MODELES,
-  LOGOUT,
+  SET_BUSINESS,
   UPDATE_PREPARE
 } from '../actions/types';
 
 const defaultState = {
   docs: [],
   modeles: [],
-  newDocs: []
+  newDocs: [],
+  business: []
 }
 
 export default (state = defaultState, action) => {
@@ -23,9 +24,10 @@ export default (state = defaultState, action) => {
         ...state,
         modeles: action.modeles,
       }
-    case LOGOUT:
+    case SET_BUSINESS:
       return {
-        ...defaultState
+        ...state,
+        business: action.business,
       }
     case UPDATE_PREPARE: {
       const currentDoc = [...state.docs];

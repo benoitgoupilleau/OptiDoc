@@ -5,24 +5,23 @@ import { ActivityIndicator } from 'react-native';
 import Main from '../components/Main';
 
 import { connectDb } from '../redux/actions/network';
-import { getTeam, getTeamRight } from '../redux/actions/team'
+import { getTeam, getTeamRight, getUser } from '../redux/actions/team'
 
-const  AuthLoadingScreen = (props) => {
-  const {
-    token,
-    mssqlConnected,
-    mssqlConnectionFailed,
-    teamLoaded,
-    teamRightsLoaded,
-    connectDb,
-    navigation,
-    getTeam,
-    getTeamRight
-  } = props
+const  AuthLoadingScreen = ({token,
+  mssqlConnected,
+  mssqlConnectionFailed,
+  teamLoaded,
+  teamRightsLoaded,
+  connectDb,
+  navigation,
+  getTeam,
+  getUser,
+  getTeamRight}) => {
   if (!mssqlConnected && !mssqlConnectionFailed) {
     connectDb();
   } else {
     getTeam();
+    getUser();
     getTeamRight();
     if (teamLoaded && teamRightsLoaded) {
       navigation.navigate(token !== '' ? 'App' : 'Auth');
@@ -54,7 +53,8 @@ const mapStateToProps = state => ({
   mssqlConnected: state.network.mssqlConnected,
   mssqlConnectionFailed: state.network.mssqlConnectionFailed,
   teamLoaded: state.teams.teamLoaded,
+  usersLoaded: state.teams.usersLoaded,
   teamRightsLoaded: state.teams.teamRightsLoaded,
 })
 
-export default connect(mapStateToProps, { connectDb, getTeam, getTeamRight })(AuthLoadingScreen);
+export default connect(mapStateToProps, { connectDb, getTeam, getUser, getTeamRight })(AuthLoadingScreen);

@@ -23,6 +23,7 @@ const encryptor = createEncryptor({
 
 const persistConfig = {
   key: 'root',
+  keyPrefix: '',
   transforms: [encryptor],
   storage: storage,
   stateReconciler: autoMergeLevel2

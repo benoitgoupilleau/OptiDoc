@@ -14,8 +14,8 @@ import Colors from '../constants/Colors'
 import Layout from '../constants/Layout'
 
 import { login } from '../redux/actions/user'
+import { getTeam, getTeamRight, getUser } from '../redux/actions/team'
 
-const emailRegex = new RegExp(/^[a-zA-Z0-9\.]+@[a-zA-Z0-9]+(\-)?[a-zA-Z0-9]+(\.)?[a-zA-Z0-9]{2,6}?\.[a-zA-Z]{2,6}$/);
 
 const Wrapper = styled(View)`
   max-width: 400px;
@@ -57,38 +57,51 @@ const StyledText = styled(Text)`
   font-size: ${Layout.font.medium};
 `;
 
+const encoded = (str) => {
+  const encodedChar = []
+  for (let i = 0; i < str.length; i++) {
+    encodedChar.push(String.fromCharCode(str.charCodeAt(i) + 10))
+  }
+  return encodedChar.join('');
+}
+
 class Signin extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      email: '',
+      userName: '',
       password: ''
     }
   }
 
   componentDidMount(){
-    const email = this.props.email;
-    this.setState({ email })
+    const userName = this.props.userName;
+    if (this.props.isConnected) {
+      this.props.getTeam()
+      this.props.getUser()
+      this.props.getTeamRight()
+    }
+    this.setState({ userName })
   }
 
   signInAsync = async () => {
     if (!this.props.teamLoaded) {
       Alert.alert('Connexion Impossible', 'Merci de réessayer plus tard', [{ text: 'Ok' }]);
     } else {
-      if (!emailRegex.test(this.state.email)) {
-        Alert.alert('Identifiants incorrects', 'Adresse email invalide', [{ text: 'Ok' }]);
+      if (this.state.userName === '') {
+        Alert.alert('Identifiants incorrects', 'Merci de saisir votre identifiant', [{ text: 'Ok' }]);
       } else if (this.state.password === '') {
         Alert.alert('Identifiants incorrects', 'Merci de saisir votre mot de passe', [{ text: 'Ok' }]);
       } else {
 
-        const users = this.props.teams.filter(t => (t.Statut === 'Actif' && t.Mail === this.state.email && ((ENV && ENV === 'dev') || t.Mdp === this.state.password)));
-        if (users.length > 0) {
+        const user = this.props.users.filter(t => (t.ON_Android === 'O' && t.Login === this.state.userName && t.Mdp === encoded(this.state.password)));
+        if (user.length > 0) {
           const addTime = parseInt(JWT_EXPIRE, 10);
-          const token = await jwt.sign({ iss: users[0].ID, exp: new Date().getTime() + addTime * 1000 }, JWT_SECRET, { alg: 'hs256'});
-          this.props.login(this.state.email, users[0], token)
+          const token = await jwt.sign({ iss: user[0].ID, exp: new Date().getTime() + addTime * 1000 }, JWT_SECRET, { alg: 'hs256'});
+          this.props.login(this.state.userName, user[0], token)
           this.props.navigation.navigate('App');
         } else {
-          Alert.alert('Identifiants incorrects', 'Merci de vérifier votre email et mot de passe', [{ text: 'Ok' }]);
+          Alert.alert('Identifiants incorrects', 'Merci de vérifier votre identifiant et mot de passe', [{ text: 'Ok' }]);
         }
       }
     }
@@ -106,10 +119,9 @@ class Signin extends React.Component {
         <Title>OptiDoc</Title>
         <StyledInput 
           allowFontScaling
-          keyboardType="email-address"
-          onChangeText={(email) => this.setState({ email })}
-          placeholder="Email"
-          value={this.state.email}
+          onChangeText={(userName) => this.setState({ userName })}
+          placeholder="Identifiant"
+          value={this.state.userName}
           editable={!this.props.locked}
           returnKeyType="next"
         />
@@ -134,17 +146,22 @@ class Signin extends React.Component {
 Signin.propTypes = {
   navigation: PropTypes.object.isRequired,
   login: PropTypes.func.isRequired,
-  email: PropTypes.string.isRequired,
   locked: PropTypes.bool.isRequired,
   teamLoaded: PropTypes.bool.isRequired,
-  teams: PropTypes.array.isRequired
+  teams: PropTypes.array.isRequired,
+  isConnected: PropTypes.bool.isRequired,
+  getTeam: PropTypes.func.isRequired,
+  getTeamRight: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => ({
-  email: state.user.email,
+  userName: state.user.userName,
+  isConnected: state.network.isConnected,
   locked: state.user.locked,
+  users: state.teams.users,
+  usersLoaded: state.teams.usersLoaded,
   teams: state.teams.teams,
   teamLoaded: state.teams.teamLoaded
 })
 
-export default withNavigation(connect(mapStateToProps, { login })(Signin));
+export default withNavigation(connect(mapStateToProps, { login, getTeam, getUser, getTeamRight })(Signin));
