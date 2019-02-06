@@ -1,11 +1,44 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, PermissionsAndroid, Alert } from 'react-native';
 import Main from '../components/Main';
 
 import { connectDb } from '../redux/actions/network';
 import { getTeam, getTeamRight, getUser } from '../redux/actions/team'
+
+const checkAccess = async () => {
+  const isAuthorised = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
+  if (isAuthorised) {
+    return true;
+  } else {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        {
+          title: "Optidoc demande l'acccès aux documents",
+          message:
+            "Optidoc a besoin d'accéder à vos documents " +
+            "pour que vous puissiez les modifier",
+          buttonPositive: 'Autoriser',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        return true;
+      } else {
+        Alert.alert(
+          "L'application doit pouvoir accéder aux documents",
+          "L'application est inutilisable sans accès aux documents. Merci de valider l'accès",
+          [
+            { text: 'Ok', onPress: () => checkAccess() },
+          ],
+        )
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+}
 
 const  AuthLoadingScreen = ({token,
   mssqlConnected,
@@ -17,6 +50,7 @@ const  AuthLoadingScreen = ({token,
   getTeam,
   getUser,
   getTeamRight}) => {
+  checkAccess();
   if (!mssqlConnected && !mssqlConnectionFailed) {
     connectDb();
   } else {

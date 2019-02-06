@@ -2,12 +2,13 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { TouchableOpacity, Text, View, ActivityIndicator, Dimensions, PermissionsAndroid } from 'react-native';
+import { TouchableOpacity, Text, View, ActivityIndicator, Dimensions } from 'react-native';
 import pick from 'lodash.pick';
 import RNFS from 'react-native-fs';
+import { EXTERNAL_PATH } from 'react-native-dotenv';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { withNavigation } from 'react-navigation';
-import { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, editPrepare } from '../../redux/actions/user'
+import { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, editPrepare, removePrepare } from '../../redux/actions/user'
 import { updatePrepared } from '../../redux/actions/business';
 
 import Layout from '../../constants/Layout';
@@ -52,10 +53,9 @@ class Document extends React.Component {
   onEdit = async () => {
     const { type, ID, Extension, Dossier1, userId, loadingBusiness, prep, rea, modeleDocs } = this.props;
     const filePath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
-    console.log({filePath})
     const fileExists = await RNFS.exists(filePath);
     if (fileExists) {
-      this.props.editFile(ID, filePath)
+      this.props.editFile({ ID, editPath: `${EXTERNAL_PATH}${ID}.${Extension}`}, filePath)
     } else if (!loadingBusiness.includes(Dossier1)) {
       this.props.downloadBusiness(userId, Dossier1, prep, rea, modeleDocs)
     }
@@ -82,56 +82,30 @@ class Document extends React.Component {
   onPrepare = () => {
     const newPrepared = this.props.Prepared === 'O' ? 'N' : 'O';
     const now = new Date();
-    const PreparedOn = newPrepared === 'N' ? '1900-01-01' : now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
-    this.props.updatePrepared(this.props.ID, newPrepared, PreparedOn);
-    this.props.editPrepare(this.props.ID)
+    if (newPrepared === 'N') {
+      const PreparedOn = '1900-01-01';
+      this.props.updatePrepared(this.props.ID, newPrepared, PreparedOn);
+      this.props.removePrepare(this.props.ID)
+    } else {
+      const PreparedOn = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
+      this.props.updatePrepared(this.props.ID, newPrepared, PreparedOn);
+      this.props.editPrepare({ID: this.props.ID, prepared: true})
+    }
   }
 
   onCreate = () => {
 
   }
   onCancel = async () => {
-    const { type, ID, Extension, Dossier1, userId, isNew, ServerPath } = this.props;
-    const filePath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
-    await RNFS.unlink(filePath);
-    
+    const { ID, isNew } = this.props;
     if (!isNew) {
       this.props.removeFromEdit(ID);
-      this.props.downLoadOneFile(ServerPath, `${rootDir}/${userId}/${Dossier1}/${type}`)
     }
   }
-  test = async () => {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-      {
-        title: "Optidoc demande d'acccès aux photos",
-        message:
-          "Optidoc a besoin d'accéder à vos photos " +
-          "pour que vous puissiez les importer dans l'application.",
-        buttonNeutral: 'Plus tard',
-        buttonNegative: 'Annuler',
-        buttonPositive: 'Autoriser',
-      },
-    );
-    const fileExists = await RNFS.exists("/data/user/0/com.samsung.android.spdfnote/files/DOC_20181113211703466.pdf");
-    console.log({fileExists})
-    console.log({ExternalStorageDirectoryPath: RNFS.ExternalStorageDirectoryPath})
-    RNFS.readDir("/storage/emulated/0/Write on PDF") // On Android, use "RNFS.DocumentDirectoryPath" (MainBundlePath is not defined)
-      .then((result) => {
-        console.log('GOT RESULT', result);
-      })
-      .catch(e => console.log({e}))
-      RNFS.readDir("/storage/emulated/0/Documents") // On Android, use "RNFS.DocumentDirectoryPath" (MainBundlePath is not defined)
-      .then((result) => {
-        console.log('GOT RESULT', result);
-      })
-      .catch(e => console.log({e}))
-  }
-  //"/storage/emulated/0/Write on PDF/DOC_20181113211511735.pdf"
+
   render() {
-    
-    this.test();
     const { FileName, type, navigation, ID, Dossier3, Extension, Dossier1, editedDocs, isNew, uploadingDocs, Reviewed, Prepared} = this.props;
+    const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
     return (
       <DocumentWrapper
         onPress={() => navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type })}
@@ -145,7 +119,7 @@ class Document extends React.Component {
         </File>
         {type === Folder.rea && 
           <IconsWrapper>
-            {editedDocs.includes(ID) && (
+            {isEdited && (
               <EditIcons>
                 <Icons
                   name="md-close"
@@ -168,7 +142,7 @@ class Document extends React.Component {
               color={Prepared === 'O' ? "green" : Colors.thirdColor}
               onPress={this.onPrepare}
             />
-            {Reviewed === 'O' || (Prepared === 'O' && !editedDocs.includes(ID)) ? undefined :
+            {Reviewed === 'O' || (Prepared === 'O' && !isEdited) ? undefined :
             <Icons
               name="md-create"
               size={26}
@@ -221,4 +195,4 @@ const mapStateToProps = state => ({
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
 })
 
-export default withNavigation(connect(mapStateToProps, { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, updatePrepared, editPrepare })(Document));
+export default withNavigation(connect(mapStateToProps, { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, updatePrepared, editPrepare, removePrepare })(Document));

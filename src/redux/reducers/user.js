@@ -13,7 +13,8 @@ import {
   CANCEL_DOWNLOAD_MODELE,
   MODELE_DOWNLOADED,
   REMOVE_EDIT_FILE,
-  UPLOADING_FILE
+  UPLOADING_FILE,
+  REMOVE_EDIT_PREPARE
 } from '../actions/types';
 
 const defaultState = {
@@ -100,12 +101,42 @@ export default (state = defaultState, action) => {
     }
     case EDIT_FILE: {
       const currentFiles = [...state.editedDocs];
-      if (!currentFiles.includes(action.fileId)) currentFiles.push(action.fileId)
-      return {
-        ...state,
-        editedDocs: currentFiles,
-        locked: true
+      const indexToUpdate = currentFiles.findIndex(c => c.ID === action.file.ID)
+      if (indexToUpdate === -1) {
+        currentFiles.push(action.file)
+        return {
+          ...state,
+          editedDocs: currentFiles,
+          locked: true
+        }
+      } else {
+        const newEditFile = { ...currentFiles[indexToUpdate], ...action.file}
+        return {
+          ...state,
+          editedDocs: [...currentFiles.slice(0, indexToUpdate), newEditFile, ...currentFiles.slice(indexToUpdate+1)],
+          locked: true
+        }
       }
+    }
+    case REMOVE_EDIT_PREPARE: {
+      const currentFiles = [...state.editedDocs];
+      const indexToUpdate = currentFiles.findIndex(c => c.ID === action.id)
+      const fileEdit = currentFiles[indexToUpdate];
+      if (!!fileEdit.editPath) {
+        delete fileEdit.prepared;
+        return {
+          ...state,
+          editedDocs: [...currentFiles.slice(0, indexToUpdate), fileEdit, ...currentFiles.slice(indexToUpdate+1)]
+        }
+      } else {
+        const newEditDocs = [...currentFiles.slice(0, indexToUpdate), ...currentFiles.slice(indexToUpdate+1)]
+        return {
+          ...state,
+          editedDocs: newEditDocs,
+          locked: newEditDocs.length > 0
+        }
+      }
+
     }
     case UPLOADING_FILE: {
       const currentFiles = [...state.uploadingDocs];
@@ -117,7 +148,7 @@ export default (state = defaultState, action) => {
     }
     case REMOVE_EDIT_FILE: {
       const currentFiles = [...state.editedDocs];
-      const indexToRemove = currentFiles.findIndex(el => el === action.id);
+      const indexToRemove = currentFiles.findIndex(el => el.ID === action.id);
       const newFiles = [...currentFiles.slice(0, indexToRemove), ...currentFiles.slice(indexToRemove + 1)]
       const currentUpload = [...state.uploadingDocs];
       const indexUpload = currentUpload.findIndex(el => el === action.id);

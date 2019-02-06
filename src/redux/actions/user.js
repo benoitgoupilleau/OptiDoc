@@ -15,7 +15,8 @@ import {
   CANCEL_DOWNLOAD_MODELE,
   MODELE_DOWNLOADED,
   REMOVE_EDIT_FILE,
-  UPLOADING_FILE
+  UPLOADING_FILE,
+  REMOVE_EDIT_PREPARE
 } from './types';
 
 import Folder from '../../constants/Folder'
@@ -92,16 +93,21 @@ const businessDownloaded = (id) => ({
   id
 })
 
-export const editPrepare = (fileId) => ({
+export const editPrepare = (file) => ({
   type: EDIT_FILE,
-  fileId
+  file
 })
 
-export const editFile = (fileId, filePath) => {
+export const removePrepare = (id) => ({
+  type: REMOVE_EDIT_PREPARE,
+  id
+})
+
+export const editFile = (file, filePath) => {
   FileViewer.open(filePath, { showOpenWithDialog: true });
   return ({
     type: EDIT_FILE,
-    fileId
+    file
   })
 }
 
