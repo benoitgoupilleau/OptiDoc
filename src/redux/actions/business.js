@@ -5,7 +5,8 @@ import {
   SET_DOCS,
   SET_MODELES,
   UPDATE_PREPARE,
-  SET_BUSINESS
+  SET_BUSINESS,
+  ADD_DOC,
 } from './types';
 
 
@@ -41,4 +42,9 @@ export const getBusiness = () => dispatch => MSSQL.executeQuery(`SELECT * FROM $
 const setBusiness = (business) => ({
   type: SET_BUSINESS,
   business
+})
+
+export const addNewDoc = (doc) => ({
+  type: ADD_DOC,
+  doc
 })

@@ -1,7 +1,10 @@
 import React from 'react';
+import RNFS from 'react-native-fs';
 import { connect } from 'react-redux';
 import { Text, View, TextInput, TouchableOpacity } from 'react-native';
+import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
 import styled from 'styled-components'
+import { EXTERNAL_PATH } from 'react-native-dotenv';
 
 import Logout from '../components/Logout';
 import HeaderTitle from '../components/HeaderTitle'
@@ -9,6 +12,12 @@ import Modele from '../components/business/Modele';
 
 import Layout from '../constants/Layout'
 import Colors from '../constants/Colors'
+import Folder from '../constants/Folder'
+
+import { editFile } from '../redux/actions/user'
+import { addNewDoc } from '../redux/actions/business'
+
+const rootDir = RNFS.DocumentDirectoryPath;
 
 const Wrapper = styled(View)`
   padding: 40px;
@@ -80,8 +89,9 @@ class AddFileScreen extends React.Component {
     super(props)
     this.state = {
       Dossier2: 'PV',
+      ModeleID: '',
       FileName: '',
-      comment: '',
+      filePath: '',
       FileNameFinal: '',
     }
   } 
@@ -93,12 +103,77 @@ class AddFileScreen extends React.Component {
     }
   }
 
-  handleSelectModele = (FileName) => {
-    this.setState({ FileName, FileNameFinal: FileName })
+  handleSelectModele = (ModeleID, FileName, filePath) => {
+    this.setState({ ModeleID, FileName, FileNameFinal: FileName, filePath })
   }
 
-  onCreateFile = () => {
-    
+  onCreateFile = async () => {
+    const businessId = this.props.navigation.getParam('affaire', '')
+    const now = new Date();
+    const CreatedOn = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
+    const date = now.getFullYear() + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + 
+      + now.getHours().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + now.getMinutes().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + now.getMilliseconds().toLocaleString('fr-FR', { minimumIntegerDigits: 3 })
+    const fileID= 'DOC_' + date;
+    const modeleSelected = this.props.modeles.filter(m => m.ID_Document === this.state.ModeleID)[0]
+    const Dossier3 = modeleSelected.DossierDestination;
+    const destPath= `${rootDir}/${this.props.user.id}/${businessId}/${Folder.rea}/${fileID}.pdf`
+    await RNFS.copyFile(this.state.filePath, destPath);
+    const newDoc = {
+      LocalPath: '',
+      Prepared: 'N',
+      PreparedOn: '1900-01-01',
+      PageNumber: 1,
+      ReviewedOn: '1900-01-01',
+      PreparedBy: '',
+      Revisable: 'N',
+      Size: 0,
+      CreatedBy: this.props.user.name,
+      Dossier2: this.state.Dossier2,
+      UpLoadedOn: '1900-01-01',
+      FileName: this.state.FileNameFinal,
+      CreatedOn,
+      Dossier1: businessId,
+      ID: fileID,
+      UpdatedOn: CreatedOn,
+      UpdatedBy: this.props.user.name,
+      Commentaire: '',
+      Dossier3,
+      ServerPath: `${businessId}/Realisation/${Dossier3}/${fileID}.pdf`,
+      ReviewedBy: '',
+      Extension: 'pdf',
+      Reviewed: 'N',
+      Locked: 'N',
+      UpLoadedBy: ''
+    }
+    const page1 = PDFPage
+      .modify(0)
+      .drawText('Rédigé par : ' + this.props.user.name, {
+        x: modeleSelected.Zone1X ? parseInt(modeleSelected.Zone1X, 10) : 5,
+        y: modeleSelected.Zone1Y ? parseInt(modeleSelected.Zone1Y, 10) : 830,
+        fontSize: 10
+      })
+      .drawText('Affaire : ' + businessId, {
+        x: modeleSelected.Zone2X ? parseInt(modeleSelected.Zone2X, 10) : 200,
+        y: modeleSelected.Zone2Y ? parseInt(modeleSelected.Zone2Y, 10) : 830,
+        fontSize: 10
+      })
+      .drawText('Date : ' + CreatedOn, {
+        x: modeleSelected.Zone3X ? parseInt(modeleSelected.Zone3X, 10) : 400,
+        y: modeleSelected.Zone3Y ? parseInt(modeleSelected.Zone3Y, 10) : 830,
+        fontSize: 10
+      })
+      
+    this.props.navigation.navigate('Business');
+    PDFDocument
+      .modify(destPath)
+      .modifyPages(page1)
+      .write()
+      .then(path => {
+        this.props.editFile({ ID: fileID, editPath: `${EXTERNAL_PATH}${fileID}.pdf`}, destPath)
+        this.props.addNewDoc(newDoc)
+        console.log('PDF modified at: ' + path);
+      })
+      .catch(e => console.log({ modifyPages: e}))
   }
 
   render() {
@@ -123,7 +198,7 @@ class AddFileScreen extends React.Component {
         </Selector>
         <ModeleList>
           {this.props.modeleDocs.filter(m => m.Dossier2 === this.state.Dossier2).map(m => (
-            <Modele key={m.ID} FileName={m.FileName} handleSelect={() => this.handleSelectModele(m.FileName)} selected={this.state.FileName === m.FileName}/>))
+            <Modele key={m.ID} FileName={m.FileName} handleSelect={() => this.handleSelectModele(m.ID, m.FileName, `${rootDir}/${this.props.user.id}/${Folder.modeleDocs}/${m.ID}.${m.Extension}`)} selected={this.state.FileName === m.FileName}/>))
           }
         </ModeleList>
         <ButtonWrapper>
@@ -132,7 +207,7 @@ class AddFileScreen extends React.Component {
             onChangeText={(FileNameFinal) => this.setState({ FileNameFinal })}
             value={this.state.FileNameFinal}
           />
-          <StyledButton disabled={this.state.FileName === ''} onPress={() => console.log('Create')}>
+          <StyledButton disabled={this.state.FileName === ''} onPress={this.onCreateFile}>
             <StyledText>Créer le fichier</StyledText>
           </StyledButton>
         </ButtonWrapper>
@@ -143,6 +218,8 @@ class AddFileScreen extends React.Component {
 
 const mapStateToProps = state => ({
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
+  modeles: state.business.modeles,
+  user: state.user
 })
 
-export default connect(mapStateToProps)(AddFileScreen);
+export default connect(mapStateToProps, { editFile, addNewDoc })(AddFileScreen);

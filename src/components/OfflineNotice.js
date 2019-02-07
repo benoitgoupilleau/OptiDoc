@@ -43,7 +43,7 @@ class OfflineNotice extends PureComponent {
     if (!this.props.isConnected) {
       return (
         <Wrapper error>
-            <Message error>Vous êtes hors ligne</Message>
+            <Message error>Mode hors ligne</Message>
         </Wrapper>
       );
     } else if (this.props.mssqlFailed) {

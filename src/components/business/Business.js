@@ -58,6 +58,14 @@ const PrepSection = styled(Text)`
   padding: ${Layout.space.medium};
 `;
 
+const checkIfNew = (docs, id) => {
+  const doc = docs.filter(d => d.ID === id)
+  if (doc.length > 0 && !!doc[0].isNew) {
+    return true;
+  } 
+  return false;
+}
+
 class Business extends React.Component {
   displayIcon = () => {
     const { title, prep, rea, downloadedBusiness, downloadBusiness, userId, loadingBusiness, modeleDocs } = this.props;
@@ -83,7 +91,7 @@ class Business extends React.Component {
   }
 
   render() {
-    const { title, prep, rea, navigation } = this.props;
+    const { title, prep, rea, navigation, editedDocs } = this.props;
     return (
       <BusinessWrapper>
         <MainSection>
@@ -101,7 +109,7 @@ class Business extends React.Component {
             onPress={() => navigation.navigate('Add', { affaire: title })}
           />
         </ReaSection>
-        {rea.map(r => <Document key={r.ID} {...r} type={Folder.rea} prep={prep} rea={rea} />)}
+        {rea.map(r => <Document key={r.ID} isNew={checkIfNew(editedDocs, r.ID)} {...r} type={Folder.rea} prep={prep} rea={rea} />)}
       </BusinessWrapper>
     );
   }
@@ -128,6 +136,7 @@ const mapStateToProps = state => ({
   downloadedBusiness: state.user.downloadedBusiness,
   loadingBusiness: state.user.loadingBusiness,
   userId: state.user.id,
+  editedDocs: state.user.editedDocs,
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
 })
 

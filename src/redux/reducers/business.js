@@ -2,7 +2,9 @@ import {
   SET_DOCS,
   SET_MODELES,
   SET_BUSINESS,
-  UPDATE_PREPARE
+  UPDATE_PREPARE,
+  ADD_DOC,
+  REMOVED_NEW_DOC
 } from '../actions/types';
 
 const defaultState = {
@@ -29,6 +31,21 @@ export default (state = defaultState, action) => {
         ...state,
         business: action.business,
       }
+    case ADD_DOC: {
+      const newDocsUpd = [...state.newDocs, action.doc];
+      return {
+        ...state,
+        newDocs: newDocsUpd
+      }
+    }
+    case REMOVED_NEW_DOC: {
+      const currentNewDoc = [...state.newDocs];
+      const indexToRemove = currentNewDoc.findIndex(el => el.ID === action.id)
+      return {
+        ...state,
+        newDocs: [currentNewDoc.slice(0, indexToRemove), ...currentNewDoc.slice(indexToRemove + 1)]
+      }
+    }
     case UPDATE_PREPARE: {
       const currentDoc = [...state.docs];
       const indexToUpdate = currentDoc.findIndex(el => el.ID === action.fileId);

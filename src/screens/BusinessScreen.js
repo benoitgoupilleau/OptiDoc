@@ -119,7 +119,7 @@ BusinessScreen.propTypes = {
 
 const mapStateToProps = ({ user, teams, business }) => {
   const businesses = listAffaires([...teams.teamRights], user.id_employe)
-  const docs = listDocs(business.docs, businesses)
+  const docs = listDocs(business.docs, business.newDocs, businesses)
   const newDocs = listNewDocs(business.newDocs, businesses)
   return ({
     businesses,

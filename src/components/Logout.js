@@ -43,8 +43,7 @@ class Logout extends React.Component {
     }
   }
 
-  signOutAsync = async () => {
-    await AsyncStorage.removeItem('userToken');
+  signOutAsync = () => {
     this.props.logout(this.props.userId);
     this.props.navigation.navigate('Auth');
   };
