@@ -6,8 +6,9 @@ import {
   SET_MODELES,
   UPDATE_PREPARE,
   SET_BUSINESS,
-  ADD_DOC,
+  ADD_NEW_DOC,
   REMOVED_NEW_DOC,
+  ADD_DOC,
 } from './types';
 
 
@@ -18,6 +19,11 @@ export const getDocs = () => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tab
 const setDocs = (docs) => ({
   type: SET_DOCS,
   docs
+})
+
+export const addDoc = (doc) => ({
+  type: ADD_DOC,
+  doc
 })
 
 export const getModeles = () => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_modeles}`)
@@ -46,7 +52,7 @@ const setBusiness = (business) => ({
 })
 
 export const addNewDoc = (doc) => ({
-  type: ADD_DOC,
+  type: ADD_NEW_DOC,
   doc
 })
 

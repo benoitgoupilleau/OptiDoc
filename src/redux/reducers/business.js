@@ -4,6 +4,7 @@ import {
   SET_BUSINESS,
   UPDATE_PREPARE,
   ADD_DOC,
+  ADD_NEW_DOC,
   REMOVED_NEW_DOC
 } from '../actions/types';
 
@@ -21,6 +22,11 @@ export default (state = defaultState, action) => {
         ...state,
         docs: action.docs,
       }
+    case ADD_DOC: 
+      return {
+        ...state,
+        docs: [...state.docs, action.doc],
+      }
     case SET_MODELES:
       return {
         ...state,
@@ -31,7 +37,7 @@ export default (state = defaultState, action) => {
         ...state,
         business: action.business,
       }
-    case ADD_DOC: {
+    case ADD_NEW_DOC: {
       const newDocsUpd = [...state.newDocs, action.doc];
       return {
         ...state,

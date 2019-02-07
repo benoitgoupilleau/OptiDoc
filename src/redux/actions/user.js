@@ -19,6 +19,8 @@ import {
   REMOVE_EDIT_PREPARE
 } from './types';
 
+import { removeNewDoc, addDoc } from './business'
+
 import Folder from '../../constants/Folder'
 import Tables from '../../constants/Tables';
 
@@ -171,3 +173,18 @@ export const downLoadOneFile = (serverPath, localPath) => async () => {
   await FTP.logout()
   return true
 }
+
+export const createFile = (filePath, file, remoteDir) => async (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
+  .then(() => FTP.uploadFile(filePath, remoteDir)
+    .then(() => {
+      //MSSQL update
+      return MSSQL.executeQuery(`INSERT INTO ${Tables.t_docs} 
+        (LocalPath, Prepared, PreparedOn, PageNumber, ReviewedOn, PreparedBy, Revisable, Size, CreatedBy, Dossier2, UpLoadedOn, FileName, CreatedOn, Dossier1, ID, UpdatedOn, UpdatedBy, Commentaire, Dossier3, ServerPath, ReviewedBy, Extension, Reviewed, Locked, UpLoadedBy) 
+        VALUES ('${file.LocalPath}', '${file.Prepared}', '${file.PreparedOn}', '${file.PageNumber}', '${file.ReviewedOn}', '${file.PreparedBy}', '${file.Revisable}', '${file.Size}', '${file.CreatedBy}', '${file.Dossier2}', '${file.UpLoadedOn}', '${file.FileName}', '${file.CreatedOn}', '${file.Dossier1}', '${file.ID}', '${file.UpdatedOn}', '${file.UpdatedBy}', '${file.Commentaire}', '${file.Dossier3}', '${file.ServerPath}', '${file.ReviewedBy}', '${file.Extension}', '${file.Reviewed}', '${file.Locked}', '${file.UpLoadedBy}');`)
+        .then(() => {
+          dispatch(removeNewDoc(file.ID))
+          dispatch(addDoc(file))
+          dispatch(removeFromEdit(file.ID))
+        })
+    }))
+  .catch((e) => console.log({ createFile: e }))

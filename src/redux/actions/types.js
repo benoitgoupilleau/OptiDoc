@@ -32,8 +32,9 @@ export const SET_USER = 'SET_USER';
 
 // Business actions
 export const SET_DOCS = 'SET_DOCS';
+export const ADD_DOC = 'ADD_DOC';
 export const SET_MODELES = 'SET_MODELES';
 export const SET_BUSINESS = 'SET_BUSINESS';
-export const ADD_DOC = 'ADD_DOC';
+export const ADD_NEW_DOC = 'ADD_NEW_DOC';
 export const REMOVED_NEW_DOC = 'REMOVED_NEW_DOC'
 

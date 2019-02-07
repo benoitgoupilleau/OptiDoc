@@ -61,10 +61,9 @@ class Document extends React.Component {
     }
   }
   onUpload = () => {
-    const { ID, Extension, Dossier1, Dossier3, isNew } = this.props;
+    const { ID, Extension, isNew, ServerPath } = this.props;
     const filePath = `${EXTERNAL_PATH}${ID}.${Extension}`;
     const file = pick(this.props, Tables.docField);
-    const remoteDir = `./${Dossier1}/Realisation${Dossier3 !== '' ? `/${Dossier3}` : ''}`
     const userName = this.props.name;
     const now = new Date();
     const date = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
@@ -76,7 +75,12 @@ class Document extends React.Component {
       UpLoadedBy: userName
     }
     this.props.uploadingFile(ID);
-    this.props.uploadFile(filePath, fileToUpLoad, remoteDir);
+    if (isNew) {
+      console.log({filePath, fileToUpLoad, ServerPath })
+      // this.props.createFile(filePath, fileToUpLoad, ServerPath)
+    } else {
+      this.props.uploadFile(filePath, fileToUpLoad, ServerPath);
+    }
   }
 
   onPrepare = () => {
@@ -142,7 +146,7 @@ class Document extends React.Component {
                   name="md-cloud-upload"
                   size={26}
                   color={Colors.secondColor}
-                  onPress={() => (isNew ? this.onCreate() : this.onUpload())}
+                  onPress={this.onUpload}
                 /> : <ActivityIndicator style={{ paddingLeft: 10, paddingRight: 10 }}/>}
               </EditIcons>
             )}
