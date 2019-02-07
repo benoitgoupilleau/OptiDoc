@@ -9,7 +9,7 @@ import { EXTERNAL_PATH } from 'react-native-dotenv';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { withNavigation } from 'react-navigation';
 import { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, editPrepare, removePrepare } from '../../redux/actions/user'
-import { updatePrepared } from '../../redux/actions/business';
+import { updatePrepared, removeNewDoc } from '../../redux/actions/business';
 
 import Layout from '../../constants/Layout';
 import Folder from '../../constants/Folder';
@@ -61,8 +61,8 @@ class Document extends React.Component {
     }
   }
   onUpload = () => {
-    const { type, ID, Extension, Dossier1, userId, Dossier3 } = this.props;
-    const filePath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
+    const { ID, Extension, Dossier1, Dossier3, isNew } = this.props;
+    const filePath = `${EXTERNAL_PATH}${ID}.${Extension}`;
     const file = pick(this.props, Tables.docField);
     const remoteDir = `./${Dossier1}/Realisation${Dossier3 !== '' ? `/${Dossier3}` : ''}`
     const userName = this.props.name;
@@ -97,9 +97,19 @@ class Document extends React.Component {
 
   }
   onCancel = async () => {
-    const { ID, isNew } = this.props;
+    const { ID, isNew, userId, Dossier1, Extension, type } = this.props;
     if (!isNew) {
       this.props.removeFromEdit(ID);
+    } else {
+      this.props.removeNewDoc(ID)
+      const localPath= `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`
+      await RNFS.unlink(localPath)
+      const externalPath = `${EXTERNAL_PATH}${ID}.${Extension}`;
+      try {
+        await RNFS.unlink(externalPath)
+      } catch (error) {
+        console.log({removeWoPFile: error })
+      }
     }
   }
 
@@ -195,4 +205,4 @@ const mapStateToProps = state => ({
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
 })
 
-export default withNavigation(connect(mapStateToProps, { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, updatePrepared, editPrepare, removePrepare })(Document));
+export default withNavigation(connect(mapStateToProps, { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, updatePrepared, editPrepare, removePrepare, removeNewDoc })(Document));

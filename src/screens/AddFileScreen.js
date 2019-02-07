@@ -169,9 +169,8 @@ class AddFileScreen extends React.Component {
       .modifyPages(page1)
       .write()
       .then(path => {
-        this.props.editFile({ ID: fileID, editPath: `${EXTERNAL_PATH}${fileID}.pdf`}, destPath)
+        this.props.editFile({ ID: fileID, editPath: `${EXTERNAL_PATH}${fileID}.pdf`, isNew: true}, destPath)
         this.props.addNewDoc(newDoc)
-        console.log('PDF modified at: ' + path);
       })
       .catch(e => console.log({ modifyPages: e}))
   }

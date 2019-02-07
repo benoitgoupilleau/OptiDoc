@@ -7,6 +7,7 @@ import {
   UPDATE_PREPARE,
   SET_BUSINESS,
   ADD_DOC,
+  REMOVED_NEW_DOC,
 } from './types';
 
 
@@ -47,4 +48,9 @@ const setBusiness = (business) => ({
 export const addNewDoc = (doc) => ({
   type: ADD_DOC,
   doc
+})
+
+export const removeNewDoc = id => ({
+  type: REMOVED_NEW_DOC,
+  id
 })

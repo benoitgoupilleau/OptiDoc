@@ -43,7 +43,7 @@ export default (state = defaultState, action) => {
       const indexToRemove = currentNewDoc.findIndex(el => el.ID === action.id)
       return {
         ...state,
-        newDocs: [currentNewDoc.slice(0, indexToRemove), ...currentNewDoc.slice(indexToRemove + 1)]
+        newDocs: [...currentNewDoc.slice(0, indexToRemove), ...currentNewDoc.slice(indexToRemove + 1)]
       }
     }
     case UPDATE_PREPARE: {
