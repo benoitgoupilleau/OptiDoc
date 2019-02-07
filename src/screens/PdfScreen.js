@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Pdf from 'react-native-pdf';
 import PropTypes from 'prop-types';
+import { EXTERNAL_PATH } from 'react-native-dotenv';
 import { Dimensions, Text, ActivityIndicator, View, TouchableOpacity } from 'react-native';
 
 import Logout from '../components/Logout';
@@ -49,13 +50,14 @@ class PdfScreen extends React.Component {
   }
 
   render() {
+    const isEdited = this.props.navigation.getParam('isEdited', false)
     const ID = this.props.navigation.getParam('ID', '')
     const Dossier3 = this.props.navigation.getParam('Dossier3', '')
     const Extension = this.props.navigation.getParam('Extension', '')
     const Dossier1 = this.props.navigation.getParam('Dossier1', '')
     const type = this.props.navigation.getParam('type', Folder.prep)
-    const filePath = (ID === '' || Dossier3 === '' || Extension === '' || Dossier1 === '') ? '' :
-      `${rootDir}/${this.props.userId}/${Dossier1}/${type}/${ID}.${Extension}`;
+    const filePath = isEdited ? `${EXTERNAL_PATH}${ID}.${Extension}` : ((ID === '' || Dossier3 === '' || Extension === '' || Dossier1 === '') ? '' :
+      `${rootDir}/${this.props.userId}/${Dossier1}/${type}/${ID}.${Extension}`);
     if (this.state.loading) {
       return (
         <Main>

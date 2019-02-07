@@ -31,7 +31,7 @@ class Logout extends React.Component {
   signOut = () => {
     if (this.props.hasEditFiles) {
       Alert.alert(
-        'Etes-vous sûr de vouloir vous déconnecter?',
+        'Etes-vous sûr de vouloir vous déconnecter ?',
         'Vous avez encore des fichiers modifiés en local. Ces modifications seront perdues',
         [
           { text: 'Annuler'},

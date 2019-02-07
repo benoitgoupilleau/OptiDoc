@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { TouchableOpacity, Text, View, ActivityIndicator, Dimensions } from 'react-native';
+import { TouchableOpacity, Text, View, ActivityIndicator, Dimensions, Alert } from 'react-native';
 import pick from 'lodash.pick';
 import RNFS from 'react-native-fs';
 import { EXTERNAL_PATH } from 'react-native-dotenv';
@@ -96,11 +96,18 @@ class Document extends React.Component {
       this.props.editPrepare({ID: this.props.ID, prepared: true})
     }
   }
-
-  onCreate = () => {
-
+  onCancel = () => {
+    Alert.alert(
+      'Etes-vous sûr de vouloir annuler les modifications ?',
+      'Les modifications seront perdues définitivement',
+      [
+        { text: 'Annuler'},
+        { text: 'Oui', onPress: this.removeFile },
+      ],
+    )
   }
-  onCancel = async () => {
+
+  removeFile = async () => {
     const { ID, isNew, userId, Dossier1, Extension, type } = this.props;
     if (!isNew) {
       this.props.removeFromEdit(ID);
@@ -122,7 +129,7 @@ class Document extends React.Component {
     const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
     return (
       <DocumentWrapper
-        onPress={() => navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type })}
+        onPress={() => navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type, isEdited })}
       > 
         <File>
           <Icons
