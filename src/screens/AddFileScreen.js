@@ -128,7 +128,7 @@ class AddFileScreen extends React.Component {
       Revisable: 'N',
       Size: 0,
       CreatedBy: this.props.user.name,
-      Dossier2: this.state.Dossier2,
+      Dossier2: 'Realisation',
       UpLoadedOn: '1900-01-01',
       FileName: this.state.FileNameFinal,
       CreatedOn,

@@ -14,7 +14,8 @@ import {
   MODELE_DOWNLOADED,
   REMOVE_EDIT_FILE,
   UPLOADING_FILE,
-  REMOVE_EDIT_PREPARE
+  REMOVE_EDIT_PREPARE,
+  CANCEL_UPLOAD
 } from '../actions/types';
 
 const defaultState = {
@@ -144,6 +145,14 @@ export default (state = defaultState, action) => {
       return {
         ...state,
         uploadingDocs: currentFiles
+      }
+    }
+    case CANCEL_UPLOAD: {
+      const currentFiles = [...state.uploadingDocs];
+      const indexToRemove = currentFiles.findIndex(el => el === action.fileId);
+      return {
+        ...state,
+        uploadingDocs: [...currentFiles.slice(0, indexToRemove), ...currentFiles.slice(indexToRemove + 1)]
       }
     }
     case REMOVE_EDIT_FILE: {

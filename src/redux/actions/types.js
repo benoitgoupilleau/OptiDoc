@@ -12,6 +12,7 @@ export const REMOVE_EDIT_FILE = 'REMOVE_EDIT_FILE';
 export const UPLOADING_FILE = 'UPLOADING_FILE';
 export const UPDATE_PREPARE = 'UPDATE_PREPARE'
 export const REMOVE_EDIT_PREPARE = 'REMOVE_EDIT_PREPARE'
+export const CANCEL_UPLOAD = 'CANCEL_UPLOAD'
 
 // News actions
 export const SET_NEWS = 'SET_NEWS';

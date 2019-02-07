@@ -16,6 +16,7 @@ import {
   MODELE_DOWNLOADED,
   REMOVE_EDIT_FILE,
   UPLOADING_FILE,
+  CANCEL_UPLOAD,
   REMOVE_EDIT_PREPARE
 } from './types';
 
@@ -107,6 +108,7 @@ export const removePrepare = (id) => ({
 
 export const editFile = (file, filePath) => {
   FileViewer.open(filePath, { showOpenWithDialog: true });
+  MSSQL.executeUpdate(`UPDATE ${Tables.t_docs} SET Locked='O' WHERE ID='${file.ID}'`)
   return ({
     type: EDIT_FILE,
     file
@@ -153,14 +155,22 @@ export const uploadingFile = (fileId) => ({
   fileId
 })
 
+export const cancelUploadingFile = (fileId) => ({
+  type: CANCEL_UPLOAD,
+  fileId
+})
+
 export const uploadFile = (filePath, file, remoteDir) => async (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
   .then(() => FTP.uploadFile(filePath, remoteDir)
     .then(() => {
       //MSSQL update
-      return MSSQL.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}' WHERE ID='${file.ID}'`)
+      return MSSQL.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}', Locked='N' WHERE ID='${file.ID}'`)
         .then(() => dispatch(removeFromEdit(file.ID)))
     }))
-  .catch((e) => console.log({ uploadFile: e }))
+  .catch((e) => {
+    dispatch(cancelUploadingFile(file.ID))
+    console.log({ uploadFile: e })
+  })
 
 export const removeFromEdit = (id) => ({
   type: REMOVE_EDIT_FILE,
@@ -178,7 +188,7 @@ export const createFile = (filePath, file, remoteDir) => async (dispatch) => FTP
   .then(() => FTP.uploadFile(filePath, remoteDir)
     .then(() => {
       //MSSQL update
-      return MSSQL.executeQuery(`INSERT INTO ${Tables.t_docs} 
+      return MSSQL.executeUpdate(`INSERT INTO ${Tables.t_docs} 
         (LocalPath, Prepared, PreparedOn, PageNumber, ReviewedOn, PreparedBy, Revisable, Size, CreatedBy, Dossier2, UpLoadedOn, FileName, CreatedOn, Dossier1, ID, UpdatedOn, UpdatedBy, Commentaire, Dossier3, ServerPath, ReviewedBy, Extension, Reviewed, Locked, UpLoadedBy) 
         VALUES ('${file.LocalPath}', '${file.Prepared}', '${file.PreparedOn}', '${file.PageNumber}', '${file.ReviewedOn}', '${file.PreparedBy}', '${file.Revisable}', '${file.Size}', '${file.CreatedBy}', '${file.Dossier2}', '${file.UpLoadedOn}', '${file.FileName}', '${file.CreatedOn}', '${file.Dossier1}', '${file.ID}', '${file.UpdatedOn}', '${file.UpdatedBy}', '${file.Commentaire}', '${file.Dossier3}', '${file.ServerPath}', '${file.ReviewedBy}', '${file.Extension}', '${file.Reviewed}', '${file.Locked}', '${file.UpLoadedBy}');`)
         .then(() => {
@@ -187,4 +197,7 @@ export const createFile = (filePath, file, remoteDir) => async (dispatch) => FTP
           dispatch(removeFromEdit(file.ID))
         })
     }))
-  .catch((e) => console.log({ createFile: e }))
+  .catch((e) => {
+    dispatch(cancelUploadingFile(file.ID))
+    console.log({ createFile: e })
+  })

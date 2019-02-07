@@ -145,10 +145,6 @@ class AddFileScreen extends React.Component {
     this.setState({ pictureName })
   }
 
-  onCreateFile = () => {
-    
-  }
-
   onCreatePicture = () => {
 
   }

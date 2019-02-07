@@ -8,7 +8,7 @@ import RNFS from 'react-native-fs';
 import { EXTERNAL_PATH } from 'react-native-dotenv';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { withNavigation } from 'react-navigation';
-import { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, editPrepare, removePrepare } from '../../redux/actions/user'
+import { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, editPrepare, removePrepare, createFile } from '../../redux/actions/user'
 import { updatePrepared, removeNewDoc } from '../../redux/actions/business';
 
 import Layout from '../../constants/Layout';
@@ -60,10 +60,13 @@ class Document extends React.Component {
       this.props.downloadBusiness(userId, Dossier1, prep, rea, modeleDocs)
     }
   }
-  onUpload = () => {
-    const { ID, Extension, isNew, ServerPath } = this.props;
+  onUpload = async () => {
+    const { ID, Extension, isNew, userId, Dossier1, Dossier3, type } = this.props;
     const filePath = `${EXTERNAL_PATH}${ID}.${Extension}`;
+    const destPath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
     const file = pick(this.props, Tables.docField);
+    await RNFS.copyFile(filePath, destPath);
+    const remoteDir = `./${Dossier1}/Realisation${Dossier3 !== '' ? `/${Dossier3}` : ''}`
     const userName = this.props.name;
     const now = new Date();
     const date = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
@@ -76,10 +79,9 @@ class Document extends React.Component {
     }
     this.props.uploadingFile(ID);
     if (isNew) {
-      console.log({filePath, fileToUpLoad, ServerPath })
-      // this.props.createFile(filePath, fileToUpLoad, ServerPath)
+      return this.props.createFile(filePath, fileToUpLoad, remoteDir)
     } else {
-      this.props.uploadFile(filePath, fileToUpLoad, ServerPath);
+      return this.props.uploadFile(filePath, fileToUpLoad, remoteDir);
     }
   }
 
@@ -216,4 +218,4 @@ const mapStateToProps = state => ({
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
 })
 
-export default withNavigation(connect(mapStateToProps, { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, updatePrepared, editPrepare, removePrepare, removeNewDoc })(Document));
+export default withNavigation(connect(mapStateToProps, { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, updatePrepared, editPrepare, removePrepare, removeNewDoc, createFile })(Document));
