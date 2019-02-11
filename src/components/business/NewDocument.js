@@ -48,13 +48,13 @@ const Icons = styled(Ionicons)`
 
 class NewDocument extends React.Component {
   onEdit = async () => {
-    const { type, ID, Extension, Dossier1, userId, loadingBusiness, prep, rea, modeleDocs } = this.props;
+    const { type, ID, Extension, Dossier1, userId, loadingBusiness, prep, rea } = this.props;
     const filePath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
     const fileExists = await RNFS.exists(filePath);
     if (fileExists) {
       this.props.editFile(ID, filePath)
     } else if (!loadingBusiness.includes(Dossier1)) {
-      this.props.downloadBusiness(userId, Dossier1, prep, rea, modeleDocs)
+      this.props.downloadBusiness(userId, Dossier1, prep, rea)
     }
   }
   onUpload = () => {

@@ -14,7 +14,7 @@ import Layout from '../constants/Layout'
 import Colors from '../constants/Colors'
 import Folder from '../constants/Folder'
 
-import { editFile } from '../redux/actions/user'
+import { editFile, downloadModels } from '../redux/actions/user'
 import { addNewDoc } from '../redux/actions/business'
 
 const rootDir = RNFS.DocumentDirectoryPath;
@@ -101,6 +101,10 @@ class AddFileScreen extends React.Component {
     headerStyle: {
       height: 70
     }
+  }
+
+  componentDidMount() {
+    this.props.downloadModels(this.props.user.id, this.props.modeleDocs);
   }
 
   handleSelectModele = (ModeleID, FileName, filePath) => {
@@ -221,4 +225,4 @@ const mapStateToProps = state => ({
   user: state.user
 })
 
-export default connect(mapStateToProps, { editFile, addNewDoc })(AddFileScreen);
+export default connect(mapStateToProps, { editFile, addNewDoc, downloadModels })(AddFileScreen);

@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { TouchableOpacity, Text, View, ActivityIndicator, Dimensions, Alert } from 'react-native';
 import pick from 'lodash.pick';
 import RNFS from 'react-native-fs';
+import FileViewer from 'react-native-file-viewer';
 import { EXTERNAL_PATH } from 'react-native-dotenv';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { withNavigation } from 'react-navigation';
@@ -51,15 +52,21 @@ const Icons = styled(Ionicons)`
 
 class Document extends React.Component {
   onEdit = async () => {
-    const { type, ID, Extension, Dossier1, userId, loadingBusiness, prep, rea, modeleDocs } = this.props;
-    const filePath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
-    const fileExists = await RNFS.exists(filePath);
-    if (fileExists) {
-      this.props.editFile({ ID, editPath: `${EXTERNAL_PATH}${ID}.${Extension}`}, filePath)
-    } else if (!loadingBusiness.includes(Dossier1)) {
-      this.props.downloadBusiness(userId, Dossier1, prep, rea, modeleDocs)
+    const { type, ID, Extension, Dossier1, userId, loadingBusiness, prep, rea } = this.props;
+    const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
+    if (isEdited) {
+      FileViewer.open(`${EXTERNAL_PATH}${ID}.${Extension}`, { showOpenWithDialog: true });
+    } else {
+      const filePath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
+      const fileExists = await RNFS.exists(filePath);
+      if (fileExists) {
+        this.props.editFile({ ID, editPath: `${EXTERNAL_PATH}${ID}.${Extension}`}, filePath)
+      } else if (!loadingBusiness.includes(Dossier1)) {
+        this.props.downloadBusiness(userId, Dossier1, prep, rea)
+      }
     }
   }
+
   onUpload = async () => {
     const { ID, Extension, isNew, userId, Dossier1, Dossier3, type } = this.props;
     const filePath = `${EXTERNAL_PATH}${ID}.${Extension}`;
@@ -98,6 +105,7 @@ class Document extends React.Component {
       this.props.editPrepare({ID: this.props.ID, prepared: true})
     }
   }
+
   onCancel = () => {
     Alert.alert(
       'Etes-vous sûr de vouloir annuler les modifications ?',
@@ -126,12 +134,26 @@ class Document extends React.Component {
     }
   }
 
+  onOpenFile = () => {
+    const { FileName, type, navigation, ID, Dossier3, Extension, Dossier1, isDownloaded, userId, prep, rea} = this.props;
+    if (isDownloaded) {
+      return navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type, isEdited })
+    }
+    this.props.downloadBusiness(userId, Dossier1, prep, rea)
+    return ToastAndroid.showWithGravity(
+      "Affaire en cours de téléchargement",
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER,
+    );
+    
+  }
+
   render() {
-    const { FileName, type, navigation, ID, Dossier3, Extension, Dossier1, editedDocs, isNew, uploadingDocs, Reviewed, Prepared} = this.props;
+    const { FileName, type, ID, Extension, editedDocs, uploadingDocs, Reviewed, Prepared} = this.props;
     const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
     return (
       <DocumentWrapper
-        onPress={() => navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type, isEdited })}
+        onPress={this.onOpenFile}
       > 
         <File>
           <Icons
@@ -202,11 +224,13 @@ Document.propTypes = {
   removeFromEdit: PropTypes.func.isRequired,
   downLoadOneFile: PropTypes.func.isRequired,
   isNew: PropTypes.bool,
+  isDownloaded: PropTypes.bool
 }
 
 Document.defaultProps = {
   type: Folder.prep,
-  isNew: false
+  isNew: false,
+  isDownloaded: false
 }
 
 const mapStateToProps = state => ({

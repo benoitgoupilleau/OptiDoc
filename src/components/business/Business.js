@@ -68,7 +68,7 @@ const checkIfNew = (docs, id) => {
 
 class Business extends React.Component {
   displayIcon = () => {
-    const { title, prep, rea, downloadedBusiness, downloadBusiness, userId, loadingBusiness, modeleDocs } = this.props;
+    const { title, prep, rea, downloadedBusiness, downloadBusiness, userId, loadingBusiness } = this.props;
     if (loadingBusiness.includes(title)) {
       return <ActivityIndicator />
     } else if (downloadedBusiness.includes(title)) {
@@ -85,13 +85,13 @@ class Business extends React.Component {
         name={"md-cloud-download"}
         size={30}
         color={Colors.secondColor}
-        onPress={() => downloadBusiness(userId, title, prep, rea, modeleDocs)}
+        onPress={() => downloadBusiness(userId, title, prep, rea)}
       />
     )
   }
 
   render() {
-    const { title, prep, rea, navigation, editedDocs } = this.props;
+    const { title, prep, rea, navigation, editedDocs, downloadedBusiness } = this.props;
     return (
       <BusinessWrapper>
         <MainSection>
@@ -99,7 +99,7 @@ class Business extends React.Component {
           {this.displayIcon()}
         </MainSection>
         <PrepSection>Préparation</PrepSection>
-        {prep.map(p => <Document key={p.ID} {...p} type={Folder.prep} prep={prep} rea={rea} />)}
+        {prep.map(p => <Document key={p.ID} {...p} type={Folder.prep} prep={prep} rea={rea} isDownloaded={downloadedBusiness.includes(title)}/>)}
         <ReaSection>
           <Section>Réalisation</Section>
           <Ionicons
@@ -109,7 +109,7 @@ class Business extends React.Component {
             onPress={() => navigation.navigate('Add', { affaire: title })}
           />
         </ReaSection>
-        {rea.map(r => <Document key={r.ID} isNew={checkIfNew(editedDocs, r.ID)} {...r} type={Folder.rea} prep={prep} rea={rea} />)}
+        {rea.map(r => <Document key={r.ID} isNew={checkIfNew(editedDocs, r.ID)} {...r} type={Folder.rea} prep={prep} rea={rea} isDownloaded={downloadedBusiness.includes(title)}/>)}
       </BusinessWrapper>
     );
   }

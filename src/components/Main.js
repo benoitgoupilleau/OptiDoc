@@ -14,7 +14,9 @@ const Wrapper = styled(View)`
 const Main = ({children}) => (
   <Wrapper>
     <OfflineNotice />
-    {children}
+    <Wrapper>
+      {children}
+    </Wrapper>
   </Wrapper>
 );
 

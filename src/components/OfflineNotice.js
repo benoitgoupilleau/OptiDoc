@@ -49,8 +49,8 @@ class OfflineNotice extends PureComponent {
     } else if (this.props.mssqlFailed) {
       return (
         <Wrapper>
-          <TouchableOpacity onPress={this.props.connectDb} >
-            <Message>Connexion impossible à la base de données. Réessayer</Message>
+          <TouchableOpacity onPress={this.props.connectDb} style={{ height: 30 }}>
+            <Message>Connexion impossible à la base de données. Cliquer pour réessayer</Message>
           </TouchableOpacity>
         </Wrapper>
       );
