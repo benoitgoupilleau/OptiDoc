@@ -1,12 +1,13 @@
 import React from 'react';
 import RNFS from 'react-native-fs';
 import { connect } from 'react-redux';
-import { Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
 import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
 import styled from 'styled-components'
 import { EXTERNAL_PATH } from 'react-native-dotenv';
 
 import Logout from '../components/Logout';
+import OfflineNotice from '../components/OfflineNotice';
 import HeaderTitle from '../components/HeaderTitle'
 import Modele from '../components/business/Modele';
 
@@ -104,7 +105,9 @@ class AddFileScreen extends React.Component {
   }
 
   componentDidMount() {
-    this.props.downloadModels(this.props.user.id, this.props.modeleDocs);
+    if (this.props.modeleDownloaded !== 'in progress') {
+      this.props.downloadModels(this.props.modeleDocs);
+    }
   }
 
   handleSelectModele = (ModeleID, FileName, filePath) => {
@@ -112,109 +115,119 @@ class AddFileScreen extends React.Component {
   }
 
   onCreateFile = async () => {
-    const businessId = this.props.navigation.getParam('affaire', '')
-    const now = new Date();
-    const CreatedOn = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
-    const date = now.getFullYear() + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + 
-      + now.getHours().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + now.getMinutes().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + now.getMilliseconds().toLocaleString('fr-FR', { minimumIntegerDigits: 3 })
-    const fileID= 'DOC_' + date;
-    const modeleSelected = this.props.modeles.filter(m => m.ID_Document === this.state.ModeleID)[0]
-    const Dossier3 = modeleSelected.DossierDestination;
-    const destPath= `${rootDir}/${this.props.user.id}/${businessId}/${Folder.rea}/${fileID}.pdf`
-    await RNFS.copyFile(this.state.filePath, destPath);
-    const newDoc = {
-      LocalPath: '',
-      Prepared: 'N',
-      PreparedOn: '1900-01-01',
-      PageNumber: 1,
-      ReviewedOn: '1900-01-01',
-      PreparedBy: '',
-      Revisable: 'N',
-      Size: 0,
-      CreatedBy: this.props.user.name,
-      Dossier2: 'Realisation',
-      UpLoadedOn: '1900-01-01',
-      FileName: this.state.FileNameFinal,
-      CreatedOn,
-      Dossier1: businessId,
-      ID: fileID,
-      UpdatedOn: CreatedOn,
-      UpdatedBy: this.props.user.name,
-      Commentaire: '',
-      Dossier3,
-      ServerPath: `${businessId}/Realisation/${Dossier3}/${fileID}.pdf`,
-      ReviewedBy: '',
-      Extension: 'pdf',
-      Reviewed: 'N',
-      Locked: 'N',
-      UpLoadedBy: ''
+    if (this.props.modeleDownloaded === 'in progress') {
+      return Alert.alert('Modèle en cours de téléchargement', 'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants', [{ text: 'Ok' }]);
+    } else {
+      const businessId = this.props.navigation.getParam('affaire', '')
+      const now = new Date();
+      const CreatedOn = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
+      const date = now.getFullYear() + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + 
+        + now.getHours().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + now.getMinutes().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + now.getMilliseconds().toLocaleString('fr-FR', { minimumIntegerDigits: 3 })
+      const fileID= 'DOC_' + date;
+      const modeleSelected = this.props.modeles.filter(m => m.ID_Document === this.state.ModeleID)[0]
+      const Dossier3 = modeleSelected.DossierDestination;
+      const destPath= `${rootDir}/${this.props.user.id}/${businessId}/${Folder.rea}/${fileID}.pdf`;
+      await RNFS.mkdir(`${rootDir}/${this.props.user.id}/${businessId}/${Folder.rea}`);
+      await RNFS.copyFile(this.state.filePath, destPath);
+      const newDoc = {
+        LocalPath: '',
+        Prepared: 'N',
+        PreparedOn: '1900-01-01',
+        PageNumber: 1,
+        ReviewedOn: '1900-01-01',
+        PreparedBy: '',
+        Revisable: 'N',
+        Size: 0,
+        CreatedBy: this.props.user.name,
+        Dossier2: 'Realisation',
+        UpLoadedOn: '1900-01-01',
+        FileName: this.state.FileNameFinal,
+        CreatedOn,
+        Dossier1: businessId,
+        ID: fileID,
+        UpdatedOn: CreatedOn,
+        UpdatedBy: this.props.user.name,
+        Commentaire: '',
+        Dossier3,
+        ServerPath: `${businessId}/Realisation/${Dossier3}/${fileID}.pdf`,
+        ReviewedBy: '',
+        Extension: 'pdf',
+        Reviewed: 'N',
+        Locked: 'N',
+        UpLoadedBy: ''
+      }
+      const page1 = PDFPage
+        .modify(0)
+        .drawText('Rédigé par : ' + this.props.user.name, {
+          x: modeleSelected.Zone1X ? parseInt(modeleSelected.Zone1X, 10) : 5,
+          y: modeleSelected.Zone1Y ? parseInt(modeleSelected.Zone1Y, 10) : 830,
+          fontSize: 10
+        })
+        .drawText('Affaire : ' + businessId, {
+          x: modeleSelected.Zone2X ? parseInt(modeleSelected.Zone2X, 10) : 200,
+          y: modeleSelected.Zone2Y ? parseInt(modeleSelected.Zone2Y, 10) : 830,
+          fontSize: 10
+        })
+        .drawText('Date : ' + CreatedOn, {
+          x: modeleSelected.Zone3X ? parseInt(modeleSelected.Zone3X, 10) : 400,
+          y: modeleSelected.Zone3Y ? parseInt(modeleSelected.Zone3Y, 10) : 830,
+          fontSize: 10
+        })
+        
+      this.props.navigation.navigate('Business');
+      PDFDocument
+        .modify(destPath)
+        .modifyPages(page1)
+        .write()
+        .then(() => {
+          this.props.editFile({ ID: fileID, editPath: `${EXTERNAL_PATH}${fileID}.pdf`, isNew: true}, destPath)
+          this.props.addNewDoc(newDoc)
+        })
+        .catch(e => console.log({ modifyPages: e}))
     }
-    const page1 = PDFPage
-      .modify(0)
-      .drawText('Rédigé par : ' + this.props.user.name, {
-        x: modeleSelected.Zone1X ? parseInt(modeleSelected.Zone1X, 10) : 5,
-        y: modeleSelected.Zone1Y ? parseInt(modeleSelected.Zone1Y, 10) : 830,
-        fontSize: 10
-      })
-      .drawText('Affaire : ' + businessId, {
-        x: modeleSelected.Zone2X ? parseInt(modeleSelected.Zone2X, 10) : 200,
-        y: modeleSelected.Zone2Y ? parseInt(modeleSelected.Zone2Y, 10) : 830,
-        fontSize: 10
-      })
-      .drawText('Date : ' + CreatedOn, {
-        x: modeleSelected.Zone3X ? parseInt(modeleSelected.Zone3X, 10) : 400,
-        y: modeleSelected.Zone3Y ? parseInt(modeleSelected.Zone3Y, 10) : 830,
-        fontSize: 10
-      })
-      
-    this.props.navigation.navigate('Business');
-    PDFDocument
-      .modify(destPath)
-      .modifyPages(page1)
-      .write()
-      .then(() => {
-        this.props.editFile({ ID: fileID, editPath: `${EXTERNAL_PATH}${fileID}.pdf`, isNew: true}, destPath)
-        this.props.addNewDoc(newDoc)
-      })
-      .catch(e => console.log({ modifyPages: e}))
   }
 
   render() {
     const title = this.props.navigation.getParam('affaire', '')
+    const affaire = this.props.affaires.filter(a => a.ID === title)[0]
+    const clientName = affaire ? `${affaire.Designation} - ${affaire.Client}` : title;
     return (
-      <Wrapper>
-        <Title>{title}</Title>
-        <Section>Sélectionner un modèle</Section>
-        <Selector>
-          <Option
-            isSelected={this.state.Dossier2 === 'PV'}
-            onPress={() => this.setState({ Dossier2: 'PV', FileName: '' })}
-          >
-            <OptionText isSelected={this.state.Dossier2 === 'PV'}>PV</OptionText>
-          </Option>
-          <Option
-            isSelected={this.state.Dossier2 === 'DMOS'}
-            onPress={() => this.setState({ Dossier2: 'DMOS', FileName: '' })}
-          >
-            <OptionText isSelected={this.state.Dossier2 === 'DMOS'}>DMOS</OptionText>
-          </Option>
-        </Selector>
-        <ModeleList>
-          {this.props.modeleDocs.filter(m => m.Dossier2 === this.state.Dossier2).map(m => (
-            <Modele key={m.ID} FileName={m.FileName} handleSelect={() => this.handleSelectModele(m.ID, m.FileName, `${rootDir}/${this.props.user.id}/${Folder.modeleDocs}/${m.ID}.${m.Extension}`)} selected={this.state.FileName === m.FileName}/>))
-          }
-        </ModeleList>
-        <ButtonWrapper>
-          <FileNameInput
-            placeholder="Nom du fichier"
-            onChangeText={(FileNameFinal) => this.setState({ FileNameFinal })}
-            value={this.state.FileNameFinal}
-          />
-          <StyledButton disabled={this.state.FileName === ''} onPress={this.onCreateFile}>
-            <StyledText>Créer le fichier</StyledText>
-          </StyledButton>
-        </ButtonWrapper>
-      </Wrapper>
+      <View>
+        <OfflineNotice />
+        <Wrapper>
+          <Title>{clientName}</Title>
+          <Section>Sélectionner un modèle</Section>
+          <Selector>
+            <Option
+              isSelected={this.state.Dossier2 === 'PV'}
+              onPress={() => this.setState({ Dossier2: 'PV', FileName: '' })}
+            >
+              <OptionText isSelected={this.state.Dossier2 === 'PV'}>PV</OptionText>
+            </Option>
+            <Option
+              isSelected={this.state.Dossier2 === 'DMOS'}
+              onPress={() => this.setState({ Dossier2: 'DMOS', FileName: '' })}
+            >
+              <OptionText isSelected={this.state.Dossier2 === 'DMOS'}>DMOS</OptionText>
+            </Option>
+          </Selector>
+          <ModeleList>
+            {this.props.modeleDocs.filter(m => m.Dossier2 === this.state.Dossier2).map(m => (
+              <Modele key={m.ID} FileName={m.FileName} handleSelect={() => this.handleSelectModele(m.ID, m.FileName, `${rootDir}/${Folder.modeleDocs}/${m.ID}.${m.Extension}`)} selected={this.state.FileName === m.FileName}/>))
+            }
+          </ModeleList>
+          <ButtonWrapper>
+            <FileNameInput
+              placeholder="Nom du fichier"
+              onChangeText={(FileNameFinal) => this.setState({ FileNameFinal })}
+              value={this.state.FileNameFinal}
+            />
+            <StyledButton disabled={this.state.FileName === ''} onPress={this.onCreateFile}>
+              <StyledText>Créer le fichier</StyledText>
+            </StyledButton>
+          </ButtonWrapper>
+        </Wrapper>
+      </View>
     );
   }
 }
@@ -222,7 +235,9 @@ class AddFileScreen extends React.Component {
 const mapStateToProps = state => ({
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
   modeles: state.business.modeles,
-  user: state.user
+  user: state.user,
+  affaires: state.business.affaires,
+  modeleDownloaded: state.user.modeleDownloaded
 })
 
 export default connect(mapStateToProps, { editFile, addNewDoc, downloadModels })(AddFileScreen);

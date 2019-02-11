@@ -6,6 +6,8 @@ import Main from '../components/Main';
 
 import { connectDb } from '../redux/actions/network';
 import { getTeam, getTeamRight, getUser } from '../redux/actions/team'
+import { getDocs } from '../redux/actions/business'
+import { downloadModels } from '../redux/actions/user'
 
 const checkAccess = async () => {
   const isAuthorised = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
@@ -49,7 +51,9 @@ const  AuthLoadingScreen = ({token,
   navigation,
   getTeam,
   getUser,
-  getTeamRight}) => {
+  getTeamRight,
+  downloadModels,
+  modeleDocs}) => {
   checkAccess();
   if (!mssqlConnected && !mssqlConnectionFailed) {
     connectDb();
@@ -57,6 +61,8 @@ const  AuthLoadingScreen = ({token,
     getTeam();
     getUser();
     getTeamRight();
+    getDocs()
+    downloadModels(modeleDocs)
     if (teamLoaded && teamRightsLoaded) {
       navigation.navigate(token !== '' ? 'App' : 'Auth');
     } else {
@@ -89,6 +95,7 @@ const mapStateToProps = state => ({
   teamLoaded: state.teams.teamLoaded,
   usersLoaded: state.teams.usersLoaded,
   teamRightsLoaded: state.teams.teamRightsLoaded,
+  modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
 })
 
-export default connect(mapStateToProps, { connectDb, getTeam, getUser, getTeamRight })(AuthLoadingScreen);
+export default connect(mapStateToProps, { connectDb, getTeam, getUser, getTeamRight, getDocs, downloadModels })(AuthLoadingScreen);

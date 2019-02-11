@@ -5,14 +5,16 @@ import {
   UPDATE_PREPARE,
   ADD_DOC,
   ADD_NEW_DOC,
-  REMOVED_NEW_DOC
+  REMOVED_NEW_DOC,
+  SET_AFFAIRES
 } from '../actions/types';
 
 const defaultState = {
   docs: [],
   modeles: [],
   newDocs: [],
-  business: []
+  business: [],
+  affaires: []
 }
 
 export default (state = defaultState, action) => {
@@ -36,6 +38,11 @@ export default (state = defaultState, action) => {
       return {
         ...state,
         business: action.business,
+      }
+    case SET_AFFAIRES:
+      return {
+        ...state,
+        affaires: action.affaires,
       }
     case ADD_NEW_DOC: {
       const newDocsUpd = [...state.newDocs, action.doc];

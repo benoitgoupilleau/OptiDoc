@@ -10,7 +10,7 @@ import News from '../components/news/News';
 import Main from '../components/Main';
 
 import { getNews, refreshNews } from '../redux/actions/news'
-import { getDocs, getModeles, getBusiness } from '../redux/actions/business'
+import { getDocs, getModeles, getBusiness, getAffaires } from '../redux/actions/business'
 import { getTeam, getTeamRight, getUser } from '../redux/actions/team'
 import { downloadModels } from '../redux/actions/user'
 import { filterNews } from '../redux/selector/news'
@@ -50,7 +50,8 @@ class HomeScreen extends React.Component {
       this.props.getTeam();
       this.props.getUser()
       this.props.getTeamRight();
-      this.props.downloadModels(this.props.userId, this.props.modeleDocs)
+      this.props.getAffaires()
+      if(this.props.modeleDownloaded !== 'in progress') this.props.downloadModels(this.props.modeleDocs)
     } 
   }
 
@@ -126,6 +127,7 @@ const mapStateToProps = (state) => ({
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
   teamLoaded: state.teams.teamLoaded,
   teamRightsLoaded: state.teams.teamRightsLoaded,
+  modeleDownloaded: state.user.modeleDownloaded
 })
 
-export default connect(mapStateToProps, { getNews, refreshNews, getDocs, getModeles, getBusiness, getTeam, getUser, getTeamRight, downloadModels })(HomeScreen);
+export default connect(mapStateToProps, { getNews, refreshNews, getDocs, getModeles, getBusiness, getTeam, getUser, getTeamRight, downloadModels, getAffaires })(HomeScreen);

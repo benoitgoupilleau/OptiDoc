@@ -45,7 +45,12 @@ class ListBusinessScreen extends React.Component {
     }
   }
 
-  
+  getAffaireName = (id) => {
+    const affaire = this.props.affaires.filter(a => a.ID === id)[0]
+    const clientName = affaire ? `${affaire.Designation} - ${affaire.Client}` : id;
+    return clientName;
+  }
+
   render() {
     if (this.props.availableBusinesses.length > 0) {
       return (
@@ -54,7 +59,7 @@ class ListBusinessScreen extends React.Component {
             <StyledScroll>
               {this.props.availableBusinesses.map(b => (
               <BusinessWrapper key={b.ID_Affaire +Math.random()}>
-                <Title>{b.ID_Affaire}</Title>
+                <Title>{this.getAffaireName(b.ID_Affaire)}</Title>
               </BusinessWrapper>
               ))}
             </StyledScroll>
@@ -76,7 +81,8 @@ ListBusinessScreen.propTypes = {
 
 
 const mapStateToProps = (state) => ({
-  availableBusinesses: state.business.business
+  availableBusinesses: state.business.business,
+  affaires: state.business.affaires
 })
 
 export default connect(mapStateToProps)(ListBusinessScreen);

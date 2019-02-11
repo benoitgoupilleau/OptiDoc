@@ -6,6 +6,7 @@ export default {
   t_modeles: 't_Modeles',
   t_users: 't_Utilisateurs',
   t_business: 'v_AffairesVisiblesDepuisAndroid',
+  t_affaires: 't_Affaires',
   docField: [
     'LocalPath',
     'Prepared',

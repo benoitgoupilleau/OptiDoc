@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { View, Button, AsyncStorage, Alert, ToastAndroid, ActivityIndicator } from 'react-native';
+import { View, Button, Alert, ToastAndroid, ActivityIndicator } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
 import Colors from '../constants/Colors';
@@ -11,7 +11,7 @@ import Layout from '../constants/Layout'
 
 import { logout } from '../redux/actions/user';
 import { getNews } from '../redux/actions/news'
-import { getDocs, getModeles, getBusiness } from '../redux/actions/business'
+import { getDocs, getModeles, getBusiness, getAffaires } from '../redux/actions/business'
 import { getTeam, getTeamRight } from '../redux/actions/team'
 
 const Wrapper = styled(View)`
@@ -52,6 +52,7 @@ class Logout extends React.Component {
     this.setState({ refreshing: true})
     this.props.getNews()
     this.props.getDocs()
+    this.props.getAffaires()
     this.props.getBusiness();
     this.props.getModeles()
     this.props.getTeam()
@@ -109,6 +110,7 @@ export default withNavigation(connect(mapStateToProps, {
   logout,
   getNews,
   getDocs,
+  getAffaires,
   getBusiness,
   getModeles,
   getTeam,

@@ -9,6 +9,7 @@ import {
   ADD_NEW_DOC,
   REMOVED_NEW_DOC,
   ADD_DOC,
+  SET_AFFAIRES
 } from './types';
 
 
@@ -59,4 +60,13 @@ export const addNewDoc = (doc) => ({
 export const removeNewDoc = id => ({
   type: REMOVED_NEW_DOC,
   id
+})
+
+export const getAffaires = () => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_affaires}`)
+  .then((res) => dispatch(setAffaires(res)))
+  .catch(e => console.log({ getAffaires: e }))
+
+const setAffaires = (affaires) => ({
+  type: SET_AFFAIRES,
+  affaires
 })

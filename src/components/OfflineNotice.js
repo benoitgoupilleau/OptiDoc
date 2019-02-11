@@ -11,7 +11,7 @@ import Colors from '../constants/Colors';
 const { width } = Dimensions.get('window');
 
 const Wrapper = styled(View)`
-  background-color: ${props => props.error ? Colors.errorBackground : Colors.warningBackground};
+  background-color: ${props => props.type === 'error' ? Colors.errorBackground : (props.type === 'warning' ? Colors.warningBackground : Colors.mainColor)};
   height: 30px;
   justify-content: center;
   align-items: center;
@@ -20,7 +20,7 @@ const Wrapper = styled(View)`
 `;
 
 const Message = styled(Text)`
-  color: ${props => props.error ? Colors.errorText : Colors.warningText};
+  color: ${props => props.type === 'error' ? Colors.errorText : (props.type === 'warning' ? Colors.warningText : Colors.warningText)};
 `;
 
 class OfflineNotice extends PureComponent {
@@ -42,16 +42,22 @@ class OfflineNotice extends PureComponent {
   render() {
     if (!this.props.isConnected) {
       return (
-        <Wrapper error>
-            <Message error>Mode hors ligne</Message>
+        <Wrapper type="error">
+            <Message type="error">Mode hors ligne</Message>
         </Wrapper>
       );
     } else if (this.props.mssqlFailed) {
       return (
-        <Wrapper>
+        <Wrapper type="warning">
           <TouchableOpacity onPress={this.props.connectDb} style={{ height: 30 }}>
-            <Message>Connexion impossible à la base de données. Cliquer pour réessayer</Message>
+            <Message type="warning" >Connexion impossible à la base de données. Cliquer pour réessayer</Message>
           </TouchableOpacity>
+        </Wrapper>
+      );
+    } else if (this.props.modeleDownloaded === 'in progress') {
+      return (
+        <Wrapper>
+            <Message>Fichiers modèles en cours de téléchargement</Message>
         </Wrapper>
       );
     }
@@ -63,6 +69,7 @@ const mapStateToProps = state => ({
   isConnected: state.network.isConnected,
   mssqlFailed: state.network.mssqlConnectionFailed,
   mssqlConnected: state.network.mssqlConnected,
+  modeleDownloaded: state.user.modeleDownloaded
 })
 
 OfflineNotice.propTypes = {

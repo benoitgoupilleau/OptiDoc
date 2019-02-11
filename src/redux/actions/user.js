@@ -62,8 +62,8 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
     await FTP.logout()
     return dispatch(businessDownloaded(businessId))
   }).catch(async (e) => {
-    dispatch(cancelDownload(businessId))
     await FTP.logout()
+    dispatch(cancelDownload(businessId))
     console.log({ downloadBusiness: e})
   })
 }
@@ -102,25 +102,30 @@ export const editFile = (file, filePath) => {
   })
 }
 
-export const downloadModels = (userId, modeleDocs) => dispatch => {
-  return RNFS.mkdir(`${rootDir}/${userId}/${Folder.modeleDocs}`)
+export const downloadModels = (modeleDocs) => dispatch => {
+  return RNFS.mkdir(`${rootDir}/${Folder.modeleDocs}`)
     .then(async () => {
       await FTP.login(FTP_USERNAME, FTP_PASSWORD);
       if (modeleDocs.length > 0) {
         dispatch(downloadModele())
         for (let i = 0; i < modeleDocs.length; i += 1) {
-          const fileExists = await RNFS.exists(`${rootDir}/${userId}/${Folder.modeleDocs}/${modeleDocs[i].ID}.${modeleDocs[i].Extension}`)
+          const fileExists = await RNFS.exists(`${rootDir}/${Folder.modeleDocs}/${modeleDocs[i].ID}.${modeleDocs[i].Extension}`)
           if (!fileExists) {
-            await FTP.downloadFile(`./${modeleDocs[i].ServerPath}`,
-              `${rootDir}/${userId}/${Folder.modeleDocs}`)
+            try {
+              await FTP.downloadFile(`./${modeleDocs[i].ServerPath}`,
+              `${rootDir}/${Folder.modeleDocs}`)
+            } catch (error) {
+              await RNFS.unlink(`${rootDir}/${Folder.modeleDocs}/${modeleDocs[i].ID}.${modeleDocs[i].Extension}`)
+              console.log({ modeleDoc: modeleDocs[i], "FTP.downloadFile": error })
+            }
           }
         }
       }
       await FTP.logout()
       return dispatch(modeleDownloaded())
     }).catch(async (e) => {
-      dispatch(cancelDownloadModel())
       await FTP.logout()
+      dispatch(cancelDownloadModel())
       console.log({ downloadModels: e })
     })
 }

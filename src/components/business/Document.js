@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { TouchableOpacity, Text, View, ActivityIndicator, Dimensions, Alert } from 'react-native';
+import { TouchableOpacity, Text, View, ActivityIndicator, Dimensions, Alert, ToastAndroid } from 'react-native';
 import pick from 'lodash.pick';
 import RNFS from 'react-native-fs';
 import FileViewer from 'react-native-file-viewer';
@@ -52,7 +52,7 @@ const Icons = styled(Ionicons)`
 
 class Document extends React.Component {
   onEdit = async () => {
-    const { type, ID, Extension, Dossier1, userId, loadingBusiness, prep, rea } = this.props;
+    const { type, ID, Extension, Dossier1, userId, loadingBusiness, prep, rea, editedDocs } = this.props;
     const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
     if (isEdited) {
       FileViewer.open(`${EXTERNAL_PATH}${ID}.${Extension}`, { showOpenWithDialog: true });
@@ -62,7 +62,11 @@ class Document extends React.Component {
       if (fileExists) {
         this.props.editFile({ ID, editPath: `${EXTERNAL_PATH}${ID}.${Extension}`}, filePath)
       } else if (!loadingBusiness.includes(Dossier1)) {
-        this.props.downloadBusiness(userId, Dossier1, prep, rea)
+        if (this.props.modeleDownloaded === 'in progress') {
+          Alert.alert('Modèle en cours de téléchargement', 'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants', [{ text: 'Ok' }]);
+        } else {
+          this.props.downloadBusiness(userId, Dossier1, prep, rea)
+        }
       }
     }
   }
@@ -135,11 +139,23 @@ class Document extends React.Component {
   }
 
   onOpenFile = () => {
-    const { FileName, type, navigation, ID, Dossier3, Extension, Dossier1, isDownloaded, userId, prep, rea} = this.props;
+    const { FileName, type, navigation, ID, Dossier3, Extension, Dossier1, isDownloaded, userId, prep, rea, loadingBusiness, editedDocs} = this.props;
+    const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
     if (isDownloaded) {
       return navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type, isEdited })
     }
-    this.props.downloadBusiness(userId, Dossier1, prep, rea)
+    if (!loadingBusiness.includes(Dossier1)) {
+      if (this.props.modeleDownloaded === 'in progress') {
+        return Alert.alert('Modèle en cours de téléchargement', 'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants', [{ text: 'Ok' }]);
+      } else {
+        this.props.downloadBusiness(userId, Dossier1, prep, rea)
+        return ToastAndroid.showWithGravity(
+          "Affaire en cours de téléchargement",
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+      }
+    }
     return ToastAndroid.showWithGravity(
       "Affaire en cours de téléchargement",
       ToastAndroid.SHORT,
@@ -240,6 +256,7 @@ const mapStateToProps = state => ({
   userId: state.user.id,
   name: state.user.name,
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
+  modeleDownloaded: state.user.modeleDownloaded
 })
 
 export default withNavigation(connect(mapStateToProps, { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, updatePrepared, editPrepare, removePrepare, removeNewDoc, createFile })(Document));

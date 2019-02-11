@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text, ActivityIndicator, Alert } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -68,7 +68,7 @@ const checkIfNew = (docs, id) => {
 
 class Business extends React.Component {
   displayIcon = () => {
-    const { title, prep, rea, downloadedBusiness, downloadBusiness, userId, loadingBusiness } = this.props;
+    const { title, downloadedBusiness, loadingBusiness } = this.props;
     if (loadingBusiness.includes(title)) {
       return <ActivityIndicator />
     } else if (downloadedBusiness.includes(title)) {
@@ -85,17 +85,28 @@ class Business extends React.Component {
         name={"md-cloud-download"}
         size={30}
         color={Colors.secondColor}
-        onPress={() => downloadBusiness(userId, title, prep, rea)}
+        onPress={this.onDownload}
       />
     )
   }
 
+  onDownload = () => {
+    const { title, prep, rea, modeleDownloaded, downloadBusiness, userId } = this.props;
+    if (modeleDownloaded === 'in progress') {
+      Alert.alert('Modèle en cours de téléchargement', 'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants', [{ text: 'Ok' }]);
+    } else {
+      downloadBusiness(userId, title, prep, rea)
+    }
+  }
+
   render() {
     const { title, prep, rea, navigation, editedDocs, downloadedBusiness } = this.props;
+    const affaire = this.props.affaires.filter(a => a.ID === title)[0]
+    const clientName = affaire ? `${affaire.Designation} - ${affaire.Client}` : title;
     return (
       <BusinessWrapper>
         <MainSection>
-          <Title>{title}</Title>
+          <Title>{clientName}</Title>
           {this.displayIcon()}
         </MainSection>
         <PrepSection>Préparation</PrepSection>
@@ -138,6 +149,8 @@ const mapStateToProps = state => ({
   userId: state.user.id,
   editedDocs: state.user.editedDocs,
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
+  affaires: state.business.affaires,
+  modeleDownloaded: state.user.modeleDownloaded
 })
 
 export default withNavigation(connect(mapStateToProps, { downloadBusiness })(Business));
