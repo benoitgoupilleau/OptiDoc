@@ -53,7 +53,8 @@ const  AuthLoadingScreen = ({token,
   getUser,
   getTeamRight,
   downloadModels,
-  modeleDocs}) => {
+  modeleDocs,
+  editedDocs}) => {
   checkAccess();
   if (!mssqlConnected && !mssqlConnectionFailed) {
     connectDb();
@@ -61,7 +62,7 @@ const  AuthLoadingScreen = ({token,
     getTeam();
     getUser();
     getTeamRight();
-    getDocs()
+    getDocs(editedDocs)
     downloadModels(modeleDocs)
     if (teamLoaded && teamRightsLoaded) {
       navigation.navigate(token !== '' ? 'App' : 'Auth');
@@ -90,6 +91,7 @@ AuthLoadingScreen.propTypes = {
 
 const mapStateToProps = state => ({
   token: state.user.bearerToken,
+  editedDocs: state.user.editedDocs,
   mssqlConnected: state.network.mssqlConnected,
   mssqlConnectionFailed: state.network.mssqlConnectionFailed,
   teamLoaded: state.teams.teamLoaded,

@@ -1,6 +1,7 @@
 const mainColor = '#120453';
 const secondColor = '#2873a9';
 const thirdColor = '#9d9ea0';
+const fourthColor = '#e1e1e2';
 const antiBackground= 'white'
 
 export default {
@@ -9,6 +10,7 @@ export default {
   mainColor,
   secondColor,
   thirdColor,
+  fourthColor,
   tabIconDefault: thirdColor,
   tabIconSelected: mainColor,
   tabBar: '#fefefe',

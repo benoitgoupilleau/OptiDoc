@@ -55,7 +55,7 @@ class Document extends React.Component {
     const { type, ID, Extension, Dossier1, userId, loadingBusiness, prep, rea, editedDocs } = this.props;
     const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
     if (isEdited) {
-      FileViewer.open(`${EXTERNAL_PATH}${ID}.${Extension}`, { showOpenWithDialog: true });
+      FileViewer.open(`${EXTERNAL_PATH}${ID}.${Extension}`);
     } else {
       const filePath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
       const fileExists = await RNFS.exists(filePath);
@@ -65,34 +65,42 @@ class Document extends React.Component {
         if (this.props.modeleDownloaded === 'in progress') {
           Alert.alert('Modèle en cours de téléchargement', 'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants', [{ text: 'Ok' }]);
         } else {
-          this.props.downloadBusiness(userId, Dossier1, prep, rea)
+          if (this.props.isConnected) {
+            this.props.downloadBusiness(userId, Dossier1, prep, rea)
+          } else {
+            Alert.alert('Vous êtes en mode hors-ligne', 'Vous pourrez télécharger cette affaire une fois votre connexion rétablie', [{ text: 'Ok' }]);
+          }
         }
       }
     }
   }
 
   onUpload = async () => {
-    const { ID, Extension, isNew, userId, Dossier1, Dossier3, type } = this.props;
-    const filePath = `${EXTERNAL_PATH}${ID}.${Extension}`;
-    const destPath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
-    const file = pick(this.props, Tables.docField);
-    await RNFS.copyFile(filePath, destPath);
-    const remoteDir = `./${Dossier1}/Realisation${Dossier3 !== '' ? `/${Dossier3}` : ''}`
-    const userName = this.props.name;
-    const now = new Date();
-    const date = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
-    const fileToUpLoad = {
-      ...file,
-      UpLoadedOn: date,
-      UpdatedOn: date,
-      UpdatedBy: userName,
-      UpLoadedBy: userName
-    }
-    this.props.uploadingFile(ID);
-    if (isNew) {
-      return this.props.createFile(filePath, fileToUpLoad, remoteDir)
+    const { ID, Extension, isNew, userId, Dossier1, Dossier3, type, isConnected } = this.props;
+    if (isConnected) {
+      const filePath = `${EXTERNAL_PATH}${ID}.${Extension}`;
+      const destPath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
+      const file = pick(this.props, Tables.docField);
+      await RNFS.copyFile(filePath, destPath);
+      const remoteDir = `./${Dossier1}/Realisation${Dossier3 !== '' ? `/${Dossier3}` : ''}`
+      const userName = this.props.name;
+      const now = new Date();
+      const date = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
+      const fileToUpLoad = {
+        ...file,
+        UpLoadedOn: date,
+        UpdatedOn: date,
+        UpdatedBy: userName,
+        UpLoadedBy: userName
+      }
+      this.props.uploadingFile(ID);
+      if (isNew) {
+        return this.props.createFile(filePath, fileToUpLoad, remoteDir)
+      } else {
+        return this.props.uploadFile(filePath, fileToUpLoad, remoteDir);
+      }
     } else {
-      return this.props.uploadFile(filePath, fileToUpLoad, remoteDir);
+      Alert.alert('Vous êtes en mode hors-ligne', 'Vous pourrez envoyer votre fichier une fois votre connexion rétablie', [{ text: 'Ok' }]);
     }
   }
 
@@ -148,12 +156,16 @@ class Document extends React.Component {
       if (this.props.modeleDownloaded === 'in progress') {
         return Alert.alert('Modèle en cours de téléchargement', 'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants', [{ text: 'Ok' }]);
       } else {
-        this.props.downloadBusiness(userId, Dossier1, prep, rea)
-        return ToastAndroid.showWithGravity(
-          "Affaire en cours de téléchargement",
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
+        if (this.props.isConnected) {
+          this.props.downloadBusiness(userId, Dossier1, prep, rea)
+          return ToastAndroid.showWithGravity(
+            "Affaire en cours de téléchargement",
+            ToastAndroid.SHORT,
+            ToastAndroid.CENTER,
+          );
+        } else {
+          Alert.alert('Vous êtes en mode hors-ligne', 'Vous pourrez télécharger cette affaire une fois votre connexion rétablie', [{ text: 'Ok' }]);
+        }
       }
     }
     return ToastAndroid.showWithGravity(
@@ -165,7 +177,7 @@ class Document extends React.Component {
   }
 
   render() {
-    const { FileName, type, ID, Extension, editedDocs, uploadingDocs, Reviewed, Prepared} = this.props;
+    const { FileName, type, ID, Extension, editedDocs, uploadingDocs, Reviewed, Prepared } = this.props;
     const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
     return (
       <DocumentWrapper
@@ -201,7 +213,7 @@ class Document extends React.Component {
               name="md-checkbox-outline"
               size={26}
               color={Prepared === 'O' ? "green" : Colors.thirdColor}
-              onPress={this.onPrepare}
+              onPress={(Prepared === 'O' && !isEdited) ? () => {} : this.onPrepare}
             />
             {Reviewed === 'O' || (Prepared === 'O' && !isEdited) ? undefined :
             <Icons
@@ -250,6 +262,7 @@ Document.defaultProps = {
 }
 
 const mapStateToProps = state => ({
+  isConnected: state.network.isConnected,
   loadingBusiness: state.user.loadingBusiness,
   editedDocs: state.user.editedDocs,
   uploadingDocs: state.user.uploadingDocs,

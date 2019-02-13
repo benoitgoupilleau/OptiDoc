@@ -44,7 +44,7 @@ class HomeScreen extends React.Component {
   componentDidMount() {
     if (this.props.mssqlConnected){
       this.props.getNews();
-      this.props.getDocs();
+      this.props.getDocs(this.props.editedDocs);
       this.props.getBusiness()
       this.props.getModeles()
       this.props.getTeam();
@@ -124,6 +124,7 @@ const mapStateToProps = (state) => ({
   mssqlConnected: state.network.mssqlConnected,
   usersLoaded: state.teams.usersLoaded,
   userId: state.user.id,
+  editedDocs: state.user.editedDocs,
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
   teamLoaded: state.teams.teamLoaded,
   teamRightsLoaded: state.teams.teamRightsLoaded,

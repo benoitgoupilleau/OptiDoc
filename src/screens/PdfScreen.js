@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Pdf from 'react-native-pdf';
 import PropTypes from 'prop-types';
+import FileViewer from 'react-native-file-viewer';
 import { EXTERNAL_PATH } from 'react-native-dotenv';
 import { Dimensions, Text, ActivityIndicator, View, TouchableOpacity } from 'react-native';
 
@@ -49,6 +50,14 @@ class PdfScreen extends React.Component {
     }, 500);
   }
 
+  onPressEdit = (ID, Extension, filePath, isEdited) => {
+    if (isEdited) {
+      FileViewer.open(`${EXTERNAL_PATH}${ID}.${Extension}`);
+    } else {
+      this.props.editFile({ ID, editPath: `${EXTERNAL_PATH}${ID}.${Extension}`}, filePath)
+    }
+  }
+
   render() {
     const isEdited = this.props.navigation.getParam('isEdited', false)
     const ID = this.props.navigation.getParam('ID', '')
@@ -70,7 +79,7 @@ class PdfScreen extends React.Component {
         return (
           <Main>
             <View>
-              {type === Folder.rea && (<Edit onPress={() => this.props.editFile(ID, filePath)}>
+              {type === Folder.rea && (<Edit onPress={() => this.props.onPressEdit(ID, Extension, filePath, isEdited)}>
                 <EditText>Modifier</EditText>
               </Edit>)}
               <Pdf

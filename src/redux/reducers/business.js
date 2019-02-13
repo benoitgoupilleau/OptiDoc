@@ -19,11 +19,29 @@ const defaultState = {
 
 export default (state = defaultState, action) => {
   switch (action.type) {
-    case SET_DOCS:
+    case SET_DOCS: {
+      if (action.editedDocs.length > 0) {
+        const newDocs = [];
+        const currentDocs = [...state.docs];
+        for (let i = 0; i< action.docs.length; i++) {
+          const indexOfEdited = action.editedDocs.findIndex(el => el.ID === action.docs[i].ID)
+          if (indexOfEdited === -1) {
+            newDocs.push(action.docs[i])
+          } else {
+            const indexToKeep = currentDocs.findIndex(el => el.ID === action.docs[i].ID);
+            newDocs.push(currentDocs[indexToKeep])
+          }
+        }
+        return {
+          ...state,
+          docs: newDocs
+        }
+      }
       return {
         ...state,
         docs: action.docs,
       }
+    }
     case ADD_DOC: 
       return {
         ...state,

@@ -57,7 +57,7 @@ class OfflineNotice extends PureComponent {
     } else if (this.props.modeleDownloaded === 'in progress') {
       return (
         <Wrapper>
-            <Message>Fichiers modèles en cours de téléchargement</Message>
+            <Message>Fichiers modèles en cours de téléchargement {this.props.nbDownloaded}/{this.props.totalModeles}</Message>
         </Wrapper>
       );
     }
@@ -69,7 +69,9 @@ const mapStateToProps = state => ({
   isConnected: state.network.isConnected,
   mssqlFailed: state.network.mssqlConnectionFailed,
   mssqlConnected: state.network.mssqlConnected,
-  modeleDownloaded: state.user.modeleDownloaded
+  modeleDownloaded: state.user.modeleDownloaded,
+  nbDownloaded: state.user.nbDownloaded,
+  totalModeles: state.user.totalModeles
 })
 
 OfflineNotice.propTypes = {

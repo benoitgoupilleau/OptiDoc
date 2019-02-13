@@ -27,6 +27,9 @@ import Tables from '../../constants/Tables';
 
 const rootDir = RNFS.DocumentDirectoryPath;
 
+let isDownloadingFiles = false;
+let isDownloadingModeles = false;
+
 export const login = (userName, user, bearerToken) => ({
   type: LOGIN,
   userName,
@@ -41,30 +44,57 @@ export const logout = (userId) => dispatch => RNFS.unlink(`${rootDir}/${userId}`
   .catch(() => dispatch({ type: LOGOUT }))
 
 export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
-  dispatch(downloading(businessId))
+  if (isDownloadingModeles) {
+    return dispatch(cancelDownload(businessId))
+  }
+  isDownloadingFiles = true;
   return RNFS.mkdir(`${rootDir}/${userId}/${businessId}`)
-  .then(async () => {
-    await FTP.login(FTP_USERNAME, FTP_PASSWORD);
-    if (prep.length > 0) {
-      await RNFS.mkdir(`${rootDir}/${userId}/${businessId}/${Folder.prep}`);
-      for (let i = 0; i < prep.length; i += 1) {
-        await FTP.downloadFile(`./${prep[i].ServerPath}`,
-          `${rootDir}/${userId}/${businessId}/${Folder.prep}`)
+    .then(() => FTP.login(FTP_USERNAME, FTP_PASSWORD).then(async () => {
+      const total = prep.length + rea.length;
+      let nbDownloading = 0
+      if (prep.length > 0) {
+        await RNFS.mkdir(`${rootDir}/${userId}/${businessId}/${Folder.prep}`);
+        for (let i = 0; i < prep.length; i += 1) {
+          try {
+            const fileExists = await RNFS.exists(`${rootDir}/${userId}/${businessId}/${Folder.prep}/${prep[i].ID}.${prep[i].Extension}`)
+            nbDownloading = nbDownloading + 1;
+            dispatch(downloading(businessId, nbDownloading, total))
+            if (!fileExists) {
+              await FTP.downloadFile(`./${prep[i].ServerPath}`, `${rootDir}/${userId}/${businessId}/${Folder.prep}`)
+            }
+          } catch (error) {
+            console.log({ prepDoc: prep[i], "FTP.downloadFile": error })
+            return dispatch(cancelDownload(businessId))
+          }
+        }
       }
-    }
-    if (rea.length > 0) {
-      await RNFS.mkdir(`${rootDir}/${userId}/${businessId}/${Folder.rea}`);
-      for (let i = 0; i < rea.length; i += 1) {
-        await FTP.downloadFile(`./${rea[i].ServerPath}`,
-          `${rootDir}/${userId}/${businessId}/${Folder.rea}`)
+      if (rea.length > 0) {
+        await RNFS.mkdir(`${rootDir}/${userId}/${businessId}/${Folder.rea}`);
+        for (let i = 0; i < rea.length; i += 1) {
+          try {
+            const fileExists = await RNFS.exists(`${rootDir}/${userId}/${businessId}/${Folder.rea}/${rea[i].ID}.${rea[i].Extension}`)
+            nbDownloading = nbDownloading + 1;
+            dispatch(downloading(businessId, nbDownloading, total))
+            if (!fileExists) {
+              await FTP.downloadFile(`./${rea[i].ServerPath}`, `${rootDir}/${userId}/${businessId}/${Folder.rea}`)
+            }
+          } catch (error) {
+            console.log({ reaDoc: rea[i], "FTP.downloadFile": error })
+            return dispatch(cancelDownload(businessId))
+          }
+        }
       }
-    }
-    await FTP.logout()
-    return dispatch(businessDownloaded(businessId))
-  }).catch(async (e) => {
-    await FTP.logout()
-    dispatch(cancelDownload(businessId))
+      return FTP.logout().then(() => {
+        isDownloadingFiles = false;
+        return dispatch(businessDownloaded(businessId))
+      })
+    })
+  ).catch((e) => {
     console.log({ downloadBusiness: e})
+    return FTP.logout().then(() => {
+      isDownloadingFiles = false;
+      return dispatch(cancelDownload(businessId))
+    })
   })
 }
 
@@ -73,9 +103,11 @@ const cancelDownload = (id) => ({
   id
 })
 
-const downloading = (id) => ({
+const downloading = (id, nb, total) => ({
   type: DOWNLOADING_BUSINESS,
-  id
+  id,
+  nb,
+  total
 })
 
 const businessDownloaded = (id) => ({
@@ -95,7 +127,6 @@ export const removePrepare = (id) => ({
 
 export const editFile = (file, filePath) => {
   FileViewer.open(filePath, { showOpenWithDialog: true });
-  MSSQL.executeUpdate(`UPDATE ${Tables.t_docs} SET Locked='O' WHERE ID='${file.ID}'`)
   return ({
     type: EDIT_FILE,
     file
@@ -103,17 +134,21 @@ export const editFile = (file, filePath) => {
 }
 
 export const downloadModels = (modeleDocs) => dispatch => {
+  if (isDownloadingFiles) {
+    return dispatch(cancelDownloadModel())
+  }
+  isDownloadingModeles = true;
   return RNFS.mkdir(`${rootDir}/${Folder.modeleDocs}`)
-    .then(async () => {
-      await FTP.login(FTP_USERNAME, FTP_PASSWORD);
+    .then(() => FTP.login(FTP_USERNAME, FTP_PASSWORD).then(async () => {
       if (modeleDocs.length > 0) {
-        dispatch(downloadModele())
+        const total = modeleDocs.length;
         for (let i = 0; i < modeleDocs.length; i += 1) {
           const fileExists = await RNFS.exists(`${rootDir}/${Folder.modeleDocs}/${modeleDocs[i].ID}.${modeleDocs[i].Extension}`)
           if (!fileExists) {
             try {
-              await FTP.downloadFile(`./${modeleDocs[i].ServerPath}`,
-              `${rootDir}/${Folder.modeleDocs}`)
+              dispatch(downloadModele(i+1, total))
+              await FTP.downloadFile(`./${modeleDocs[i].ServerPath}`, `${rootDir}/${Folder.modeleDocs}`)
+              console.log(`downloaded ${i+1}/${total}`)
             } catch (error) {
               await RNFS.unlink(`${rootDir}/${Folder.modeleDocs}/${modeleDocs[i].ID}.${modeleDocs[i].Extension}`)
               console.log({ modeleDoc: modeleDocs[i], "FTP.downloadFile": error })
@@ -121,12 +156,17 @@ export const downloadModels = (modeleDocs) => dispatch => {
           }
         }
       }
-      await FTP.logout()
-      return dispatch(modeleDownloaded())
-    }).catch(async (e) => {
-      await FTP.logout()
-      dispatch(cancelDownloadModel())
+      return FTP.logout().then(() => {
+        isDownloadingModeles = false;
+        return dispatch(modeleDownloaded())
+      })
+      })
+    ).catch((e) => {
       console.log({ downloadModels: e })
+      return FTP.logout().then(() => {
+        isDownloadingModeles = false;
+        return dispatch(cancelDownloadModel())
+      })
     })
 }
 
@@ -138,8 +178,10 @@ const cancelDownloadModel = () => ({
   type: CANCEL_DOWNLOAD_MODELE
 })
 
-const downloadModele = () => ({
-  type: DOWNLOADING_MODELE
+const downloadModele = (nb, total) => ({
+  type: DOWNLOADING_MODELE,
+  nb,
+  total
 })
 
 export const uploadingFile = (fileId) => ({

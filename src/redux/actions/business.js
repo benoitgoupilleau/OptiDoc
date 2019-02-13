@@ -13,13 +13,14 @@ import {
 } from './types';
 
 
-export const getDocs = () => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_docs}`)
-  .then((res) => dispatch(setDocs(res)))
+export const getDocs = (editedDocs) => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_docs}`)
+  .then((res) => dispatch(setDocs(editedDocs, res)))
   .catch(e => console.log({ getDocs: e }))
 
-const setDocs = (docs) => ({
+const setDocs = (editedDocs, docs) => ({
   type: SET_DOCS,
-  docs
+  docs,
+  editedDocs
 })
 
 export const addDoc = (doc) => ({

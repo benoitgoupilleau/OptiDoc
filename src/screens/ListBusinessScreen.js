@@ -47,7 +47,7 @@ class ListBusinessScreen extends React.Component {
 
   getAffaireName = (id) => {
     const affaire = this.props.affaires.filter(a => a.ID === id)[0]
-    const clientName = affaire ? `${affaire.Designation} - ${affaire.Client}` : id;
+    const clientName = affaire ? `${affaire.Client} - ${affaire.Designation}` : id;
     return clientName;
   }
 

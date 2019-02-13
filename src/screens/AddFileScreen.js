@@ -105,7 +105,7 @@ class AddFileScreen extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.modeleDownloaded !== 'in progress') {
+    if (this.props.modeleDownloaded !== 'in progress' && this.props.isConnected) {
       this.props.downloadModels(this.props.modeleDocs);
     }
   }
@@ -120,6 +120,8 @@ class AddFileScreen extends React.Component {
     } else {
       const businessId = this.props.navigation.getParam('affaire', '')
       const now = new Date();
+      const affaire = this.props.affaires.filter(a => a.ID === businessId)[0]
+      const clientName = affaire ? `${affaire.Client} - ${affaire.Designation}` : businessId;
       const CreatedOn = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
       const date = now.getFullYear() + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + 
         + now.getHours().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + now.getMinutes().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + now.getMilliseconds().toLocaleString('fr-FR', { minimumIntegerDigits: 3 })
@@ -163,13 +165,13 @@ class AddFileScreen extends React.Component {
           y: modeleSelected.Zone1Y ? parseInt(modeleSelected.Zone1Y, 10) : 830,
           fontSize: 10
         })
-        .drawText('Affaire : ' + businessId, {
+        .drawText('Affaire : ' + clientName, {
           x: modeleSelected.Zone2X ? parseInt(modeleSelected.Zone2X, 10) : 200,
           y: modeleSelected.Zone2Y ? parseInt(modeleSelected.Zone2Y, 10) : 830,
           fontSize: 10
         })
         .drawText('Date : ' + CreatedOn, {
-          x: modeleSelected.Zone3X ? parseInt(modeleSelected.Zone3X, 10) : 400,
+          x: modeleSelected.Zone3X ? parseInt(modeleSelected.Zone3X, 10) : 500,
           y: modeleSelected.Zone3Y ? parseInt(modeleSelected.Zone3Y, 10) : 830,
           fontSize: 10
         })
@@ -190,7 +192,7 @@ class AddFileScreen extends React.Component {
   render() {
     const title = this.props.navigation.getParam('affaire', '')
     const affaire = this.props.affaires.filter(a => a.ID === title)[0]
-    const clientName = affaire ? `${affaire.Designation} - ${affaire.Client}` : title;
+    const clientName = affaire ? `${affaire.Client} - ${affaire.Designation}` : title;
     return (
       <View>
         <OfflineNotice />
@@ -233,6 +235,7 @@ class AddFileScreen extends React.Component {
 }
 
 const mapStateToProps = state => ({
+  isConnected: state.network.isConnected,
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
   modeles: state.business.modeles,
   user: state.user,

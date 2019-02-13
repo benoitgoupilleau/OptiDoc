@@ -26,10 +26,14 @@ const defaultState = {
   name: '',
   downloadedBusiness: [],
   loadingBusiness: [],
+  nbDocBusiness: 0,
+  totalDocBusiness: 0,
   editedDocs: [],
   uploadingDocs: [],
   locked: false,
   modeleDownloaded: 'no',
+  nbDownloaded: 0,
+  totalModeles: 0
 }
 
 const checkToken = async (token) => {
@@ -76,20 +80,24 @@ export default (state = defaultState, action) => {
         ...omit(defaultState, 'userName')
       }
     case DOWNLOADING_BUSINESS: {
-      const currentBusiness = [...state.loadingBusiness, action.id];
+      const currentBusiness = state.loadingBusiness.includes(action.id) ? [...state.loadingBusiness] : [...state.loadingBusiness, action.id];
       return {
         ...state,
-        loadingBusiness: currentBusiness
+        loadingBusiness: currentBusiness,
+        nbDocBusiness: action.nb,
+        totalDocBusiness: action.total
       }
     }
     case BUSINESS_DOWNLOADED: {
-      const currentBusiness = [...state.downloadedBusiness, action.id];
+      const currentBusiness = state.downloadedBusiness.includes(action.id) ? [...state.downloadedBusiness] : [...state.downloadedBusiness, action.id];
       const downloading = [...state.loadingBusiness];
       const indexToRemove = downloading.findIndex(el => el === action.id);
       return {
         ...state,
         downloadedBusiness: currentBusiness,
-        loadingBusiness: [...downloading.slice(0, indexToRemove), ...downloading.slice(indexToRemove + 1)]
+        loadingBusiness: [...downloading.slice(0, indexToRemove), ...downloading.slice(indexToRemove + 1)],
+        nbDocBusiness: 0,
+        totalDocBusiness: 0
       }
     }
     case CANCEL_DOWNLOAD: {
@@ -171,7 +179,9 @@ export default (state = defaultState, action) => {
     case DOWNLOADING_MODELE:
       return {
         ...state,
-        modeleDownloaded: 'in progress'
+        modeleDownloaded: 'in progress',
+        nbDownloaded: action.nb,
+        totalModeles: action.total
       }
     case CANCEL_DOWNLOAD_MODELE:
       return {
