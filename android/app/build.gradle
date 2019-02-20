@@ -111,6 +111,16 @@ android {
             abiFilters "armeabi-v7a", "x86"
         }
     }
+    signingConfigs {
+        release {
+            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
+                storeFile file(MYAPP_RELEASE_STORE_FILE)
+                storePassword MYAPP_RELEASE_STORE_PASSWORD
+                keyAlias MYAPP_RELEASE_KEY_ALIAS
+                keyPassword MYAPP_RELEASE_KEY_PASSWORD
+            }
+        }
+    }
     splits {
         abi {
             reset()
@@ -123,6 +133,7 @@ android {
         release {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
         }
     }
     // applicationVariants are e.g. debug, release
@@ -141,16 +152,16 @@ android {
 }
 
 dependencies {
-    compile project(':react-native-pdf-lib')
-    compile project(':react-native-file-viewer')
-    compile project(':rn-fetch-blob')
-    compile project(':react-native-vector-icons')
-    compile project(':react-native-pdf')
-    compile project(':react-native-pure-jwt')
-    compile project(':react-native-ftp')
-    compile project(':react-native-gesture-handler')
-    compile project(':react-native-fs')
-    compile project(':react-native-mssql')
+    implementation project(':react-native-pdf-lib')
+    implementation project(':react-native-file-viewer')
+    implementation project(':rn-fetch-blob')
+    implementation project(':react-native-vector-icons')
+    implementation project(':react-native-pdf')
+    implementation project(':react-native-pure-jwt')
+    implementation project(':react-native-ftp')
+    implementation project(':react-native-gesture-handler')
+    implementation project(':react-native-fs')
+    implementation project(':react-native-mssql')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.facebook.react:react-native:+"  // From node_modules
