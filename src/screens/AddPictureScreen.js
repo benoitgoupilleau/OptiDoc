@@ -94,13 +94,13 @@ class AddFileScreen extends React.Component {
   }
 
   handleButtonPress = async () => {
-    const isAuthorised = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
+    const isAuthorised = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
     if (isAuthorised) {
       this.getPhotos();
     } else {
       try {
         const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
           {
             title: "Optidoc demande d'acccès aux photos",
             message:

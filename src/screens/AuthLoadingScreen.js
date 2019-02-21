@@ -10,13 +10,13 @@ import { getDocs } from '../redux/actions/business'
 import { downloadModels } from '../redux/actions/user'
 
 const checkAccess = async () => {
-  const isAuthorised = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
+  const isAuthorised = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
   if (isAuthorised) {
     return true;
   } else {
     try {
       const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
         {
           title: "Optidoc demande l'acccès aux documents",
           message:
@@ -58,6 +58,11 @@ const  AuthLoadingScreen = ({token,
   checkAccess();
   if (!mssqlConnected && !mssqlConnectionFailed) {
     connectDb();
+    if (teamLoaded && teamRightsLoaded) {
+      navigation.navigate(token !== '' ? 'App' : 'Auth');
+    } else {
+      navigation.navigate('Auth');
+    }
   } else {
     getTeam();
     getUser();

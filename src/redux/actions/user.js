@@ -84,17 +84,15 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
           }
         }
       }
-      return FTP.logout().then(() => {
-        isDownloadingFiles = false;
-        return dispatch(businessDownloaded(businessId))
-      })
-    })
-  ).catch((e) => {
-    console.log({ downloadBusiness: e})
-    return FTP.logout().then(() => {
       isDownloadingFiles = false;
-      return dispatch(cancelDownload(businessId))
+      await FTP.logout()
+      return dispatch(businessDownloaded(businessId))
     })
+  ).catch(async (e) => {
+    console.log({ downloadBusiness: e})
+    isDownloadingFiles = false;
+    await FTP.logout()  
+    return dispatch(cancelDownload(businessId))
   })
 }
 
@@ -148,7 +146,6 @@ export const downloadModels = (modeleDocs) => dispatch => {
             try {
               dispatch(downloadModele(i+1, total))
               await FTP.downloadFile(`./${modeleDocs[i].ServerPath}`, `${rootDir}/${Folder.modeleDocs}`)
-              console.log(`downloaded ${i+1}/${total}`)
             } catch (error) {
               await RNFS.unlink(`${rootDir}/${Folder.modeleDocs}/${modeleDocs[i].ID}.${modeleDocs[i].Extension}`)
               console.log({ modeleDoc: modeleDocs[i], "FTP.downloadFile": error })
@@ -156,17 +153,15 @@ export const downloadModels = (modeleDocs) => dispatch => {
           }
         }
       }
-      return FTP.logout().then(() => {
-        isDownloadingModeles = false;
-        return dispatch(modeleDownloaded())
+      isDownloadingModeles = false;
+      await FTP.logout()
+      return dispatch(modeleDownloaded())
       })
-      })
-    ).catch((e) => {
+    ).catch(async (e) => {
+      dispatch(cancelDownloadModel())
+      isDownloadingModeles = false;
       console.log({ downloadModels: e })
-      return FTP.logout().then(() => {
-        isDownloadingModeles = false;
-        return dispatch(cancelDownloadModel())
-      })
+      return await FTP.logout()
     })
 }
 

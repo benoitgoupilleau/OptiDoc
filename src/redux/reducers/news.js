@@ -1,5 +1,4 @@
 import {
-  LOGOUT,
   SET_NEWS,
   REFRESH_NEWS
 } from '../actions/types';

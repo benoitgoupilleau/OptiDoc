@@ -46,7 +46,7 @@ class OfflineNotice extends PureComponent {
             <Message type="error">Mode hors ligne</Message>
         </Wrapper>
       );
-    } else if (this.props.mssqlFailed) {
+    } else if (this.props.isConnected && this.props.mssqlFailed) {
       return (
         <Wrapper type="warning">
           <TouchableOpacity onPress={this.props.connectDb} style={{ height: 30 }}>
