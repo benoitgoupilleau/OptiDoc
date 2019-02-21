@@ -5,12 +5,12 @@ import { connect } from 'react-redux';
 import { TouchableOpacity, Text, View, ActivityIndicator, Dimensions, Alert, ToastAndroid } from 'react-native';
 import pick from 'lodash.pick';
 import RNFS from 'react-native-fs';
-import FileViewer from 'react-native-file-viewer';
 import { EXTERNAL_PATH } from 'react-native-dotenv';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { withNavigation } from 'react-navigation';
 import { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, editPrepare, removePrepare, createFile } from '../../redux/actions/user'
 import { updatePrepared, removeNewDoc } from '../../redux/actions/business';
+import { openFile } from '../../services/openfile'
 
 import Layout from '../../constants/Layout';
 import Folder from '../../constants/Folder';
@@ -55,7 +55,7 @@ class Document extends React.Component {
     const { type, ID, Extension, Dossier1, userId, loadingBusiness, prep, rea, editedDocs } = this.props;
     const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
     if (isEdited) {
-      FileViewer.open(`${EXTERNAL_PATH}${ID}.${Extension}`);
+      await openFile(ID, Extension);
     } else {
       const filePath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
       const fileExists = await RNFS.exists(filePath);
@@ -76,8 +76,13 @@ class Document extends React.Component {
   }
 
   onUpload = async () => {
-    const { ID, Extension, isNew, userId, Dossier1, Dossier3, type, isConnected } = this.props;
-    if (isConnected) {
+    const { ID, Extension, isNew, userId, Dossier1, Dossier3, type, isConnected, mssqlConnected } = this.props;
+    if (isConnected && mssqlConnected) {
+      const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${ID}(0).${Extension}`);
+      if (secondVersion) {
+        await RNFS.copyFile(`${EXTERNAL_PATH}${ID}(0).${Extension}`, `${EXTERNAL_PATH}${ID}.${Extension}`);
+        await RNFS.unlink(`${EXTERNAL_PATH}${ID}(0).${Extension}`)
+      }
       const filePath = `${EXTERNAL_PATH}${ID}.${Extension}`;
       const destPath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
       const file = pick(this.props, Tables.docField);
@@ -100,7 +105,7 @@ class Document extends React.Component {
         return this.props.uploadFile(filePath, fileToUpLoad, remoteDir);
       }
     } else {
-      Alert.alert('Vous êtes en mode hors-ligne', 'Vous pourrez envoyer votre fichier une fois votre connexion rétablie', [{ text: 'Ok' }]);
+      Alert.alert('Connexion impossible', 'Vous pourrez envoyer votre fichier une fois votre connexion rétablie', [{ text: 'Ok' }]);
     }
   }
 
@@ -132,6 +137,10 @@ class Document extends React.Component {
   removeFile = async () => {
     const { ID, isNew, userId, Dossier1, Extension, type } = this.props;
     if (!isNew) {
+      const doc = this.props.editedDocs.filter(e => e.ID === ID)[0]
+      if (doc.prepared) {
+        this.props.updatePrepared(ID, 'N', '1900-01-01');
+      }
       this.props.removeFromEdit(ID);
     } else {
       this.props.removeNewDoc(ID)
@@ -146,11 +155,23 @@ class Document extends React.Component {
     }
   }
 
-  onOpenFile = () => {
-    const { FileName, type, navigation, ID, Dossier3, Extension, Dossier1, isDownloaded, userId, prep, rea, loadingBusiness, editedDocs} = this.props;
-    const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
+  onOpenFile = async () => {
+    const { FileName, type, navigation, ID, Dossier3, Extension, Dossier1, isDownloaded, userId, prep, rea, loadingBusiness, editedDocs, Prepared, Reviewed} = this.props;
+    const isEdited = editedDocs.filter(e => e.ID === ID && !!e.editPath).length > 0;
+    const isPrepared = editedDocs.filter(e => e.ID === ID && e.prepared).length > 0;
     if (isDownloaded) {
-      return navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type, isEdited })
+      const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${ID}(0).${Extension}`);
+      if (secondVersion && isEdited) {
+        RNFS.copyFile(`${EXTERNAL_PATH}${ID}(0).${Extension}`, `${EXTERNAL_PATH}${ID}.${Extension}`)
+          .then(() => RNFS.unlink(`${EXTERNAL_PATH}${ID}(0).${Extension}`)
+            .then(() => 
+              navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type, isEdited, Prepared, Reviewed, isPrepared })
+            )
+          )
+          .catch((e) => console.log({e}))
+      } else {
+        return navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type, isEdited, Prepared, Reviewed, isPrepared })
+      } 
     }
     if (!loadingBusiness.includes(Dossier1)) {
       if (this.props.modeleDownloaded === 'in progress') {
@@ -263,13 +284,15 @@ Document.defaultProps = {
 
 const mapStateToProps = state => ({
   isConnected: state.network.isConnected,
+  mssqlConnected: state.network.mssqlConnected,
+  mssqlConnectionFailed: state.network.mssqlConnectionFailed,
   loadingBusiness: state.user.loadingBusiness,
   editedDocs: state.user.editedDocs,
   uploadingDocs: state.user.uploadingDocs,
   userId: state.user.id,
   name: state.user.name,
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
-  modeleDownloaded: state.user.modeleDownloaded
+  modeleDownloaded: state.user.modeleDownloaded,
 })
 
 export default withNavigation(connect(mapStateToProps, { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, updatePrepared, editPrepare, removePrepare, removeNewDoc, createFile })(Document));

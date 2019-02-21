@@ -136,7 +136,7 @@ class Business extends React.Component {
             color={Colors.mainColor}
             onPress={this.togglePrep}
           />
-          <Section>Préparation</Section>
+          <Section onPress={this.togglePrep} >Préparation</Section>
         </SectionWrapper>
         {this.state.showPrep && prep.map(p => <Document key={p.ID} {...p} type={Folder.prep} prep={prep} rea={rea} isDownloaded={downloadedBusiness.includes(title)}/>)}
         <SectionWrapper>
@@ -146,7 +146,7 @@ class Business extends React.Component {
             color={Colors.mainColor}
             onPress={this.toggleRea}
           />
-          <Section>Réalisation</Section>
+          <Section onPress={this.togglePrep} >Réalisation</Section>
           <Icons
             name={"md-add"}
             size={26}

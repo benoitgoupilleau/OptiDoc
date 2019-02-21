@@ -70,13 +70,14 @@ class Signin extends React.Component {
     super(props)
     this.state = {
       userName: '',
-      password: ''
+      password: '',
+      hasFetchedData: false
     }
   }
 
   componentDidMount(){
     const userName = this.props.userName;
-    if (this.props.isConnected) {
+    if (this.props.mssqlConnected) {
       this.props.getTeam()
       this.props.getUser()
       this.props.getTeamRight()
@@ -108,6 +109,12 @@ class Signin extends React.Component {
   };
 
   render() {
+    if (this.props.mssqlConnected && !this.state.hasFetchedData) {
+      this.props.getTeam()
+      this.props.getUser()
+      this.props.getTeamRight()
+      this.setState({hasFetchedData: true})
+    }
     return (
       <Wrapper>
         <View style={{ alignItems : 'center' }}>
@@ -157,6 +164,7 @@ Signin.propTypes = {
 const mapStateToProps = state => ({
   userName: state.user.userName,
   isConnected: state.network.isConnected,
+  mssqlConnected: state.network.mssqlConnected,
   locked: state.user.locked,
   users: state.teams.users,
   usersLoaded: state.teams.usersLoaded,

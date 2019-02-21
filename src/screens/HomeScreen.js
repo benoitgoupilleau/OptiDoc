@@ -30,6 +30,7 @@ class HomeScreen extends React.Component {
     super(props);
     this.state = {
       refreshing: props.refreshing,
+      hasFetchedData: false
     }
   }
 
@@ -68,6 +69,18 @@ class HomeScreen extends React.Component {
   }
 
   render() {
+    if (this.props.mssqlConnected && !this.state.hasFetchedData){
+      this.props.getNews();
+      this.props.getDocs(this.props.editedDocs);
+      this.props.getBusiness()
+      this.props.getModeles()
+      this.props.getTeam();
+      this.props.getUser()
+      this.props.getTeamRight();
+      this.props.getAffaires()
+      if(this.props.modeleDownloaded !== 'in progress') this.props.downloadModels(this.props.modeleDocs)
+      this.setState({hasFetchedData: true})
+    } 
     if (!this.props.loaded) {
       return(
         <Main>
