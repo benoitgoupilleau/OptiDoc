@@ -43,7 +43,7 @@ class HomeScreen extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.mssqlConnected){
+    if (this.props.mssqlConnected) {
       this.props.getNews();
       this.props.getDocs(this.props.editedDocs);
       this.props.getBusiness()
@@ -52,8 +52,10 @@ class HomeScreen extends React.Component {
       this.props.getUser()
       this.props.getTeamRight();
       this.props.getAffaires()
-      if(this.props.modeleDownloaded !== 'in progress') this.props.downloadModels(this.props.modeleDocs)
-    } 
+    }
+    if (this.props.modeleDownloaded !== 'in progress' && this.props.isConnected) {
+      this.props.downloadModels(this.props.modeleDocs);
+    }
   }
 
   componentDidUpdate(prevProps) {

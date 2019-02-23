@@ -94,6 +94,7 @@ class AddFileScreen extends React.Component {
       FileName: '',
       filePath: '',
       FileNameFinal: '',
+      creatingFile: false
     }
   } 
   static navigationOptions = {
@@ -114,10 +115,11 @@ class AddFileScreen extends React.Component {
     this.setState({ ModeleID, FileName, FileNameFinal: FileName, filePath })
   }
 
-  onCreateFile = async () => {
+  onCreateFile = () => {
     if (this.props.modeleDownloaded === 'in progress') {
       return Alert.alert('Modèle en cours de téléchargement', 'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants', [{ text: 'Ok' }]);
     } else {
+      this.setState({creatingFile: true})
       const businessId = this.props.navigation.getParam('affaire', '')
       const now = new Date();
       const affaire = this.props.affaires.filter(a => a.ID === businessId)[0]
@@ -129,63 +131,76 @@ class AddFileScreen extends React.Component {
       const modeleSelected = this.props.modeles.filter(m => m.ID_Document === this.state.ModeleID)[0]
       const Dossier3 = modeleSelected.DossierDestination;
       const destPath= `${rootDir}/${this.props.user.id}/${businessId}/${Folder.rea}/${fileID}.pdf`;
-      await RNFS.mkdir(`${rootDir}/${this.props.user.id}/${businessId}/${Folder.rea}`);
-      await RNFS.copyFile(this.state.filePath, destPath);
-      const newDoc = {
-        LocalPath: '',
-        Prepared: 'N',
-        PreparedOn: '1900-01-01',
-        PageNumber: 1,
-        ReviewedOn: '1900-01-01',
-        PreparedBy: '',
-        Revisable: 'N',
-        Size: 0,
-        CreatedBy: this.props.user.name,
-        Dossier2: 'Realisation',
-        UpLoadedOn: '1900-01-01',
-        FileName: this.state.FileNameFinal,
-        CreatedOn,
-        Dossier1: businessId,
-        ID: fileID,
-        UpdatedOn: CreatedOn,
-        UpdatedBy: this.props.user.name,
-        Commentaire: '',
-        Dossier3,
-        ServerPath: `${businessId}/Realisation/${Dossier3}/${fileID}.pdf`,
-        ReviewedBy: '',
-        Extension: 'pdf',
-        Reviewed: 'N',
-        Locked: 'N',
-        UpLoadedBy: ''
-      }
-      const page1 = PDFPage
-        .modify(0)
-        .drawText('Rédigé par : ' + this.props.user.name, {
-          x: modeleSelected.Zone1X ? parseInt(modeleSelected.Zone1X, 10) : 5,
-          y: modeleSelected.Zone1Y ? parseInt(modeleSelected.Zone1Y, 10) : 830,
-          fontSize: 10
+      RNFS.mkdir(`${rootDir}/${this.props.user.id}/${businessId}/${Folder.rea}`)
+        .then(() => RNFS.copyFile(this.state.filePath, destPath)
+          .then(() => {
+            const newDoc = {
+              LocalPath: '',
+              Prepared: 'N',
+              PreparedOn: '1900-01-01',
+              PageNumber: 1,
+              ReviewedOn: '1900-01-01',
+              PreparedBy: '',
+              Revisable: 'N',
+              Size: 0,
+              CreatedBy: this.props.user.name,
+              Dossier2: 'Realisation',
+              UpLoadedOn: '1900-01-01',
+              FileName: this.state.FileNameFinal,
+              CreatedOn,
+              Dossier1: businessId,
+              ID: fileID,
+              UpdatedOn: CreatedOn,
+              UpdatedBy: this.props.user.name,
+              Commentaire: '',
+              Dossier3,
+              ServerPath: `${businessId}/Realisation/${Dossier3}/${fileID}.pdf`,
+              ReviewedBy: '',
+              Extension: 'pdf',
+              Reviewed: 'N',
+              Locked: 'N',
+              UpLoadedBy: ''
+            }
+            const page1 = PDFPage
+              .modify(0)
+              .drawText('Rédigé par : ' + this.props.user.name, {
+                x: modeleSelected.Zone1X ? parseInt(modeleSelected.Zone1X, 10) : 5,
+                y: modeleSelected.Zone1Y ? parseInt(modeleSelected.Zone1Y, 10) : 830,
+                fontSize: 10
+              })
+              .drawText('Affaire : ' + clientName, {
+                x: modeleSelected.Zone2X ? parseInt(modeleSelected.Zone2X, 10) : 200,
+                y: modeleSelected.Zone2Y ? parseInt(modeleSelected.Zone2Y, 10) : 830,
+                fontSize: 10
+              })
+              .drawText('Date : ' + CreatedOn, {
+                x: modeleSelected.Zone3X ? parseInt(modeleSelected.Zone3X, 10) : 500,
+                y: modeleSelected.Zone3Y ? parseInt(modeleSelected.Zone3Y, 10) : 830,
+                fontSize: 10
+              })
+              
+            this.props.navigation.navigate('Business');
+            return PDFDocument
+              .modify(destPath)
+              .modifyPages(page1)
+              .write()
+              .then(() => {
+                this.props.editFile({ ID: fileID, editPath: `${EXTERNAL_PATH}${fileID}.pdf`, isNew: true}, destPath)
+                return this.props.addNewDoc(newDoc)
+              })
+              .catch(e => {
+                console.log({ modifyPages: e})
+                this.setState({creatingFile: false})
+              })
+          })
+          .catch(e => {
+            console.log({ copyFile: e})
+            this.setState({creatingFile: false})
+          }))
+        .catch((e) => {
+          console.log({ onCreateFile: e})
+          this.setState({creatingFile: false})
         })
-        .drawText('Affaire : ' + clientName, {
-          x: modeleSelected.Zone2X ? parseInt(modeleSelected.Zone2X, 10) : 200,
-          y: modeleSelected.Zone2Y ? parseInt(modeleSelected.Zone2Y, 10) : 830,
-          fontSize: 10
-        })
-        .drawText('Date : ' + CreatedOn, {
-          x: modeleSelected.Zone3X ? parseInt(modeleSelected.Zone3X, 10) : 500,
-          y: modeleSelected.Zone3Y ? parseInt(modeleSelected.Zone3Y, 10) : 830,
-          fontSize: 10
-        })
-        
-      this.props.navigation.navigate('Business');
-      PDFDocument
-        .modify(destPath)
-        .modifyPages(page1)
-        .write()
-        .then(() => {
-          this.props.editFile({ ID: fileID, editPath: `${EXTERNAL_PATH}${fileID}.pdf`, isNew: true}, destPath)
-          this.props.addNewDoc(newDoc)
-        })
-        .catch(e => console.log({ modifyPages: e}))
     }
   }
 
@@ -202,13 +217,13 @@ class AddFileScreen extends React.Component {
           <Selector>
             <Option
               isSelected={this.state.Dossier2 === 'PV'}
-              onPress={() => this.setState({ Dossier2: 'PV', FileName: '' })}
+              onPress={() => this.setState({ Dossier2: 'PV', FileName: '', FileNameFinal: '' })}
             >
               <OptionText isSelected={this.state.Dossier2 === 'PV'}>PV</OptionText>
             </Option>
             <Option
               isSelected={this.state.Dossier2 === 'DMOS'}
-              onPress={() => this.setState({ Dossier2: 'DMOS', FileName: '' })}
+              onPress={() => this.setState({ Dossier2: 'DMOS', FileName: '', FileNameFinal: '' })}
             >
               <OptionText isSelected={this.state.Dossier2 === 'DMOS'}>DMOS</OptionText>
             </Option>
@@ -224,8 +239,8 @@ class AddFileScreen extends React.Component {
               onChangeText={(FileNameFinal) => this.setState({ FileNameFinal })}
               value={this.state.FileNameFinal}
             />
-            <StyledButton disabled={this.state.FileName === ''} onPress={this.onCreateFile}>
-              <StyledText>Créer le fichier</StyledText>
+            <StyledButton disabled={this.state.FileName === '' || this.state.creatingFile} onPress={this.onCreateFile}>
+              <StyledText>{this.state.creatingFile ? 'Création en cours' : 'Créer le fichier'}</StyledText>
             </StyledButton>
           </ButtonWrapper>
         </Wrapper>

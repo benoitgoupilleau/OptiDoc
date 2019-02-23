@@ -146,7 +146,7 @@ class Business extends React.Component {
             color={Colors.mainColor}
             onPress={this.toggleRea}
           />
-          <Section onPress={this.togglePrep} >Réalisation</Section>
+          <Section onPress={this.toggleRea} >Réalisation</Section>
           <Icons
             name={"md-add"}
             size={26}

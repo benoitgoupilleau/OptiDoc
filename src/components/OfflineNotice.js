@@ -25,6 +25,10 @@ const Message = styled(Text)`
 
 class OfflineNotice extends PureComponent {
   componentDidMount() {
+    NetInfo.getConnectionInfo().then((connectionInfo) => {
+      const isConnected = connectionInfo.type === 'wifi' || connectionInfo.type === 'cellular';
+      this.props.connectivityChange(isConnected);
+    });
     NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
   }
 
@@ -34,9 +38,6 @@ class OfflineNotice extends PureComponent {
 
   handleConnectivityChange = isConnected => {
     this.props.connectivityChange(isConnected);
-    if (isConnected) {
-      this.props.connectDb();
-    }
   }
 
   render() {
@@ -50,7 +51,7 @@ class OfflineNotice extends PureComponent {
       return (
         <Wrapper type="warning">
           <TouchableOpacity onPress={this.props.connectDb} style={{ height: 30 }}>
-            <Message type="warning" >Connexion impossible à la base de données. Cliquer pour réessayer</Message>
+            <Message type="warning" >Connexion perdue avec la base de données. Cliquer pour réessayer</Message>
           </TouchableOpacity>
         </Wrapper>
       );
