@@ -11,7 +11,7 @@ import Layout from '../constants/Layout'
 
 import { logout } from '../redux/actions/user';
 import { getNews } from '../redux/actions/news'
-import { getDocs, getModeles, getBusiness, getAffaires } from '../redux/actions/business'
+import { getDocs, getModeles, getBusiness, getAffaires, getArbo } from '../redux/actions/business'
 import { getTeam, getTeamRight } from '../redux/actions/team'
 
 const Wrapper = styled(View)`
@@ -66,6 +66,7 @@ class Logout extends React.Component {
     this.props.getNews()
     this.props.getDocs()
     this.props.getAffaires()
+    this.props.getArbo()
     this.props.getBusiness();
     this.props.getModeles()
     this.props.getTeam()
@@ -127,6 +128,7 @@ export default withNavigation(connect(mapStateToProps, {
   getNews,
   getDocs,
   getAffaires,
+  getArbo,
   getBusiness,
   getModeles,
   getTeam,

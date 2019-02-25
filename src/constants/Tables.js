@@ -7,6 +7,7 @@ export default {
   t_users: 't_Utilisateurs',
   t_business: 'v_AffairesVisiblesDepuisAndroid',
   t_affaires: 't_Affaires',
+  t_arbo: 't_Supp_Arbo',
   docField: [
     'LocalPath',
     'Prepared',

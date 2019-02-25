@@ -9,7 +9,8 @@ import {
   ADD_NEW_DOC,
   REMOVED_NEW_DOC,
   ADD_DOC,
-  SET_AFFAIRES
+  SET_AFFAIRES,
+  SET_ARBO,
 } from './types';
 
 
@@ -70,4 +71,13 @@ export const getAffaires = () => dispatch => MSSQL.executeQuery(`SELECT * FROM $
 const setAffaires = (affaires) => ({
   type: SET_AFFAIRES,
   affaires
+})
+
+export const getArbo = () => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_arbo}`)
+  .then((res) => dispatch(setArbo(res)))
+  .catch(e => console.log({ getArbo: e }))
+
+const setArbo = (subFolder) => ({
+  type: SET_ARBO,
+  subFolder
 })
