@@ -217,14 +217,14 @@ class Document extends React.Component {
               <EditIcons>
                 <Icons
                   name="md-close"
-                  size={26}
+                  size={20}
                   color="red"
                   onPress={this.onCancel}
                 />
                 {!uploadingDocs.includes(ID) ?
                 <Icons
                   name="md-cloud-upload"
-                  size={26}
+                  size={20}
                   color={Colors.secondColor}
                   onPress={this.onUpload}
                 /> : <ActivityIndicator style={{ paddingLeft: 10, paddingRight: 10 }}/>}
@@ -232,14 +232,14 @@ class Document extends React.Component {
             )}
             <Icons
               name="md-checkbox-outline"
-              size={26}
+              size={20}
               color={Prepared === 'O' ? "green" : Colors.thirdColor}
               onPress={(Prepared === 'O' && !isEdited) ? () => {} : this.onPrepare}
             />
             {Reviewed === 'O' || (Prepared === 'O' && !isEdited) ? undefined :
             <Icons
               name="md-create"
-              size={26}
+              size={20}
               onPress={this.onEdit}
             />}
           </IconsWrapper>

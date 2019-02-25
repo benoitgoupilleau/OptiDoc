@@ -1,7 +1,6 @@
 import React from 'react';
 import { Text, ScrollView, Dimensions, View } from 'react-native';
 import { connect } from 'react-redux';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -12,9 +11,9 @@ import Main from '../components/Main';
 import Business from '../components/business/Business'
 
 import Layout from '../constants/Layout'
-import Colors from '../constants/Colors';
 
 import { listAffaires, listDocs, listNewDocs } from '../redux/selector/business'
+import { downloadModels } from '../redux/actions/user'
 
 const { width } = Dimensions.get('window');
 
@@ -22,22 +21,6 @@ const StyledScroll = styled(ScrollView)`
   background-color: #ededed;
   padding-bottom: ${Layout.space.large};
   width: ${width};
-`;
-
-const Legend = styled(View)`
-  align-items: center;
-  flex-flow: row wrap;
-  padding: 5px 0;
-`;
-
-const LegendItem = styled(View)`
-  flex-direction: row;
-  padding: 0 5px;
-  align-items: center;
-`;
-
-const Icons = styled(Ionicons)`
-  padding: 0 10px;
 `;
 
 class BusinessScreen extends React.Component {
@@ -49,53 +32,18 @@ class BusinessScreen extends React.Component {
     }
   }
 
+  componentDidMount() {
+    if (this.props.modeleDownloaded !== 'in progress' && this.props.isConnected) {
+      this.props.downloadModels(this.props.modeleDocs);
+    }
+  }
+
   
   render() {
     if (this.props.businesses.length > 0) {
       return (
         <Main>
           <View>
-            <Legend>
-              <Text style={{paddingLeft: 5, paddingRight: 5}}>Légende : </Text>
-              <LegendItem>
-                <Icons
-                  name="md-create"
-                  size={26}
-                />
-                <Text>Modifier</Text>
-              </LegendItem>
-              <LegendItem>
-                <Icons
-                  name="md-cloud-upload"
-                  size={26}
-                  color={Colors.secondColor}
-                />
-                <Text>Envoyer</Text>
-              </LegendItem>
-              <LegendItem>
-                <Icons
-                  name="md-close"
-                  size={26}
-                  color="red"
-                />
-                <Text>Annuler les modifications locales</Text>
-              </LegendItem>
-              <LegendItem>
-                <Icons
-                  name="md-checkbox-outline"
-                  size={26}
-                />
-                <Text>Non Préparé</Text>
-              </LegendItem>
-              <LegendItem>
-                <Icons
-                  name="md-checkbox-outline"
-                  size={26}
-                  color="green"
-                />
-                <Text>Préparé</Text>
-              </LegendItem>
-            </Legend>
             <StyledScroll>
               {this.props.businesses.map(b => <Business key={b} title={b} prep={this.props.docs[b].prep} rea={this.props.docs[b].rea} newDocs={this.props.newDocs[b]} />)}
             </StyledScroll>
@@ -117,15 +65,17 @@ BusinessScreen.propTypes = {
 }
 
 
-const mapStateToProps = ({ user, teams, business }) => {
-  const businesses = listAffaires([...teams.teamRights], user.id_employe)
+const mapStateToProps = ({ user, business, network }) => {
+  const businesses = listAffaires(business.business, user.id)
   const docs = listDocs(business.docs, business.newDocs, businesses)
   const newDocs = listNewDocs(business.newDocs, businesses)
   return ({
     businesses,
     docs,
-    newDocs
+    newDocs,
+    modeleDownloaded: user.modeleDownloaded,
+    isConnected: network.isConnected,
   })
 }
 
-export default connect(mapStateToProps)(BusinessScreen);
+export default connect(mapStateToProps, { downloadModels })(BusinessScreen);

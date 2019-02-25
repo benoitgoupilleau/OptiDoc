@@ -10,11 +10,11 @@ export default {
   },
   isSmallDevice: width < 375,
   font: {
-    xlarge: '32px',
-    large: '22px',
-    medium: '20px',
-    small: '18px',
-    xsmall: '16px'
+    xlarge: '28px',
+    large: '18px',
+    medium: '14px',
+    small: '12px',
+    xsmall: '10px'
   },
   space: {
     xlarge: '30px',

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { View, Button, Alert, ToastAndroid, ActivityIndicator } from 'react-native';
+import { View, TouchableOpacity, Text, Alert, ToastAndroid, ActivityIndicator } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
 import Colors from '../constants/Colors';
@@ -22,6 +22,19 @@ const Wrapper = styled(View)`
 
 const Icons = styled(Ionicons)`
   padding: 0 20px;
+`;
+
+const StyledButton = styled(TouchableOpacity)`
+  align-items: center;
+  background-color: ${Colors.mainColor};
+  height: 28px;
+  text-align: center;
+`
+
+const StyledText = styled(Text)`
+  color: white;
+  padding: 5px;
+  font-size: ${Layout.font.small};
 `;
 
 class Logout extends React.Component {
@@ -74,10 +87,13 @@ class Logout extends React.Component {
         <ActivityIndicator style={{ paddingLeft: 20, paddingRight: 20 }}/> :
         <Icons
           name="md-refresh"
-          size={26}
+          size={20}
           onPress={this.refreshData}
         />}
-        <Button color={Colors.mainColor} title={this.props.title} onPress={this.signOut} />
+        <StyledButton onPress={this.signOut}>
+          <StyledText>{this.props.title}</StyledText>
+        </StyledButton>
+        {/* <StyledButton color={Colors.mainColor} title={this.props.title} onPress={this.signOut} /> */}
       </Wrapper>
     );
   }

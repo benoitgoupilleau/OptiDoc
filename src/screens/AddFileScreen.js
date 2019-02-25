@@ -179,7 +179,7 @@ class AddFileScreen extends React.Component {
                 fontSize: 10
               })
               
-            this.props.navigation.navigate('Business');
+            this.props.navigation.goBack();
             return PDFDocument
               .modify(destPath)
               .modifyPages(page1)

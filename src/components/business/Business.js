@@ -6,12 +6,10 @@ import { View, Text, ActivityIndicator, Alert } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import Document from './Document'
 import { downloadBusiness } from '../../redux/actions/user'
 
 import Colors from '../../constants/Colors';
 import Layout from '../../constants/Layout'
-import Folder from '../../constants/Folder'
 
 const BusinessWrapper = styled(View)`
   background: ${Colors.antiBackground};
@@ -34,32 +32,9 @@ const Title = styled(Text)`
   font-weight: bold;
 `;
 
-const SectionWrapper = styled(View)`
-  align-items: center;
-  border-bottom-color: ${Colors.mainColor};
-  border-bottom-width: 1px;
+const IconView = styled(View)`
   flex-direction: row;
-  margin-bottom: ${Layout.space.medium};
-  padding: ${Layout.space.medium};
-`
-
-const Section = styled(Text)`
-  color: ${Colors.mainColor};
-  font-size: ${Layout.font.medium};
-  flex-grow: 1;
 `;
-
-const Icons = styled(Ionicons)`
-  padding: 0 ${Layout.space.medium};
-`;
-
-const checkIfNew = (docs, id) => {
-  const doc = docs.filter(d => d.ID === id)
-  if (doc.length > 0 && !!doc[0].isNew) {
-    return true;
-  } 
-  return false;
-}
 
 class Business extends React.Component {
   state = {
@@ -77,21 +52,35 @@ class Business extends React.Component {
         </View>)
     } else if (downloadedBusiness.includes(title)) {
       return (
-        <Ionicons
-          name={"md-phone-portrait"}
-          size={30}
-          color={Colors.secondColor}
-        />
+        <IconView>
+            <Ionicons
+            name={"md-phone-portrait"}
+            size={20}
+            color={Colors.secondColor}
+          />
+          <Ionicons
+            name={"md-arrow-dropright"}
+            size={20}
+            style={{ paddingLeft: 30 }}
+            color={Colors.secondColor}
+            onPress={this.goToDocs}
+          />
+        </IconView>
       );
     }
     return (
       <Ionicons
         name={"md-cloud-download"}
-        size={30}
+        size={20}
         color={Colors.secondColor}
         onPress={this.onDownload}
       />
     )
+  }
+
+  goToDocs = () => {
+    const { title, rea, prep, newDocs } = this.props
+    this.props.navigation.navigate('Docs', { affaire: title, rea, prep, newDocs })
   }
 
   onDownload = () => {
@@ -111,50 +100,21 @@ class Business extends React.Component {
     }
   }
 
-  toggleRea = () => {
-    this.setState({showRea: !this.state.showRea})
-  }
-
-  togglePrep = () => {
-    this.setState({showPrep: !this.state.showPrep})
-  }
-
   render() {
-    const { title, prep, rea, navigation, editedDocs, downloadedBusiness } = this.props;
+    const { title } = this.props;
     const affaire = this.props.affaires.filter(a => a.ID === title)[0]
     const clientName = affaire ? `${affaire.Client} - ${affaire.Designation}` : title;
     return (
       <BusinessWrapper>
         <MainSection>
-          <Title>{clientName}</Title>
+          <Title onPress={() => { 
+            if (this.props.downloadedBusiness.includes(title)) {
+              return this.goToDocs();
+            }
+            return;
+          }} >{clientName}</Title>
           {this.displayIcon()}
         </MainSection>
-        <SectionWrapper>
-          <Icons
-            name={this.state.showPrep ? "md-arrow-dropdown" : "md-arrow-dropright"}
-            size={26}
-            color={Colors.mainColor}
-            onPress={this.togglePrep}
-          />
-          <Section onPress={this.togglePrep} >Préparation</Section>
-        </SectionWrapper>
-        {this.state.showPrep && prep.map(p => <Document key={p.ID} {...p} type={Folder.prep} prep={prep} rea={rea} isDownloaded={downloadedBusiness.includes(title)}/>)}
-        <SectionWrapper>
-          <Icons
-            name={this.state.showRea ? "md-arrow-dropdown" : "md-arrow-dropright"}
-            size={26}
-            color={Colors.mainColor}
-            onPress={this.toggleRea}
-          />
-          <Section onPress={this.toggleRea} >Réalisation</Section>
-          <Icons
-            name={"md-add"}
-            size={26}
-            color={Colors.mainColor}
-            onPress={() => navigation.navigate('Add', { affaire: title })}
-          />
-        </SectionWrapper>
-        {this.state.showRea && rea.map(r => <Document key={r.ID} isNew={checkIfNew(editedDocs, r.ID)} {...r} type={Folder.rea} prep={prep} rea={rea} isDownloaded={downloadedBusiness.includes(title)}/>)}
       </BusinessWrapper>
     );
   }

@@ -1,5 +1,5 @@
 export const listAffaires =  (rights, userId) => {
-  return rights.filter(r => r.ID_Soudeur === userId).map(filtered => filtered.ID_Affaire);
+  return rights.filter(r => r.ID_User === userId).map(filtered => filtered.ID_Affaire);
 }
 
 export const listDocs = (docs, newDoc, businesses) => {

@@ -34,14 +34,14 @@ const StyledInput = styled(TextInput)`
   border-color: gray;
   border-width: 1px;
   font-size: ${Layout.font.medium};
-  height: 60px;
+  height: 50px;
   margin-bottom: ${Layout.space.large};
 `;
 
 const StyledButton = styled(TouchableOpacity)`
   align-items: center;
   background-color: ${Colors.mainColor};
-  height: 60px;
+  height: 50px;
   text-align: center;
   padding: ${Layout.space.medium};
 `;

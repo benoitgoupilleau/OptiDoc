@@ -12,7 +12,7 @@ const Wrapper = styled(View)`
   align-items: center;
   display: flex;
   flex-direction: row;
-  margin: 0 ${Layout.space.large};
+  margin: 0 ${Layout.space.small};
 `;
 
 const Title = styled(Text)`
@@ -23,14 +23,15 @@ const Title = styled(Text)`
 `
 
 
-const HeaderTitle = ({ title }) => {
+const HeaderTitle = ({ title, noLogo = false }) => {
+  const displayTitle = title.length > 25 ? title.substring(0, 25) + '(...)' : title
   return (
     <Wrapper> 
-      {logo && <Image
+      {logo && !noLogo && <Image
         source={logo}
         style={{ width: 95, height: 50 }}
       />}
-      {title.length > 0 && <Title>{title}</Title> }
+      {displayTitle.length > 0 && <Title>{displayTitle}</Title> }
     </Wrapper>
   );
 }

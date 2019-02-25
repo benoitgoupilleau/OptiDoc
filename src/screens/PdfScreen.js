@@ -37,7 +37,7 @@ class PdfScreen extends React.Component {
     }
   }
   static navigationOptions = ({navigation}) => ({
-    headerTitle: <HeaderTitle title={navigation.getParam('title', '')}/>,
+    headerTitle: <HeaderTitle noLogo title={navigation.getParam('title', '')}/>,
     headerRight: <Logout />,
     headerStyle: {
       height: 70
