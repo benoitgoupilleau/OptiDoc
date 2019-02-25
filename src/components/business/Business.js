@@ -79,8 +79,8 @@ class Business extends React.Component {
   }
 
   goToDocs = () => {
-    const { title, rea, prep, newDocs } = this.props
-    this.props.navigation.navigate('Docs', { affaire: title, rea, prep, newDocs })
+    const { title } = this.props
+    this.props.navigation.navigate('Docs', { affaire: title })
   }
 
   onDownload = () => {

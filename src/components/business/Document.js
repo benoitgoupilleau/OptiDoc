@@ -47,7 +47,7 @@ const EditIcons = styled(View)`
 `;
 
 const Icons = styled(Ionicons)`
-  padding: 0 5px;
+  padding: 0 10px 0 5px;
 `;
 
 class Document extends React.Component {

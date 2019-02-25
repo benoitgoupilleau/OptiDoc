@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, ScrollView, Dimensions, View } from 'react-native';
+import { connect } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -7,6 +8,7 @@ import styled from 'styled-components';
 import Logout from '../components/Logout';
 import HeaderTitle from '../components/HeaderTitle'
 import Main from '../components/Main';
+import { listAffaires, listDocs, listNewDocs } from '../redux/selector/business'
 
 import BusinessWithDocs from '../components/business/BusinessWithDocs'
 
@@ -30,6 +32,8 @@ const Legend = styled(View)`
 
 const LegendWrapper = styled(View)`
   flex-flow: row wrap;
+  flex-grow: 1;
+  width: ${width-40}px;
 `
 
 const LegendItem = styled(View)`
@@ -54,16 +58,13 @@ class DocsScreen extends React.Component {
   
   render() {
     const affaire =  this.props.navigation.getParam('affaire', '');
-    const rea = this.props.navigation.getParam('rea', [])
-    const prep = this.props.navigation.getParam('prep', [])
-    const newDocs = this.props.navigation.getParam('newDocs', [])
 
     if (affaire !== '') {
       return (
         <Main>
           <StyledScroll>
             <Legend>
-              <Text style={{paddingLeft: 5, paddingRight: 3, fontSize: 10}}>Légende : </Text>
+              <Text style={{paddingLeft: 5, paddingRight: 3, fontSize: 10, flexGrow: 1}}>Légende : </Text>
               <LegendWrapper>
                 <LegendItem>
                   <Icons
@@ -105,7 +106,7 @@ class DocsScreen extends React.Component {
                 </LegendItem>
               </LegendWrapper>
             </Legend>
-            <BusinessWithDocs key={affaire} title={affaire} prep={prep} rea={rea} newDocs={newDocs} />
+            <BusinessWithDocs key={affaire} title={affaire} prep={this.props.docs[affaire].prep} rea={this.props.docs[affaire].rea} newDocs={this.props.newDocs[affaire]} />
           </StyledScroll>
         </Main>
       );
@@ -118,4 +119,14 @@ class DocsScreen extends React.Component {
   }
 }
 
-export default DocsScreen;
+const mapStateToProps = ({ user, business }) => {
+  const businesses = listAffaires(business.business, user.id)
+  const docs = listDocs(business.docs, business.newDocs, businesses)
+  const newDocs = listNewDocs(business.newDocs, businesses)
+  return ({
+    docs,
+    newDocs,
+  })
+}
+
+export default connect(mapStateToProps)(DocsScreen);
