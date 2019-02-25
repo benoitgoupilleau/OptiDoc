@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import Orientation from 'react-native-orientation';
 import { Text, View, TextInput, ScrollView, Dimensions, CameraRoll, PermissionsAndroid, TouchableOpacity } from 'react-native';
 import styled from 'styled-components'
 
@@ -91,6 +92,10 @@ class AddFileScreen extends React.Component {
     headerStyle: {
       height: 70
     }
+  }
+
+  componentDidMount() {
+    Orientation.lockToPortrait();
   }
 
   handleButtonPress = async () => {

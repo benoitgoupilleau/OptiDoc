@@ -6,7 +6,6 @@ import TabBarLabel from '../components/TabBarLabel'
 import TabBarIcon from '../components/TabBarIcon';
 
 import HomeScreen from '../screens/HomeScreen';
-import ProfileScreen from '../screens/ProfileScreen';
 import AddFileScreen from '../screens/AddFileScreen';
 import BusinessScreen from '../screens/BusinessScreen';
 import DocsScreen from '../screens/DocsScreen';
@@ -31,24 +30,6 @@ HomeStack.navigationOptions = {
   ),
 };
 
-const ProfileStack = createStackNavigator({
-  Profile: ProfileScreen,
-});
-
-ProfileStack.navigationOptions = {
-  tabBarLabel: ({ focused }) => (
-    <TabBarLabel
-      focused={focused}
-      title="Paramètres"
-    />
-  ),
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name="md-settings"
-    />
-  ),
-};
 
 const BusinessStack = createStackNavigator({
   Business: BusinessScreen,
@@ -76,7 +57,6 @@ BusinessStack.navigationOptions = {
 export default createBottomTabNavigator({
   HomeStack,
   BusinessStack,
-  // ProfileStack
 }, {
   tabBarOptions: {
     style: {

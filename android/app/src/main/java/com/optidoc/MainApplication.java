@@ -17,6 +17,7 @@ import com.facebook.soloader.SoLoader;
 import com.stonem.mssql.MSSQLPackage;
 import com.rnfs.RNFSPackage;
 import com.zaguini.rnjwt.RNJwtPackage;
+import com.github.yamill.orientation.OrientationPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -42,7 +43,8 @@ public class MainApplication extends Application implements ReactApplication {
         new RNJwtPackage(),
         new RNFtpPackage(),
         new RNGestureHandlerPackage(),
-        new MSSQLPackage()
+        new MSSQLPackage(),
+        new OrientationPackage()
       );
     }
 

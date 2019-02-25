@@ -3,6 +3,7 @@ import RNFS from 'react-native-fs';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Pdf from 'react-native-pdf';
+import Orientation from 'react-native-orientation';
 import PropTypes from 'prop-types';
 import { EXTERNAL_PATH } from 'react-native-dotenv';
 import { Dimensions, Text, ActivityIndicator, View, TouchableOpacity } from 'react-native';
@@ -45,6 +46,7 @@ class PdfScreen extends React.Component {
   })
 
   componentDidMount() {
+    Orientation.unlockAllOrientations();
     setTimeout(() => {
       this.setState({loading: false})
     }, 500);

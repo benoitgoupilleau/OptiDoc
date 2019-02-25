@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, ScrollView, Dimensions, View } from 'react-native';
 import { connect } from 'react-redux';
+import Orientation from 'react-native-orientation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -53,6 +54,10 @@ class DocsScreen extends React.Component {
     headerStyle: {
       height: 70
     }
+  }
+
+  componentDidMount() {
+    Orientation.lockToPortrait()
   }
 
   

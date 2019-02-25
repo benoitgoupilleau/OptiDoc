@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { View, Text, NetInfo, Dimensions, TouchableOpacity } from 'react-native';
 
-import { connectivityChange, connectDb } from '../redux/actions/network';
+import { connectivityChange, connectDbOut } from '../redux/actions/network';
 
 import Colors from '../constants/Colors';
 import Layout from '../constants/Layout'
@@ -53,7 +53,7 @@ class OfflineNotice extends PureComponent {
     } else if (this.props.isConnected && !this.props.mssqlConnected) {
       return (
         <Wrapper type="warning">
-          <TouchableOpacity onPress={this.props.connectDb} style={{ height: 30 }}>
+          <TouchableOpacity onPress={this.props.connectDbOut} style={{ height: 30 }}>
             <Message type="warning" >Connexion perdue avec la base de données. Cliquer pour réessayer</Message>
           </TouchableOpacity>
         </Wrapper>
@@ -82,8 +82,8 @@ OfflineNotice.propTypes = {
   isConnected: PropTypes.bool.isRequired,
   mssqlFailed: PropTypes.bool.isRequired,
   connectivityChange: PropTypes.func.isRequired,
-  connectDb: PropTypes.func.isRequired,
+  connectDbOut: PropTypes.func.isRequired,
 }
 
 
-export default connect(mapStateToProps, { connectivityChange, connectDb })(OfflineNotice);
+export default connect(mapStateToProps, { connectivityChange, connectDbOut })(OfflineNotice);

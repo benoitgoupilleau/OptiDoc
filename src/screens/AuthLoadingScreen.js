@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { ActivityIndicator, PermissionsAndroid, Alert } from 'react-native';
 import Main from '../components/Main';
 
-import { connectDb } from '../redux/actions/network';
+import { connectDbOut } from '../redux/actions/network';
 import { getUser } from '../redux/actions/team'
 import { getDocs } from '../redux/actions/business'
 import { downloadModels } from '../redux/actions/user'
@@ -46,7 +46,7 @@ const  AuthLoadingScreen = ({token,
   mssqlConnected,
   mssqlConnectionFailed,
   usersLoaded,
-  connectDb,
+  connectDbOut,
   navigation,
   getUser,
   downloadModels,
@@ -54,7 +54,7 @@ const  AuthLoadingScreen = ({token,
   editedDocs}) => {
   checkAccess();
   if (!mssqlConnected && !mssqlConnectionFailed) {
-    connectDb();
+    connectDbOut();
     if (usersLoaded) {
       navigation.navigate(token !== '' ? 'App' : 'Auth');
     } else {
@@ -82,7 +82,7 @@ AuthLoadingScreen.propTypes = {
   token: PropTypes.string.isRequired,
   mssqlConnected: PropTypes.bool.isRequired,
   mssqlConnectionFailed: PropTypes.bool.isRequired,
-  connectDb: PropTypes.func.isRequired,
+  connectDbOut: PropTypes.func.isRequired,
 }
 
 const mapStateToProps = state => ({
@@ -94,4 +94,4 @@ const mapStateToProps = state => ({
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
 })
 
-export default connect(mapStateToProps, { connectDb, getUser, getDocs, downloadModels })(AuthLoadingScreen);
+export default connect(mapStateToProps, { connectDbOut, getUser, getDocs, downloadModels })(AuthLoadingScreen);

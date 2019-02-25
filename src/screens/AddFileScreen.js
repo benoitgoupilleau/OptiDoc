@@ -1,6 +1,7 @@
 import React from 'react';
 import RNFS from 'react-native-fs';
 import { connect } from 'react-redux';
+import Orientation from 'react-native-orientation';
 import { Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
 import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
 import styled from 'styled-components'
@@ -106,6 +107,7 @@ class AddFileScreen extends React.Component {
   }
 
   componentDidMount() {
+    Orientation.lockToPortrait();
     if (this.props.modeleDownloaded !== 'in progress' && this.props.isConnected) {
       this.props.downloadModels(this.props.modeleDocs);
     }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, ScrollView, Dimensions, View } from 'react-native';
+import Orientation from 'react-native-orientation';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -33,6 +34,7 @@ class BusinessScreen extends React.Component {
   }
 
   componentDidMount() {
+    Orientation.lockToPortrait();
     if (this.props.modeleDownloaded !== 'in progress' && this.props.isConnected) {
       this.props.downloadModels(this.props.modeleDocs);
     }

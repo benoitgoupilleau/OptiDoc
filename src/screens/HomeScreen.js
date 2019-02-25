@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
+import Orientation from 'react-native-orientation';
 import { ScrollView, Text, RefreshControl, ActivityIndicator, Dimensions } from 'react-native';
 
 import Logout from '../components/Logout';
@@ -43,6 +44,7 @@ class HomeScreen extends React.Component {
   }
 
   componentDidMount() {
+    Orientation.lockToPortrait();
     if (this.props.mssqlConnected) {
       this.props.getNews();
       this.props.getDocs(this.props.editedDocs);
