@@ -47,7 +47,7 @@ const EditIcons = styled(View)`
 `;
 
 const Icons = styled(Ionicons)`
-  padding: 0 10px;
+  padding: 0 5px;
 `;
 
 class Document extends React.Component {
@@ -207,7 +207,7 @@ class Document extends React.Component {
         <File>
           <Icons
             name={['png', 'jpg'].includes(Extension) ? 'md-image' : 'md-document'}
-            size={18}
+            size={Layout.icon.small}
           />
           <Title>{FileName}</Title>
         </File>
@@ -217,14 +217,14 @@ class Document extends React.Component {
               <EditIcons>
                 <Icons
                   name="md-close"
-                  size={20}
+                  size={Layout.icon.default}
                   color="red"
                   onPress={this.onCancel}
                 />
                 {!uploadingDocs.includes(ID) ?
                 <Icons
                   name="md-cloud-upload"
-                  size={20}
+                  size={Layout.icon.default}
                   color={Colors.secondColor}
                   onPress={this.onUpload}
                 /> : <ActivityIndicator style={{ paddingLeft: 10, paddingRight: 10 }}/>}
@@ -232,14 +232,14 @@ class Document extends React.Component {
             )}
             <Icons
               name="md-checkbox-outline"
-              size={20}
+              size={Layout.icon.default}
               color={Prepared === 'O' ? "green" : Colors.thirdColor}
               onPress={(Prepared === 'O' && !isEdited) ? () => {} : this.onPrepare}
             />
             {Reviewed === 'O' || (Prepared === 'O' && !isEdited) ? undefined :
             <Icons
               name="md-create"
-              size={20}
+              size={Layout.icon.default}
               onPress={this.onEdit}
             />}
           </IconsWrapper>

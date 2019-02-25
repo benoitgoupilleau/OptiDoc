@@ -6,10 +6,13 @@ import { View, Text, ActivityIndicator, Alert } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+import Document from './Document'
+import SubArbo from './SubArbo';
 import { downloadBusiness } from '../../redux/actions/user'
 
 import Colors from '../../constants/Colors';
 import Layout from '../../constants/Layout'
+import Folder from '../../constants/Folder'
 
 const BusinessWrapper = styled(View)`
   background: ${Colors.antiBackground};
@@ -36,7 +39,34 @@ const IconView = styled(View)`
   flex-direction: row;
 `;
 
-class Business extends React.Component {
+const SectionWrapper = styled(View)`
+  align-items: center;
+  border-bottom-color: ${Colors.mainColor};
+  border-bottom-width: 1px;
+  flex-direction: row;
+  margin-bottom: ${Layout.space.medium};
+  padding: ${Layout.space.medium};
+`
+
+const Section = styled(Text)`
+  color: ${Colors.mainColor};
+  font-size: ${Layout.font.medium};
+  flex-grow: 1;
+`;
+
+const Icons = styled(Ionicons)`
+  padding: 0 ${Layout.space.medium};
+`;
+
+const checkIfNew = (docs, id) => {
+  const doc = docs.filter(d => d.ID === id)
+  if (doc.length > 0 && !!doc[0].isNew) {
+    return true;
+  } 
+  return false;
+}
+
+class BusinessWithDocs extends React.Component {
   state = {
     showPrep: false,
     showRea: false
@@ -63,7 +93,6 @@ class Business extends React.Component {
             size={Layout.icon.default}
             style={{ paddingLeft: 30 }}
             color={Colors.secondColor}
-            onPress={this.goToDocs}
           />
         </IconView>
       );
@@ -76,11 +105,6 @@ class Business extends React.Component {
         onPress={this.onDownload}
       />
     )
-  }
-
-  goToDocs = () => {
-    const { title, rea, prep, newDocs } = this.props
-    this.props.navigation.navigate('Docs', { affaire: title, rea, prep, newDocs })
   }
 
   onDownload = () => {
@@ -100,27 +124,88 @@ class Business extends React.Component {
     }
   }
 
+  toggleRea = () => {
+    this.setState({showRea: !this.state.showRea})
+  }
+
+  togglePrep = () => {
+    this.setState({showPrep: !this.state.showPrep})
+  }
+
+  displayPrep = () => {
+    const { title, prep, rea, downloadedBusiness, subFolder } = this.props;
+    const listArbo = [];
+    for (let i = 0; i < prep.length; i++) {
+      const indexArbo = listArbo.findIndex(a => a.NomDossier === prep[i].Dossier3)
+      if (indexArbo === -1) {
+        const newArbo = subFolder.filter(s => s.NomDossier === prep[i].Dossier3)[0]
+        listArbo.push(newArbo)
+      }
+    }
+    listArbo.sort((a, b) => (a.NomDossier > b.NomDossier ? 1 : -1));
+    return listArbo.map(arbo => <SubArbo key={'Prep' + arbo.NomDossier} title={arbo.Designation}>{prep.filter(p => p.Dossier3 === arbo.NomDossier)
+      .map(p => <Document key={p.ID} {...p} type={Folder.prep} prep={prep} rea={rea} isDownloaded={downloadedBusiness.includes(title)}/>)}
+      </SubArbo>)
+  }
+
+  displayRea = () => {
+    const { title, prep, rea, editedDocs, downloadedBusiness, subFolder } = this.props;
+    const listArbo = [];
+    for (let i = 0; i < rea.length; i++) {
+      const indexArbo = listArbo.findIndex(a => a.NomDossier === rea[i].Dossier3)
+      if (indexArbo === -1) {
+        const newArbo = subFolder.filter(s => s.NomDossier === rea[i].Dossier3)[0]
+        listArbo.push(newArbo)
+      }
+    }
+    listArbo.sort((a, b) => (a.NomDossier > b.NomDossier ? 1 : -1));
+    return listArbo.map(arbo => <SubArbo key={'Rea' + arbo.NomDossier} title={arbo.Designation}>{rea.filter(r => r.Dossier3 === arbo.NomDossier)
+      .map(r => <Document key={r.ID} isNew={checkIfNew(editedDocs, r.ID)} {...r} type={Folder.rea} prep={prep} rea={rea} isDownloaded={downloadedBusiness.includes(title)}/>)}
+      </SubArbo>)
+  }
+
   render() {
-    const { title } = this.props;
+    const { title, navigation } = this.props;
     const affaire = this.props.affaires.filter(a => a.ID === title)[0]
     const clientName = affaire ? `${affaire.Client} - ${affaire.Designation}` : title;
     return (
       <BusinessWrapper>
         <MainSection>
-          <Title onPress={() => { 
-            if (this.props.downloadedBusiness.includes(title)) {
-              return this.goToDocs();
-            }
-            return;
-          }} >{clientName}</Title>
-          {this.displayIcon()}
+          <Title>{clientName}</Title>
+          {/* {this.displayIcon()} */}
         </MainSection>
+        <SectionWrapper>
+          <Icons
+            name={this.state.showPrep ? "md-arrow-dropdown" : "md-arrow-dropright"}
+            size={Layout.icon.default}
+            color={Colors.mainColor}
+            onPress={this.togglePrep}
+          />
+          <Section onPress={this.togglePrep} >Préparation</Section>
+        </SectionWrapper>
+        {this.state.showPrep && this.displayPrep()}
+        <SectionWrapper>
+          <Icons
+            name={this.state.showRea ? "md-arrow-dropdown" : "md-arrow-dropright"}
+            size={Layout.icon.default}
+            color={Colors.mainColor}
+            onPress={this.toggleRea}
+          />
+          <Section onPress={this.toggleRea} >Réalisation</Section>
+          <Icons
+            name={"md-add"}
+            size={Layout.icon.default}
+            color={Colors.mainColor}
+            onPress={() => navigation.navigate('Add', { affaire: title })}
+          />
+        </SectionWrapper>
+        {this.state.showRea && this.displayRea()}
       </BusinessWrapper>
     );
   }
 }
 
-Business.propTypes = {
+BusinessWithDocs.propTypes = {
   title: PropTypes.string.isRequired,
   prep: PropTypes.array,
   rea: PropTypes.array,
@@ -132,7 +217,7 @@ Business.propTypes = {
   navigation: PropTypes.object.isRequired,
 }
 
-Business.defaultProps = {
+BusinessWithDocs.defaultProps = {
   prep: [],
   rea: []
 }
@@ -146,8 +231,9 @@ const mapStateToProps = state => ({
   userId: state.user.id,
   editedDocs: state.user.editedDocs,
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
+  subFolder: state.business.subFolder,
   affaires: state.business.affaires,
   modeleDownloaded: state.user.modeleDownloaded
 })
 
-export default withNavigation(connect(mapStateToProps, { downloadBusiness })(Business));
+export default withNavigation(connect(mapStateToProps, { downloadBusiness })(BusinessWithDocs));

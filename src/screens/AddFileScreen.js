@@ -21,7 +21,7 @@ import { addNewDoc } from '../redux/actions/business'
 const rootDir = RNFS.DocumentDirectoryPath;
 
 const Wrapper = styled(View)`
-  padding: 40px;
+  padding: 20px;
 `;
 
 const Title = styled(Text)`
@@ -32,7 +32,7 @@ const Title = styled(Text)`
 `;
 
 const Section = styled(Text)`
-  font-size: ${Layout.font.large};
+  font-size: ${Layout.font.medium};
   font-weight: bold;
 `
 const Selector = styled(View)`
@@ -67,7 +67,7 @@ const ButtonWrapper = styled(View)`
 const StyledButton = styled(TouchableOpacity)`
   align-items: center;
   background-color: ${props => props.disabled ? Colors.thirdColor : Colors.mainColor};
-  height: 40px;
+  height: 30px;
   margin: 10px 0;
   padding: ${Layout.space.small};
   text-align: center;
@@ -98,7 +98,7 @@ class AddFileScreen extends React.Component {
     }
   } 
   static navigationOptions = {
-    headerTitle: <HeaderTitle title="Ajouter un document"/>,
+    headerTitle: <HeaderTitle noLogo title="Ajouter un document"/>,
     headerRight: <Logout />,
     headerStyle: {
       height: 70

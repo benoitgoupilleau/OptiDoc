@@ -87,7 +87,7 @@ class Logout extends React.Component {
         <ActivityIndicator style={{ paddingLeft: 20, paddingRight: 20 }}/> :
         <Icons
           name="md-refresh"
-          size={20}
+          size={Layout.icon.default}
           onPress={this.refreshData}
         />}
         <StyledButton onPress={this.signOut}>

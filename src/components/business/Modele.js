@@ -13,7 +13,7 @@ const ModeleWrapper = styled(TouchableOpacity)`
   margin: ${Layout.space.small};
   flex-direction: row;
   justify-content: space-between;
-  width: ${Math.round(width/2)-50}px;
+  width: ${Math.round(width/2)-40}px;
 `;
 
 const Title = styled(Text)`
@@ -34,7 +34,7 @@ const Modele = ({ FileName, handleSelect, selected }) => (
       <Icons
         color="green"
         name="md-checkmark-circle"
-        size={20}
+        size={Layout.icon.default}
       />
     }
   </ModeleWrapper>

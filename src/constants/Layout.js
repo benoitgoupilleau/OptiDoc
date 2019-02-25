@@ -9,6 +9,11 @@ export default {
     height,
   },
   isSmallDevice: width < 375,
+  icon: {
+    default: 18,
+    small: 14,
+    xsmall: 12
+  },
   font: {
     xlarge: '28px',
     large: '18px',

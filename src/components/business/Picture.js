@@ -38,7 +38,7 @@ const Picture = ({ p, handleSelect, selected }) => (
       <Icons
         color="green"
         name="md-checkmark-circle"
-        size={20}
+        size={Layout.icon.default}
       />
     }
   </PictureWrapper>

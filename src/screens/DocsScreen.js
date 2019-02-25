@@ -39,7 +39,7 @@ const LegendItem = styled(View)`
 `;
 
 const Icons = styled(Ionicons)`
-  padding: 0 10px;
+  padding: 0 3px;
 `;
 
 class DocsScreen extends React.Component {
@@ -63,46 +63,46 @@ class DocsScreen extends React.Component {
         <Main>
           <StyledScroll>
             <Legend>
-              <Text style={{paddingLeft: 5, paddingRight: 5, fontSize: 10}}>Légende : </Text>
+              <Text style={{paddingLeft: 5, paddingRight: 3, fontSize: 10}}>Légende : </Text>
               <LegendWrapper>
-              <LegendItem>
-                <Icons
-                  name="md-create"
-                  size={12}
-                />
-                <Text style={{ fontSize: 10}}>Modifier</Text>
-              </LegendItem>
-              <LegendItem>
-                <Icons
-                  name="md-cloud-upload"
-                  size={12}
-                  color={Colors.secondColor}
-                />
-                <Text style={{ fontSize: 10}}>Envoyer</Text>
-              </LegendItem>
-              <LegendItem>
-                <Icons
-                  name="md-close"
-                  size={12}
-                  color="red"
-                />
-                <Text style={{ fontSize: 10}}>Annuler les modifications locales</Text>
-              </LegendItem>
-              <LegendItem>
-                <Icons
-                  name="md-checkbox-outline"
-                  size={12}
-                />
-                <Text style={{ fontSize: 10}}>Non Préparé</Text>
-              </LegendItem>
-              <LegendItem>
-                <Icons
-                  name="md-checkbox-outline"
-                  size={12}
-                  color="green"
-                />
-                <Text style={{ fontSize: 10}}>Préparé</Text>
-              </LegendItem>
+                <LegendItem>
+                  <Icons
+                    name="md-create"
+                    size={Layout.icon.xsmall}
+                  />
+                  <Text style={{ fontSize: 10}}>Modifier</Text>
+                </LegendItem>
+                <LegendItem>
+                  <Icons
+                    name="md-cloud-upload"
+                    size={Layout.icon.xsmall}
+                    color={Colors.secondColor}
+                  />
+                  <Text style={{ fontSize: 10}}>Envoyer</Text>
+                </LegendItem>
+                <LegendItem>
+                  <Icons
+                    name="md-close"
+                    size={Layout.icon.xsmall}
+                    color="red"
+                  />
+                  <Text style={{ fontSize: 10}}>Annuler les modifications locales</Text>
+                </LegendItem>
+                <LegendItem>
+                  <Icons
+                    name="md-checkbox-outline"
+                    size={Layout.icon.xsmall}
+                  />
+                  <Text style={{ fontSize: 10}}>Non Préparé</Text>
+                </LegendItem>
+                <LegendItem>
+                  <Icons
+                    name="md-checkbox-outline"
+                    size={Layout.icon.xsmall}
+                    color="green"
+                  />
+                  <Text style={{ fontSize: 10}}>Préparé</Text>
+                </LegendItem>
               </LegendWrapper>
             </Legend>
             <BusinessWithDocs key={affaire} title={affaire} prep={prep} rea={rea} newDocs={newDocs} />
