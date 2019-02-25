@@ -7,6 +7,7 @@ import { View, Text, NetInfo, Dimensions, TouchableOpacity } from 'react-native'
 import { connectivityChange, connectDb } from '../redux/actions/network';
 
 import Colors from '../constants/Colors';
+import Layout from '../constants/Layout'
 
 const { width } = Dimensions.get('window');
 
@@ -21,6 +22,8 @@ const Wrapper = styled(View)`
 
 const Message = styled(Text)`
   color: ${props => props.type === 'error' ? Colors.errorText : (props.type === 'warning' ? Colors.warningText : Colors.warningText)};
+  font-size: ${Layout.font.small};
+  padding: 0 3px;
 `;
 
 class OfflineNotice extends PureComponent {
@@ -47,7 +50,7 @@ class OfflineNotice extends PureComponent {
             <Message type="error">Mode hors ligne</Message>
         </Wrapper>
       );
-    } else if (this.props.isConnected && this.props.mssqlFailed) {
+    } else if (this.props.isConnected && !this.props.mssqlConnected) {
       return (
         <Wrapper type="warning">
           <TouchableOpacity onPress={this.props.connectDb} style={{ height: 30 }}>

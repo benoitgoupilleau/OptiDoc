@@ -14,7 +14,7 @@ import Colors from '../constants/Colors'
 import Layout from '../constants/Layout'
 
 import { login } from '../redux/actions/user'
-import { getTeam, getTeamRight, getUser } from '../redux/actions/team'
+import { getUser } from '../redux/actions/team'
 
 
 const Wrapper = styled(View)`
@@ -78,15 +78,13 @@ class Signin extends React.Component {
   componentDidMount(){
     const userName = this.props.userName;
     if (this.props.mssqlConnected) {
-      this.props.getTeam()
       this.props.getUser()
-      this.props.getTeamRight()
     }
     this.setState({ userName })
   }
 
   signInAsync = async () => {
-    if (!this.props.teamLoaded) {
+    if (!this.props.usersLoaded) {
       Alert.alert('Connexion Impossible', 'Merci de réessayer plus tard', [{ text: 'Ok' }]);
     } else {
       if (this.state.userName === '') {
@@ -110,9 +108,7 @@ class Signin extends React.Component {
 
   render() {
     if (this.props.mssqlConnected && !this.state.hasFetchedData) {
-      this.props.getTeam()
       this.props.getUser()
-      this.props.getTeamRight()
       this.setState({hasFetchedData: true})
     }
     return (
@@ -154,11 +150,7 @@ Signin.propTypes = {
   navigation: PropTypes.object.isRequired,
   login: PropTypes.func.isRequired,
   locked: PropTypes.bool.isRequired,
-  teamLoaded: PropTypes.bool.isRequired,
-  teams: PropTypes.array.isRequired,
   isConnected: PropTypes.bool.isRequired,
-  getTeam: PropTypes.func.isRequired,
-  getTeamRight: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => ({
@@ -168,8 +160,6 @@ const mapStateToProps = state => ({
   locked: state.user.locked,
   users: state.teams.users,
   usersLoaded: state.teams.usersLoaded,
-  teams: state.teams.teams,
-  teamLoaded: state.teams.teamLoaded
 })
 
-export default withNavigation(connect(mapStateToProps, { login, getTeam, getUser, getTeamRight })(Signin));
+export default withNavigation(connect(mapStateToProps, { login, getUser })(Signin));

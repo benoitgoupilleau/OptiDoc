@@ -11,7 +11,7 @@ import Main from '../components/Main';
 
 import { getNews, refreshNews } from '../redux/actions/news'
 import { getDocs, getModeles, getBusiness, getAffaires, getArbo } from '../redux/actions/business'
-import { getTeam, getTeamRight, getUser } from '../redux/actions/team'
+import { getUser } from '../redux/actions/team'
 import { downloadModels } from '../redux/actions/user'
 import { filterNews } from '../redux/selector/news'
 
@@ -48,9 +48,7 @@ class HomeScreen extends React.Component {
       this.props.getDocs(this.props.editedDocs);
       this.props.getBusiness()
       this.props.getModeles()
-      this.props.getTeam();
       this.props.getUser()
-      this.props.getTeamRight();
       this.props.getAffaires()
       this.props.getArbo()
     }
@@ -77,9 +75,7 @@ class HomeScreen extends React.Component {
       this.props.getDocs(this.props.editedDocs);
       this.props.getBusiness()
       this.props.getModeles()
-      this.props.getTeam();
       this.props.getUser()
-      this.props.getTeamRight();
       this.props.getAffaires()
       this.props.getArbo()
       if(this.props.modeleDownloaded !== 'in progress') this.props.downloadModels(this.props.modeleDocs)
@@ -123,14 +119,10 @@ HomeScreen.propTypes = {
   newsList: PropTypes.array,
   getNews: PropTypes.func.isRequired,
   getDocs: PropTypes.func.isRequired,
-  getTeam: PropTypes.func.isRequired,
-  getTeamRight: PropTypes.func.isRequired,
   refreshing: PropTypes.bool.isRequired,
   refreshNews: PropTypes.func.isRequired,
   loaded: PropTypes.bool.isRequired,
   mssqlConnected: PropTypes.bool.isRequired,
-  teamLoaded: PropTypes.bool.isRequired,
-  teamRightsLoaded: PropTypes.bool.isRequired,
 }
 
 
@@ -143,9 +135,7 @@ const mapStateToProps = (state) => ({
   userId: state.user.id,
   editedDocs: state.user.editedDocs,
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
-  teamLoaded: state.teams.teamLoaded,
-  teamRightsLoaded: state.teams.teamRightsLoaded,
   modeleDownloaded: state.user.modeleDownloaded
 })
 
-export default connect(mapStateToProps, { getNews, refreshNews, getDocs, getModeles, getBusiness, getTeam, getUser, getTeamRight, downloadModels, getAffaires, getArbo })(HomeScreen);
+export default connect(mapStateToProps, { getNews, refreshNews, getDocs, getModeles, getBusiness, getUser, downloadModels, getAffaires, getArbo })(HomeScreen);

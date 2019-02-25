@@ -5,7 +5,7 @@ import { ActivityIndicator, PermissionsAndroid, Alert } from 'react-native';
 import Main from '../components/Main';
 
 import { connectDb } from '../redux/actions/network';
-import { getTeam, getTeamRight, getUser } from '../redux/actions/team'
+import { getUser } from '../redux/actions/team'
 import { getDocs } from '../redux/actions/business'
 import { downloadModels } from '../redux/actions/user'
 
@@ -45,31 +45,26 @@ const checkAccess = async () => {
 const  AuthLoadingScreen = ({token,
   mssqlConnected,
   mssqlConnectionFailed,
-  teamLoaded,
-  teamRightsLoaded,
+  usersLoaded,
   connectDb,
   navigation,
-  getTeam,
   getUser,
-  getTeamRight,
   downloadModels,
   modeleDocs,
   editedDocs}) => {
   checkAccess();
   if (!mssqlConnected && !mssqlConnectionFailed) {
     connectDb();
-    if (teamLoaded && teamRightsLoaded) {
+    if (usersLoaded) {
       navigation.navigate(token !== '' ? 'App' : 'Auth');
     } else {
       navigation.navigate('Auth');
     }
   } else {
-    getTeam();
     getUser();
-    getTeamRight();
     getDocs(editedDocs)
     downloadModels(modeleDocs)
-    if (teamLoaded && teamRightsLoaded) {
+    if (usersLoaded) {
       navigation.navigate(token !== '' ? 'App' : 'Auth');
     } else {
       navigation.navigate('Auth');
@@ -87,11 +82,7 @@ AuthLoadingScreen.propTypes = {
   token: PropTypes.string.isRequired,
   mssqlConnected: PropTypes.bool.isRequired,
   mssqlConnectionFailed: PropTypes.bool.isRequired,
-  teamLoaded: PropTypes.bool.isRequired,
-  teamRightsLoaded: PropTypes.bool.isRequired,
   connectDb: PropTypes.func.isRequired,
-  getTeam: PropTypes.func.isRequired,
-  getTeamRight: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => ({
@@ -99,10 +90,8 @@ const mapStateToProps = state => ({
   editedDocs: state.user.editedDocs,
   mssqlConnected: state.network.mssqlConnected,
   mssqlConnectionFailed: state.network.mssqlConnectionFailed,
-  teamLoaded: state.teams.teamLoaded,
   usersLoaded: state.teams.usersLoaded,
-  teamRightsLoaded: state.teams.teamRightsLoaded,
   modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
 })
 
-export default connect(mapStateToProps, { connectDb, getTeam, getUser, getTeamRight, getDocs, downloadModels })(AuthLoadingScreen);
+export default connect(mapStateToProps, { connectDb, getUser, getDocs, downloadModels })(AuthLoadingScreen);

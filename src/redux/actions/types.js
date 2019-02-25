@@ -25,9 +25,6 @@ export const MSSQL_CONNECTED = 'MSSQL_CONNECTED'
 export const MSSQL_FAILED = 'MSSQL_FAILED'
 
 // Team actions
-export const SET_TEAM = 'SET_TEAM';
-export const REFRESH_TEAM = 'REFRESH_TEAM';
-export const SET_TEAM_RIGHTS = 'SET_TEAM_RIGHTS';
 export const SET_USER = 'SET_USER';
 
 

@@ -12,7 +12,7 @@ import Layout from '../constants/Layout'
 import { logout } from '../redux/actions/user';
 import { getNews } from '../redux/actions/news'
 import { getDocs, getModeles, getBusiness, getAffaires, getArbo } from '../redux/actions/business'
-import { getTeam, getTeamRight } from '../redux/actions/team'
+import { getUser } from '../redux/actions/team'
 
 const Wrapper = styled(View)`
   margin: ${Layout.space.large};
@@ -69,8 +69,7 @@ class Logout extends React.Component {
     this.props.getArbo()
     this.props.getBusiness();
     this.props.getModeles()
-    this.props.getTeam()
-    this.props.getTeamRight()
+    this.props.getUser()
     setTimeout(() => {
       this.setState({ refreshing: false})
       ToastAndroid.showWithGravity(
@@ -94,7 +93,6 @@ class Logout extends React.Component {
         <StyledButton onPress={this.signOut}>
           <StyledText>{this.props.title}</StyledText>
         </StyledButton>
-        {/* <StyledButton color={Colors.mainColor} title={this.props.title} onPress={this.signOut} /> */}
       </Wrapper>
     );
   }
@@ -110,8 +108,7 @@ Logout.propTypes = {
   getDocs: PropTypes.func.isRequired,
   getBusiness: PropTypes.func.isRequired,
   getModeles: PropTypes.func.isRequired,
-  getTeam: PropTypes.func.isRequired,
-  getTeamRight: PropTypes.func.isRequired,
+  getUser: PropTypes.func.isRequired,
 }
 
 Logout.defaultProps = {
@@ -131,6 +128,5 @@ export default withNavigation(connect(mapStateToProps, {
   getArbo,
   getBusiness,
   getModeles,
-  getTeam,
-  getTeamRight
+  getUser,
 })(Logout));
