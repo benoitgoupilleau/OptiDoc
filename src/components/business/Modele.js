@@ -18,6 +18,7 @@ const ModeleWrapper = styled(TouchableOpacity)`
 
 const Title = styled(Text)`
   font-size: ${Layout.font.small};
+  max-width: ${Math.round(width/2)-75}px;
   ${props => props.selected && 'color: black;'}
 `;
 

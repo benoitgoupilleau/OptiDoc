@@ -43,7 +43,7 @@ const Selector = styled(View)`
 `;
 
 const Option = styled(TouchableOpacity)`
-  width: 50%;
+  width: 33%;
   align-items: center;
   ${props => props.isSelected && `background-color: ${Colors.thirdColor};`}
   border-bottom-color: ${Colors.thirdColor};
@@ -90,7 +90,7 @@ class AddFileScreen extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      Dossier2: 'PV',
+      TypeModele: 'PV',
       ModeleID: '',
       FileName: '',
       filePath: '',
@@ -114,7 +114,9 @@ class AddFileScreen extends React.Component {
   }
 
   handleSelectModele = (ModeleID, FileName, filePath) => {
-    this.setState({ ModeleID, FileName, FileNameFinal: FileName, filePath })
+    const now = new Date();
+    const date = now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '.' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '.' + now.getFullYear()
+    this.setState({ ModeleID, FileName, FileNameFinal: FileName + ' ' + date, filePath })
   }
 
   onCreateFile = () => {
@@ -218,21 +220,27 @@ class AddFileScreen extends React.Component {
           <Section>Sélectionner un modèle</Section>
           <Selector>
             <Option
-              isSelected={this.state.Dossier2 === 'PV'}
-              onPress={() => this.setState({ Dossier2: 'PV', FileName: '', FileNameFinal: '' })}
+              isSelected={this.state.TypeModele === 'PV'}
+              onPress={() => this.setState({ TypeModele: 'PV', FileName: '', FileNameFinal: '' })}
             >
-              <OptionText isSelected={this.state.Dossier2 === 'PV'}>PV</OptionText>
+              <OptionText isSelected={this.state.TypeModele === 'PV'}>PV</OptionText>
             </Option>
             <Option
-              isSelected={this.state.Dossier2 === 'DMOS'}
-              onPress={() => this.setState({ Dossier2: 'DMOS', FileName: '', FileNameFinal: '' })}
+              isSelected={this.state.TypeModele === 'DMOS'}
+              onPress={() => this.setState({ TypeModele: 'DMOS', FileName: '', FileNameFinal: '' })}
             >
-              <OptionText isSelected={this.state.Dossier2 === 'DMOS'}>DMOS</OptionText>
+              <OptionText isSelected={this.state.TypeModele === 'DMOS'}>DMOS</OptionText>
+            </Option>
+            <Option
+              isSelected={this.state.TypeModele === 'CR'}
+              onPress={() => this.setState({ TypeModele: 'CR', FileName: '', FileNameFinal: '' })}
+            >
+              <OptionText isSelected={this.state.TypeModele === 'CR'}>CR</OptionText>
             </Option>
           </Selector>
           <ModeleList>
-            {this.props.modeleDocs.filter(m => m.Dossier2 === this.state.Dossier2).map(m => (
-              <Modele key={m.ID} FileName={m.FileName} handleSelect={() => this.handleSelectModele(m.ID, m.FileName, `${rootDir}/${Folder.modeleDocs}/${m.ID}.${m.Extension}`)} selected={this.state.FileName === m.FileName}/>))
+            {this.props.modeles.filter(m => m.TypeModele === this.state.TypeModele).map(m => (
+              <Modele key={m.ID} FileName={m.Designation} handleSelect={() => this.handleSelectModele(m.ID_Document, m.Designation, `${rootDir}/${Folder.modeleDocs}/${m.ID_Document}.pdf`)} selected={this.state.FileName === m.Designation}/>))
             }
           </ModeleList>
           <ButtonWrapper>

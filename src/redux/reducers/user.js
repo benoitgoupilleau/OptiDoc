@@ -54,7 +54,7 @@ export default (state = defaultState, action) => {
         omitToken = { ...omit(action.payload.user, 'bearerToken') }
         omitLoading = { ...omit(action.payload.user, 'loadingBusiness') }
       }
-      const modeleDownloaded = action.payload.user.modeleDownloaded === 'in progress' ? 'no' : action.payload.user.modeleDownloaded;
+      const modeleDownloaded = action.payload && action.payload.user && (action.payload.user.modeleDownloaded === 'yes' || action.payload.user.modeleDownloaded === 'no') ? action.payload.user.modeleDownloaded : 'no';
       if (unValidToken) {
         return {
           ...state,
