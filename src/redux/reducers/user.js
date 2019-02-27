@@ -54,15 +54,18 @@ export default (state = defaultState, action) => {
         omitToken = { ...omit(action.payload.user, 'bearerToken') }
         omitLoading = { ...omit(action.payload.user, 'loadingBusiness') }
       }
+      const modeleDownloaded = action.payload.user.modeleDownloaded === 'in progress' ? 'no' : action.payload.user.modeleDownloaded;
       if (unValidToken) {
         return {
           ...state,
-          ...omitToken
+          ...omitToken,
+          modeleDownloaded
         }
       }
       return {
         ...state,
-        ...omitLoading
+        ...omitLoading,
+        modeleDownloaded
       }
     }
     case LOGIN:

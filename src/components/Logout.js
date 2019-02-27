@@ -27,7 +27,7 @@ const Icons = styled(Ionicons)`
 const StyledButton = styled(TouchableOpacity)`
   align-items: center;
   background-color: ${Colors.mainColor};
-  height: 28px;
+  height: 32px;
   text-align: center;
 `
 

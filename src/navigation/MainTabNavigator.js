@@ -60,7 +60,7 @@ export default createBottomTabNavigator({
 }, {
   tabBarOptions: {
     style: {
-      height: 50,
+      height: 60,
     }
   }
 });

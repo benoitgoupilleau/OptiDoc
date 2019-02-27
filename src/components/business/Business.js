@@ -55,12 +55,12 @@ class Business extends React.Component {
         <IconView>
             <Ionicons
             name={"md-phone-portrait"}
-            size={Layout.icon.default}
+            size={Layout.icon.large}
             color={Colors.secondColor}
           />
           <Ionicons
             name={"md-arrow-dropright"}
-            size={Layout.icon.default}
+            size={Layout.icon.large}
             style={{ paddingLeft: 30 }}
             color={Colors.secondColor}
             onPress={this.goToDocs}
@@ -71,7 +71,7 @@ class Business extends React.Component {
     return (
       <Ionicons
         name={"md-cloud-download"}
-        size={Layout.icon.default}
+        size={Layout.icon.large}
         color={Colors.secondColor}
         onPress={this.onDownload}
       />

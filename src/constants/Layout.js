@@ -10,16 +10,17 @@ export default {
   },
   isSmallDevice: width < 375,
   icon: {
-    default: 18,
-    small: 14,
-    xsmall: 12
+    large: 24,
+    default: 20,
+    small: 16,
+    xsmall: 14
   },
   font: {
-    xlarge: '28px',
-    large: '18px',
-    medium: '14px',
-    small: '12px',
-    xsmall: '10px'
+    xlarge: '30px',
+    large: '22px',
+    medium: '18px',
+    small: '16px',
+    xsmall: '14px'
   },
   space: {
     xlarge: '30px',

@@ -136,9 +136,9 @@ class BusinessWithDocs extends React.Component {
     const { title, prep, rea, downloadedBusiness, subFolder } = this.props;
     const listArbo = [];
     for (let i = 0; i < prep.length; i++) {
-      const indexArbo = listArbo.findIndex(a => a.NomDossier === prep[i].Dossier3)
+      const indexArbo = listArbo.findIndex(a => (a.NomDossier === prep[i].Dossier3 && a.Etape === 'Preparation'))
       if (indexArbo === -1) {
-        const newArbo = subFolder.filter(s => s.NomDossier === prep[i].Dossier3)[0]
+        const newArbo = subFolder.filter(s => (s.NomDossier === prep[i].Dossier3 && s.Etape === 'Preparation'))[0]
         listArbo.push(newArbo)
       }
     }
@@ -152,9 +152,9 @@ class BusinessWithDocs extends React.Component {
     const { title, prep, rea, editedDocs, downloadedBusiness, subFolder } = this.props;
     const listArbo = [];
     for (let i = 0; i < rea.length; i++) {
-      const indexArbo = listArbo.findIndex(a => a.NomDossier === rea[i].Dossier3)
+      const indexArbo = listArbo.findIndex(a => (a.NomDossier === rea[i].Dossier3 && a.Etape === 'Realisation'))
       if (indexArbo === -1) {
-        const newArbo = subFolder.filter(s => s.NomDossier === rea[i].Dossier3)[0]
+        const newArbo = subFolder.filter(s => (s.NomDossier === rea[i].Dossier3 && s.Etape === 'Realisation'))[0]
         listArbo.push(newArbo)
       }
     }
