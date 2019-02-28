@@ -6,8 +6,8 @@ export const listDocs = (docs, newDoc, businesses) => {
   const docList = {}
   for (let i = 0; i < businesses.length; i += 1) {
     const affaire = businesses[i]
-    const prep = docs.filter(d => (d.Dossier1 === affaire && d.Dossier2 === 'Preparation'))
-    const rea = [...docs.filter(d => (d.Dossier1 === affaire && d.Dossier2 === 'Realisation')), ...newDoc.filter(d => d.Dossier1 === affaire)]
+    const prep = docs.filter(d => (d.Dossier1 && d.Dossier1 === affaire && d.Dossier2 === 'Preparation'))
+    const rea = [...docs.filter(d => (d.Dossier1 && d.Dossier1 === affaire && d.Dossier2 === 'Realisation')), ...newDoc.filter(d => (d.Dossier1 && d.Dossier1 === affaire))]
     docList[affaire] = {
       prep,
       rea
@@ -20,7 +20,7 @@ export const listNewDocs = (docs, businesses) => {
   const docList = {}
   for (let i = 0; i < businesses.length; i += 1) {
     const affaire = businesses[i]
-    const newDocs = docs.filter(d => (d.Dossier1 === affaire))
+    const newDocs = docs.filter(d => (d.Dossier1 && d.Dossier1 === affaire))
     docList[affaire] = newDocs;
   }
   return docList;

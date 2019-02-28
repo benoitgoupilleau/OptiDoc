@@ -291,7 +291,7 @@ const mapStateToProps = state => ({
   uploadingDocs: state.user.uploadingDocs,
   userId: state.user.id,
   name: state.user.name,
-  modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
+  modeleDocs: state.business.docs.filter(d => (d.Dossier1 && d.Dossier1 === 'Modele')),
   modeleDownloaded: state.user.modeleDownloaded,
 })
 

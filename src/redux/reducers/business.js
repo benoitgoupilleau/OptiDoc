@@ -86,11 +86,21 @@ export default (state = defaultState, action) => {
     }
     case UPDATE_PREPARE: {
       const currentDoc = [...state.docs];
-      const indexToUpdate = currentDoc.findIndex(el => el.ID === action.fileId);
-      const newDoc = { ...currentDoc[indexToUpdate], Prepared: action.Prepared, PreparedOn: action.PreparedOn}
-      return {
-        ...state,
-        docs: [...currentDoc.slice(0, indexToUpdate), newDoc, ...currentDoc.slice(indexToUpdate+1)]
+      const currentNewDoc = [...state.newDocs];
+      const indexDocToUpdate = currentDoc.findIndex(el => el.ID === action.fileId);
+      const indexNewDocToUpdate = currentNewDoc.findIndex(el => el.ID === action.fileId);
+      if (indexNewDocToUpdate > -1) {
+        const newDoc = { ...currentNewDoc[indexNewDocToUpdate], Prepared: action.Prepared, PreparedOn: action.PreparedOn}
+        return {
+          ...state,
+          newDocs: [...currentNewDoc.slice(0, indexNewDocToUpdate), newDoc, ...currentNewDoc.slice(indexNewDocToUpdate+1)]
+        }
+      } else {
+        const newDoc = { ...currentDoc[indexDocToUpdate], Prepared: action.Prepared, PreparedOn: action.PreparedOn}
+        return {
+          ...state,
+          docs: [...currentDoc.slice(0, indexDocToUpdate), newDoc, ...currentDoc.slice(indexDocToUpdate+1)]
+        }
       }
     }
     default:

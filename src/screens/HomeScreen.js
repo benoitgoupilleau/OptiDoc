@@ -136,7 +136,7 @@ const mapStateToProps = (state) => ({
   usersLoaded: state.teams.usersLoaded,
   userId: state.user.id,
   editedDocs: state.user.editedDocs,
-  modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
+  modeleDocs: state.business.docs.filter(d => (d.Dossier1 && d.Dossier1 === 'Modele')),
   modeleDownloaded: state.user.modeleDownloaded
 })
 

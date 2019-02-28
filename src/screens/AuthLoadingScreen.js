@@ -91,7 +91,7 @@ const mapStateToProps = state => ({
   mssqlConnected: state.network.mssqlConnected,
   mssqlConnectionFailed: state.network.mssqlConnectionFailed,
   usersLoaded: state.teams.usersLoaded,
-  modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
+  modeleDocs: state.business.docs.filter(d => (d.Dossier1 && d.Dossier1 === 'Modele')),
 })
 
 export default connect(mapStateToProps, { connectDbOut, getUser, getDocs, downloadModels })(AuthLoadingScreen);

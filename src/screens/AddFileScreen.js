@@ -261,7 +261,7 @@ class AddFileScreen extends React.Component {
 
 const mapStateToProps = state => ({
   isConnected: state.network.isConnected,
-  modeleDocs: state.business.docs.filter(d => d.Dossier1 === 'Modele'),
+  modeleDocs: state.business.docs.filter(d => (d.Dossier1 && d.Dossier1 === 'Modele')),
   modeles: state.business.modeles,
   user: state.user,
   affaires: state.business.affaires,
