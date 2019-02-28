@@ -43,6 +43,10 @@ class OfflineNotice extends PureComponent {
     this.props.connectivityChange(isConnected);
   }
 
+  testDb = () => {
+    this.props.connectDbOut();
+  }
+
   render() {
     if (!this.props.isConnected) {
       return (
@@ -53,7 +57,7 @@ class OfflineNotice extends PureComponent {
     } else if (this.props.isConnected && !this.props.mssqlConnected) {
       return (
         <Wrapper type="warning">
-          <TouchableOpacity onPress={this.props.connectDbOut} style={{ height: 30 }}>
+          <TouchableOpacity onPress={this.testDb} style={{ height: 30 }}>
             <Message type="warning" >Connexion perdue avec la base de données. Cliquer pour réessayer</Message>
           </TouchableOpacity>
         </Wrapper>

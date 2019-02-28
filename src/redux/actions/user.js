@@ -39,9 +39,9 @@ export const login = (userName, user, bearerToken) => ({
   name: user.Nom
 }) 
 
-export const logout = (userId) => dispatch => RNFS.unlink(`${rootDir}/${userId}`)
-  .then(() => dispatch({type: LOGOUT}))
-  .catch(() => dispatch({ type: LOGOUT }))
+export const logout = () => ({
+  type: LOGOUT
+});
 
 export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
   if (isDownloadingModeles) {
