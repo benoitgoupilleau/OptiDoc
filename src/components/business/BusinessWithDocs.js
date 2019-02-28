@@ -1,6 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
+import RNFS from 'react-native-fs';
 import PropTypes from 'prop-types';
+import pick from 'lodash.pick';
+import { EXTERNAL_PATH } from 'react-native-dotenv';
 import { connect } from 'react-redux';
 import { View, Text, ActivityIndicator, Alert } from 'react-native';
 import { withNavigation } from 'react-navigation';
@@ -8,11 +11,14 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Document from './Document'
 import SubArbo from './SubArbo';
-import { downloadBusiness } from '../../redux/actions/user'
+import { downloadBusiness, uploadFile, uploadingFile, createFile } from '../../redux/actions/user'
 
 import Colors from '../../constants/Colors';
 import Layout from '../../constants/Layout'
 import Folder from '../../constants/Folder'
+import Tables from '../../constants/Tables';
+
+const rootDir = RNFS.DocumentDirectoryPath;
 
 const BusinessWrapper = styled(View)`
   background: ${Colors.antiBackground};
@@ -33,10 +39,6 @@ const Title = styled(Text)`
   color: ${Colors.secondColor};
   font-size: ${Layout.font.large};
   font-weight: bold;
-`;
-
-const IconView = styled(View)`
-  flex-direction: row;
 `;
 
 const SectionWrapper = styled(View)`
@@ -69,42 +71,74 @@ const checkIfNew = (docs, id) => {
 class BusinessWithDocs extends React.Component {
   state = {
     showPrep: false,
-    showRea: false
+    showRea: false,
+    upLoading: false,
+    nbFiles: 0,
+    totalFiles: 0
   }
 
   displayIcon = () => {
-    const { title, downloadedBusiness, loadingBusiness, nbDocBusiness, totalDocBusiness } = this.props;
-    if (loadingBusiness.includes(title)) {
+    const editedBusiness = this.props.editedDocs.filter(e => e.affaire === this.props.title)
+    if (this.state.upLoading) {
       return (
         <View>
-          <Text>{nbDocBusiness}/{totalDocBusiness}</Text>
+          <Text>{this.state.nbFiles}/{this.state.totalFiles}</Text>
           <ActivityIndicator />
         </View>)
-    } else if (downloadedBusiness.includes(title)) {
+    } else if (editedBusiness.length > 0) {
       return (
-        <IconView>
-            <Ionicons
-            name={"md-phone-portrait"}
-            size={Layout.icon.default}
-            color={Colors.secondColor}
-          />
-          <Ionicons
-            name={"md-arrow-dropright"}
-            size={Layout.icon.default}
-            style={{ paddingLeft: 30 }}
-            color={Colors.secondColor}
-          />
-        </IconView>
-      );
+        <Ionicons
+          name={"md-cloud-upload"}
+          size={Layout.icon.large}
+          color={Colors.secondColor}
+          onPress={this.onUpload}
+        />
+      )
     }
-    return (
-      <Ionicons
-        name={"md-cloud-download"}
-        size={Layout.icon.default}
-        color={Colors.secondColor}
-        onPress={this.onDownload}
-      />
-    )
+    return null;
+  }
+
+  onUpload = async () => {
+    if (this.props.isConnected && this.props.mssqlConnected) {
+      if (this.props.uploadingDocs.length > 0) {
+        Alert.alert('Envoi en cours', "Vous pourrez envoyer vos fichiers une fois l'envoi terminé", [{ text: 'Ok' }]);
+      } else {
+        const editedBusiness = this.props.editedDocs.filter(e => e.affaire === this.props.title)
+        this.setState({upLoading: true, totalFiles: editedBusiness.length})
+        for (let i = 0; i < editedBusiness.length; i++) {
+          this.setState({nbFiles: i + 1});
+          const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${editedBusiness[i].ID}(0).${editedBusiness[i].Extension}`);
+          if (secondVersion) {
+            await RNFS.copyFile(`${EXTERNAL_PATH}${editedBusiness[i].ID}(0).${editedBusiness[i].Extension}`, `${EXTERNAL_PATH}${editedBusiness[i].ID}.${editedBusiness[i].Extension}`);
+            await RNFS.unlink(`${EXTERNAL_PATH}${editedBusiness[i].ID}(0).${editedBusiness[i].Extension}`)
+          }
+          const filePath = `${EXTERNAL_PATH}${editedBusiness[i].ID}.${editedBusiness[i].Extension}`;
+          const destPath = `${rootDir}/${this.props.userId}/${this.props.title}/${Folder.rea}/${editedBusiness[i].ID}.${editedBusiness[i].Extension}`;
+          const file = pick(this.props, Tables.docField);
+          await RNFS.copyFile(filePath, destPath);
+          const remoteDir = `./${this.props.title}/Realisation/${editedBusiness[i].Dossier3}`
+          const userName = this.props.name;
+          const now = new Date();
+          const date = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
+          const fileToUpLoad = {
+            ...file,
+            UpLoadedOn: date,
+            UpdatedOn: date,
+            UpdatedBy: userName,
+            UpLoadedBy: userName
+          }
+          this.props.uploadingFile(editedBusiness[i].ID);
+          if (editedBusiness[i].isNew) {
+            return await this.props.createFile(filePath, fileToUpLoad, remoteDir)
+          } else {
+            return await this.props.uploadFile(filePath, fileToUpLoad, remoteDir);
+          }
+        }
+        this.setState({upLoading: false})
+      }
+    } else {
+      Alert.alert('Connexion impossible', 'Vous pourrez envoyer votre fichier une fois votre connexion rétablie', [{ text: 'Ok' }]);
+    }
   }
 
   onDownload = () => {
@@ -172,7 +206,7 @@ class BusinessWithDocs extends React.Component {
       <BusinessWrapper>
         <MainSection>
           <Title>{clientName}</Title>
-          {/* {this.displayIcon()} */}
+          {this.displayIcon()}
         </MainSection>
         <SectionWrapper>
           <Icons
@@ -224,11 +258,14 @@ BusinessWithDocs.defaultProps = {
 
 const mapStateToProps = state => ({
   isConnected: state.network.isConnected,
+  mssqlConnected: state.network.mssqlConnected,
   downloadedBusiness: state.user.downloadedBusiness,
   loadingBusiness: state.user.loadingBusiness,
   nbDocBusiness: state.user.nbDocBusiness,
+  uploadingDocs: state.user.uploadingDocs,
   totalDocBusiness: state.user.totalDocBusiness,
   userId: state.user.id,
+  name: state.user.name,
   editedDocs: state.user.editedDocs,
   modeleDocs: state.business.docs.filter(d => (d.Dossier1 && d.Dossier1 === 'Modele')),
   subFolder: state.business.subFolder,
@@ -236,4 +273,4 @@ const mapStateToProps = state => ({
   modeleDownloaded: state.user.modeleDownloaded
 })
 
-export default withNavigation(connect(mapStateToProps, { downloadBusiness })(BusinessWithDocs));
+export default withNavigation(connect(mapStateToProps, { downloadBusiness, uploadingFile, createFile, uploadFile })(BusinessWithDocs));

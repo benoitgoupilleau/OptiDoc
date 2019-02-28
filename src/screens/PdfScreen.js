@@ -52,12 +52,12 @@ class PdfScreen extends React.Component {
     }, 500);
   }
 
-  onPressEdit = async (ID, Extension, filePath, isEdited) => {
+  onPressEdit = async (ID, Extension, Dossier1, filePath, isEdited, Dossier3) => {
     this.props.navigation.goBack();
     if (isEdited) {
       await openFile(ID, Extension)
     } else {
-      this.props.editFile({ ID, editPath: `${EXTERNAL_PATH}${ID}.${Extension}`}, filePath)
+      this.props.editFile({ ID, editPath: `${EXTERNAL_PATH}${ID}.${Extension}`, affaire: Dossier1, Extension, Dossier3}, filePath)
     }
   }
 
@@ -74,6 +74,7 @@ class PdfScreen extends React.Component {
       const ID = this.props.navigation.getParam('ID', '')
       const Extension = this.props.navigation.getParam('Extension', '')
       const Dossier1 = this.props.navigation.getParam('Dossier1', '')
+      const Dossier3 = this.props.navigation.getParam('Dossier3', '')
       const Reviewed = this.props.navigation.getParam('Reviewed', '');
       const Prepared = this.props.navigation.getParam('Prepared', '');
       const type = this.props.navigation.getParam('type', Folder.prep)
@@ -83,7 +84,7 @@ class PdfScreen extends React.Component {
       return (
         <Main>
           <View>
-            {type === Folder.rea && Reviewed === 'N' && (Prepared === 'N' || isPrepared) && (<Edit onPress={() => this.onPressEdit(ID, Extension, filePath, isEdited)}>
+            {type === Folder.rea && Reviewed === 'N' && (Prepared === 'N' || isPrepared) && (<Edit onPress={() => this.onPressEdit(ID, Extension, Dossier1, filePath, isEdited, Dossier3)}>
               <EditText>Modifier</EditText>
             </Edit>)}
             <Pdf

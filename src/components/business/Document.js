@@ -52,7 +52,7 @@ const Icons = styled(Ionicons)`
 
 class Document extends React.Component {
   onEdit = async () => {
-    const { type, ID, Extension, Dossier1, userId, loadingBusiness, prep, rea, editedDocs } = this.props;
+    const { type, ID, Extension, Dossier1, userId, loadingBusiness, prep, rea, editedDocs, Dossier3 } = this.props;
     const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
     if (isEdited) {
       await openFile(ID, Extension);
@@ -60,7 +60,7 @@ class Document extends React.Component {
       const filePath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
       const fileExists = await RNFS.exists(filePath);
       if (fileExists) {
-        this.props.editFile({ ID, editPath: `${EXTERNAL_PATH}${ID}.${Extension}`}, filePath)
+        this.props.editFile({ ID, editPath: `${EXTERNAL_PATH}${ID}.${Extension}`, affaire: Dossier1, Extension, Dossier3 }, filePath)
       } else if (!loadingBusiness.includes(Dossier1)) {
         if (this.props.modeleDownloaded === 'in progress') {
           Alert.alert('Modèle en cours de téléchargement', 'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants', [{ text: 'Ok' }]);
@@ -119,7 +119,7 @@ class Document extends React.Component {
     } else {
       const PreparedOn = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
       this.props.updatePrepared(this.props.ID, newPrepared, PreparedOn);
-      this.props.editPrepare({ID: this.props.ID, prepared: true})
+      this.props.editPrepare({ID: this.props.ID, prepared: true, affaire: this.props.Dossier1, Extension: this.props.Extension, Dossier3: this.props.Dossier3})
     }
   }
 
