@@ -8,11 +8,7 @@ import { store, persistor } from './src/redux/store/store';
 
 import { Sentry } from 'react-native-sentry';
 
-Sentry.config({
-  dns:'https://fbc2d25a7f044e1980699785ab02c387@sentry.io/1405393',
-  release: '0.0.3',
-  environment: 8
-}).install();
+Sentry.config('https://fbc2d25a7f044e1980699785ab02c387@sentry.io/1405393').install();
 
 
 const App = () => (
