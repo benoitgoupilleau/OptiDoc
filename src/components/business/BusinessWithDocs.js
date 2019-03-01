@@ -129,9 +129,9 @@ class BusinessWithDocs extends React.Component {
           }
           this.props.uploadingFile(editedBusiness[i].ID);
           if (editedBusiness[i].isNew) {
-            return await this.props.createFile(filePath, fileToUpLoad, remoteDir)
+            this.props.createFile(filePath, fileToUpLoad, remoteDir)
           } else {
-            return await this.props.uploadFile(filePath, fileToUpLoad, remoteDir);
+            this.props.uploadFile(filePath, fileToUpLoad, remoteDir);
           }
         }
         this.setState({upLoading: false})

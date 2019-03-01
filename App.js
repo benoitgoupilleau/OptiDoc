@@ -6,6 +6,11 @@ import AppNavigator from './src/navigation/AppNavigator'
 
 import { store, persistor } from './src/redux/store/store';
 
+import { Sentry } from 'react-native-sentry';
+
+Sentry.config('https://fbc2d25a7f044e1980699785ab02c387@sentry.io/1405393').install();
+
+
 const App = () => (
   <Provider store={store} >
     <PersistGate loading={<ActivityIndicator />} persistor={persistor}>

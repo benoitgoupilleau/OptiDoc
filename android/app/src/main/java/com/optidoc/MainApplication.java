@@ -3,6 +3,7 @@ package com.optidoc;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import io.sentry.RNSentryPackage;
 import com.hopding.pdflib.PDFLibPackage;
 import com.vinzscam.reactnativefileviewer.RNFileViewerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -34,6 +35,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
         new MainReactPackage(),
+        new RNSentryPackage(),
         new PDFLibPackage(),
         new RNFileViewerPackage(),
         new RNFetchBlobPackage(),
