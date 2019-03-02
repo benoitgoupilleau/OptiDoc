@@ -8,7 +8,8 @@ import {
 const defaultState = {
   isConnected: true,
   mssqlConnected: false,
-  mssqlConnectionFailed: false
+  mssqlConnectionFailed: false,
+  connectedHome: false
 }
 
 export default (state = defaultState, action) => {
@@ -26,7 +27,8 @@ export default (state = defaultState, action) => {
       return {
         ...state,
         mssqlConnected: true,
-        mssqlConnectionFailed: false
+        mssqlConnectionFailed: false,
+        connectedHome: action.connectedHome
       }
     case MSSQL_FAILED:
       return {
