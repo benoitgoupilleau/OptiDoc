@@ -145,7 +145,8 @@ class Document extends React.Component {
       }
       this.props.removeFromEdit(ID);
     } else {
-      this.props.removeNewDoc(ID)
+      this.props.removeNewDoc(ID);
+      this.props.removeFromEdit(ID);
       const localPath= `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`
       await RNFS.unlink(localPath)
       const externalPath = `${EXTERNAL_PATH}${ID}.${Extension}`;
