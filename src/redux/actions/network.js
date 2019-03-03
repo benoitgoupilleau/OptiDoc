@@ -26,7 +26,7 @@ export const connectDbHome = () => dispatch => MSSQL.connect(configHome)
     return dispatch(dbFailed())
   })
 
-export const switchDb = (connectHome = false) => dispatch => MSSQL.logout()
+export const switchDb = (connectHome = false) => dispatch => MSSQL.close()
   .then(() => {
     if (connectHome) {
       return MSSQL.connect(configHome)

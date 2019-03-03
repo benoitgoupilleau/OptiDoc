@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import SwitchSelector from "react-native-switch-selector";
 import { View, TouchableOpacity, Text, Alert, ToastAndroid, ActivityIndicator } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
@@ -11,6 +12,7 @@ import Layout from '../constants/Layout'
 
 import { logout } from '../redux/actions/user';
 import { getNews } from '../redux/actions/news'
+import { switchDb } from '../redux/actions/network';
 import { getDocs, getModeles, getBusiness, getAffaires, getArbo } from '../redux/actions/business'
 import { getUser } from '../redux/actions/team'
 
@@ -57,14 +59,14 @@ class Logout extends React.Component {
   }
 
   signOutAsync = () => {
-    this.props.logout(this.props.userId);
     this.props.navigation.navigate('Auth');
+    this.props.logout(this.props.userId);
   };
 
   refreshData = () => {
     this.setState({ refreshing: true})
     this.props.getNews()
-    this.props.getDocs()
+    this.props.getDocs(this.props.editedDocs)
     this.props.getAffaires()
     this.props.getArbo()
     this.props.getBusiness();
@@ -90,6 +92,20 @@ class Logout extends React.Component {
           size={Layout.icon.default}
           onPress={this.refreshData}
         />}
+        <SwitchSelector
+          initial={this.props.connectedHome ? 1 : 0}
+          onPress={value => this.props.switchDb(value)}
+          textColor={Colors.mainColor}
+          selectedColor="#fff"
+          buttonColor={Colors.mainColor}
+          borderColor={Colors.mainColor}
+          hasPadding
+          style={{ width: 80, marginRight: 10}}
+          options={[
+            { value: false, customIcon: <Ionicons color={this.props.connectedHome ? Colors.mainColor : '#fff'} name="md-briefcase" size={Layout.icon.small} /> },
+            { value: true, customIcon: <Ionicons color={!this.props.connectedHome ? Colors.mainColor : '#fff'} name="md-home" size={Layout.icon.small} /> },
+          ]}
+        />
         <StyledButton onPress={this.signOut}>
           <StyledText>{this.props.title}</StyledText>
         </StyledButton>
@@ -117,7 +133,9 @@ Logout.defaultProps = {
 
 const mapStateToProps = state => ({
   hasEditFiles: state.user.editedDocs.length > 0,
-  userId: state.user.id
+  userId: state.user.id,
+  editedDocs: state.user.editedDocs,
+  connectedHome: state.network.connectedHome
 })
 
 export default withNavigation(connect(mapStateToProps, {
@@ -129,4 +147,5 @@ export default withNavigation(connect(mapStateToProps, {
   getBusiness,
   getModeles,
   getUser,
+  switchDb
 })(Logout));

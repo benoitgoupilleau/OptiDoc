@@ -23,6 +23,7 @@
     "react-native-pdf-lib": "^0.2.0",
     "react-native-pure-jwt": "^1.6.0",
     "react-native-sentry": "^0.42.0",
+    "react-native-switch-selector": "^1.1.12",
     "react-native-vector-icons": "^6.1.0",
     "react-navigation": "^3.0.9",
     "react-redux": "^6.0.0",

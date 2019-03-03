@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { View, Text, NetInfo, Dimensions, TouchableOpacity } from 'react-native';
 
-import { connectivityChange, connectDbOut } from '../redux/actions/network';
+import { connectivityChange, connectDbOut, connectDbHome } from '../redux/actions/network';
 
 import Colors from '../constants/Colors';
 import Layout from '../constants/Layout'
@@ -44,7 +44,7 @@ class OfflineNotice extends PureComponent {
   }
 
   testDb = () => {
-    this.props.connectDbOut();
+    this.props.connectedHome ? this.props.connectDbHome() : this.props.connectDbOut();
   }
 
   render() {
@@ -79,7 +79,8 @@ const mapStateToProps = state => ({
   mssqlConnected: state.network.mssqlConnected,
   modeleDownloaded: state.user.modeleDownloaded,
   nbDownloaded: state.user.nbDownloaded,
-  totalModeles: state.user.totalModeles
+  totalModeles: state.user.totalModeles,
+  connectedHome: state.network.connectedHome
 })
 
 OfflineNotice.propTypes = {
@@ -90,4 +91,4 @@ OfflineNotice.propTypes = {
 }
 
 
-export default connect(mapStateToProps, { connectivityChange, connectDbOut })(OfflineNotice);
+export default connect(mapStateToProps, { connectivityChange, connectDbOut, connectDbHome })(OfflineNotice);

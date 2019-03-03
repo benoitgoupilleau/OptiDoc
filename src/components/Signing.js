@@ -2,7 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components'
-import { JWT_SECRET, JWT_EXPIRE, ENV } from 'react-native-dotenv';
+import { JWT_SECRET, JWT_EXPIRE } from 'react-native-dotenv';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import SwitchSelector from "react-native-switch-selector";
 import jwt from 'react-native-pure-jwt'
 import { View, Text, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
 import { withNavigation } from 'react-navigation';
@@ -15,6 +17,7 @@ import Layout from '../constants/Layout'
 
 import { login } from '../redux/actions/user'
 import { getUser } from '../redux/actions/team'
+import { switchDb } from '../redux/actions/network'
 
 
 const Wrapper = styled(View)`
@@ -120,6 +123,22 @@ class Signin extends React.Component {
           />
         </View>
         <Title>OptiDoc</Title>
+        <View style={{alignItems : "center"}}>
+          <SwitchSelector
+            initial={this.props.connectedHome ? 1 : 0}
+            onPress={value => this.props.switchDb(value)}
+            textColor={Colors.mainColor}
+            selectedColor="#fff"
+            buttonColor={Colors.mainColor}
+            borderColor={Colors.mainColor}
+            hasPadding
+            style={{ width: 80, margin: 10 }}
+            options={[
+              { value: false, customIcon: <Ionicons color={this.props.connectedHome ? Colors.mainColor : '#fff'} name="md-briefcase" size={Layout.icon.small} /> },
+              { value: true, customIcon: <Ionicons color={!this.props.connectedHome ? Colors.mainColor : '#fff'} name="md-home" size={Layout.icon.small} /> },
+            ]}
+          />
+        </View>
         <StyledInput 
           allowFontScaling
           onChangeText={(userName) => this.setState({ userName })}
@@ -160,6 +179,7 @@ const mapStateToProps = state => ({
   locked: state.user.locked,
   users: state.teams.users,
   usersLoaded: state.teams.usersLoaded,
+  connectedHome: state.network.connectedHome
 })
 
-export default withNavigation(connect(mapStateToProps, { login, getUser })(Signin));
+export default withNavigation(connect(mapStateToProps, { login, getUser, switchDb })(Signin));

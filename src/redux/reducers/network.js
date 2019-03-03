@@ -14,10 +14,13 @@ const defaultState = {
 
 export default (state = defaultState, action) => {
   switch (action.type) {
-    case REHYDRATE: 
+    case REHYDRATE: {
+      const connectedHome = action.payload && action.payload.network && !!action.payload.network.connectedHome ? action.payload.network.connectedHome : defaultState.connectedHome; 
       return {
-        ...defaultState
+        ...defaultState,
+        connectedHome
       }
+    }
     case UPDATE_NET_STATUS:
       return {
         ...state,
