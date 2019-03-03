@@ -112,6 +112,8 @@ class Business extends React.Component {
           <Title onPress={() => { 
             if (this.props.downloadedBusiness.includes(title)) {
               return this.goToDocs();
+            } else if (!this.props.loadingBusiness.includes(title)) {
+              return this.onDownload();
             }
             return;
           }} >{clientName}</Title>

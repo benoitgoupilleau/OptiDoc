@@ -66,9 +66,11 @@ class HomeScreen extends React.Component {
   }
 
   onRefresh = () => {
-    this.setState({ refreshing: true });
-    this.props.refreshNews();
-    this.props.getNews()
+    if (this.props.mssqlConnected) {
+      this.setState({ refreshing: true });
+      this.props.refreshNews();
+      this.props.getNews()
+    }
   }
 
   render() {
