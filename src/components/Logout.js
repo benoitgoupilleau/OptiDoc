@@ -100,13 +100,14 @@ class Logout extends React.Component {
           buttonColor={Colors.mainColor}
           borderColor={Colors.mainColor}
           hasPadding
+          disabled={this.props.loadingBusiness.length > 0 || this.props.uploadingDocs.length > 0}
           style={{ width: 80, marginRight: 10}}
           options={[
             { value: false, customIcon: <Ionicons color={this.props.connectedHome ? Colors.mainColor : '#fff'} name="md-briefcase" size={Layout.icon.small} /> },
             { value: true, customIcon: <Ionicons color={!this.props.connectedHome ? Colors.mainColor : '#fff'} name="md-home" size={Layout.icon.small} /> },
           ]}
         />
-        <StyledButton onPress={this.signOut}>
+        <StyledButton onPress={this.signOut} disabled={this.props.loadingBusiness.length > 0 || this.props.uploadingDocs.length > 0}>
           <StyledText>{this.props.title}</StyledText>
         </StyledButton>
       </Wrapper>
@@ -135,7 +136,9 @@ const mapStateToProps = state => ({
   hasEditFiles: state.user.editedDocs.length > 0,
   userId: state.user.id,
   editedDocs: state.user.editedDocs,
-  connectedHome: state.network.connectedHome
+  connectedHome: state.network.connectedHome,
+  loadingBusiness: state.user.loadingBusiness,
+  uploadingDocs: state.user.uploadingDocs
 })
 
 export default withNavigation(connect(mapStateToProps, {

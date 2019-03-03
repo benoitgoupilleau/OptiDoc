@@ -38,11 +38,12 @@ const setModeles = (modeles) => ({
   modeles
 })
 
-export const updatePrepared = (fileId, Prepared, PreparedOn) => ({
+export const updatePrepared = (fileId, Prepared, PreparedOn, PreparedBy) => ({
   type: UPDATE_PREPARE,
   fileId,
   Prepared,
-  PreparedOn
+  PreparedOn,
+  PreparedBy
 })
 
 export const getBusiness = () => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_business}`)

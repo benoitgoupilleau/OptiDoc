@@ -63,7 +63,12 @@ class BusinessScreen extends React.Component {
 
 BusinessScreen.propTypes = {
   businesses: PropTypes.array.isRequired,
-  docs: PropTypes.object.isRequired
+  docs: PropTypes.object.isRequired,
+  newDocs: PropTypes.object.isRequired,
+  isConnected: PropTypes.bool.isRequired,
+  modeleDownloaded: PropTypes.string.isRequired,
+  modeleDocs: PropTypes.array.isRequired,
+  downloadModels: PropTypes.func.isRequired
 }
 
 

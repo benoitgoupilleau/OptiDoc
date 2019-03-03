@@ -38,6 +38,8 @@ const MainSection = styled(View)`
 const Title = styled(Text)`
   color: ${Colors.secondColor};
   font-size: ${Layout.font.large};
+  flex-grow: 1;
+  max-width: 500px;
   font-weight: bold;
 `;
 

@@ -114,11 +114,12 @@ class Document extends React.Component {
     const now = new Date();
     if (newPrepared === 'N') {
       const PreparedOn = '1900-01-01';
-      this.props.updatePrepared(this.props.ID, newPrepared, PreparedOn);
+      const PreparedBy = '';
+      this.props.updatePrepared(this.props.ID, newPrepared, PreparedOn, PreparedBy);
       this.props.removePrepare(this.props.ID)
     } else {
       const PreparedOn = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
-      this.props.updatePrepared(this.props.ID, newPrepared, PreparedOn);
+      this.props.updatePrepared(this.props.ID, newPrepared, PreparedOn, this.props.name);
       this.props.editPrepare({ID: this.props.ID, prepared: true, affaire: this.props.Dossier1, Extension: this.props.Extension, Dossier3: this.props.Dossier3})
     }
   }
@@ -139,7 +140,7 @@ class Document extends React.Component {
     if (!isNew) {
       const doc = this.props.editedDocs.filter(e => e.ID === ID)[0]
       if (doc.prepared) {
-        this.props.updatePrepared(ID, 'N', '1900-01-01');
+        this.props.updatePrepared(ID, 'N', '1900-01-01', '');
       }
       this.props.removeFromEdit(ID);
     } else {

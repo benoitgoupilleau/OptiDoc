@@ -64,7 +64,7 @@ class DocsScreen extends React.Component {
   render() {
     const affaire =  this.props.navigation.getParam('affaire', '');
 
-    if (affaire !== '') {
+    if (affaire !== '' && !!this.props.docs[affaire]) {
       return (
         <Main>
           <StyledScroll>
@@ -122,6 +122,12 @@ class DocsScreen extends React.Component {
       </Main>
     );
   }
+}
+
+DocsScreen.propTypes = {
+  docs: PropTypes.object.isRequired,
+  newDocs: PropTypes.object.isRequired,
+  navigation: PropTypes.object.isRequired
 }
 
 const mapStateToProps = ({ user, business }) => {
