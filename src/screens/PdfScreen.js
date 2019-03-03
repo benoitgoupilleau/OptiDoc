@@ -76,6 +76,7 @@ class PdfScreen extends React.Component {
       const Dossier1 = this.props.navigation.getParam('Dossier1', '')
       const Dossier3 = this.props.navigation.getParam('Dossier3', '')
       const Reviewed = this.props.navigation.getParam('Reviewed', '');
+      const Locked = this.props.navigation.getParam('Locked', '')
       const Prepared = this.props.navigation.getParam('Prepared', '');
       const type = this.props.navigation.getParam('type', Folder.prep)
       const filePath = isEdited ? `${EXTERNAL_PATH}${ID}.${Extension}` : `${rootDir}/${this.props.userId}/${Dossier1}/${type}/${ID}.${Extension}`;
@@ -84,7 +85,7 @@ class PdfScreen extends React.Component {
       return (
         <Main>
           <View>
-            {type === Folder.rea && Reviewed === 'N' && (Prepared === 'N' || isPrepared) && (<Edit onPress={() => this.onPressEdit(ID, Extension, Dossier1, filePath, isEdited, Dossier3)}>
+            {type === Folder.rea && Reviewed === 'N' && Locked === 'N' && (Prepared === 'N' || isPrepared) && (<Edit onPress={() => this.onPressEdit(ID, Extension, Dossier1, filePath, isEdited, Dossier3)}>
               <EditText>Modifier</EditText>
             </Edit>)}
             <Pdf

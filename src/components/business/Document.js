@@ -157,7 +157,7 @@ class Document extends React.Component {
   }
 
   onOpenFile = async () => {
-    const { FileName, type, navigation, ID, Dossier3, Extension, Dossier1, isDownloaded, userId, prep, rea, loadingBusiness, editedDocs, Prepared, Reviewed} = this.props;
+    const { FileName, type, navigation, ID, Dossier3, Extension, Dossier1, isDownloaded, userId, prep, rea, loadingBusiness, editedDocs, Prepared, Reviewed, Locked} = this.props;
     const isEdited = editedDocs.filter(e => e.ID === ID && !!e.editPath).length > 0;
     const isPrepared = editedDocs.filter(e => e.ID === ID && e.prepared).length > 0;
     if (isDownloaded) {
@@ -166,12 +166,12 @@ class Document extends React.Component {
         RNFS.copyFile(`${EXTERNAL_PATH}${ID}(0).${Extension}`, `${EXTERNAL_PATH}${ID}.${Extension}`)
           .then(() => RNFS.unlink(`${EXTERNAL_PATH}${ID}(0).${Extension}`)
             .then(() => 
-              navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type, isEdited, Prepared, Reviewed, isPrepared })
+              navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type, isEdited, Prepared, Reviewed, isPrepared, Locked })
             )
           )
           .catch((e) => console.log({e}))
       } else {
-        return navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type, isEdited, Prepared, Reviewed, isPrepared })
+        return navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type, isEdited, Prepared, Reviewed, isPrepared, Locked })
       } 
     }
     if (!loadingBusiness.includes(Dossier1)) {
@@ -199,7 +199,7 @@ class Document extends React.Component {
   }
 
   render() {
-    const { FileName, type, ID, Extension, editedDocs, uploadingDocs, Reviewed, Prepared } = this.props;
+    const { FileName, type, ID, Extension, editedDocs, uploadingDocs, Reviewed, Prepared, Locked } = this.props;
     const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
     return (
       <DocumentWrapper
@@ -235,9 +235,13 @@ class Document extends React.Component {
               name="md-checkbox-outline"
               size={Layout.icon.default}
               color={Prepared === 'O' ? "green" : Colors.thirdColor}
-              onPress={(Prepared === 'O' && !isEdited) ? () => {} : this.onPrepare}
+              onPress={Locked === 'O' || (Prepared === 'O' && !isEdited) ? () => {} : this.onPrepare}
             />
-            {Reviewed === 'O' || (Prepared === 'O' && !isEdited) ? undefined :
+            {Locked === 'O' ? 
+            <Icons
+              name="md-lock"
+              size={Layout.icon.default}
+            /> : (Reviewed === 'O' || (Prepared === 'O' && !isEdited)) ? undefined :
             <Icons
               name="md-create"
               size={Layout.icon.default}
