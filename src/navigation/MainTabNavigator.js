@@ -7,6 +7,7 @@ import TabBarIcon from '../components/TabBarIcon';
 
 import HomeScreen from '../screens/HomeScreen';
 import AddFileScreen from '../screens/AddFileScreen';
+import AddPictureScreen from '../screens/AddPictureScreen';
 import BusinessScreen from '../screens/BusinessScreen';
 import DocsScreen from '../screens/DocsScreen';
 import PdfScreen from '../screens/PdfScreen';
@@ -35,7 +36,8 @@ const BusinessStack = createStackNavigator({
   Business: BusinessScreen,
   Docs: DocsScreen,
   Pdf: PdfScreen,
-  Add: AddFileScreen
+  AddDoc: AddFileScreen,
+  AddPic: AddPictureScreen
 });
 
 BusinessStack.navigationOptions = {

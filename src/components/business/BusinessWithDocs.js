@@ -58,6 +58,10 @@ const Section = styled(Text)`
   flex-grow: 1;
 `;
 
+const IconView = styled(View)`
+  flex-direction: row;
+`;
+
 const Icons = styled(Ionicons)`
   padding: 0 ${Layout.space.medium};
 `;
@@ -228,12 +232,20 @@ class BusinessWithDocs extends React.Component {
             onPress={this.toggleRea}
           />
           <Section onPress={this.toggleRea} >Réalisation</Section>
-          <Icons
-            name={"md-add"}
-            size={Layout.icon.default}
-            color={Colors.mainColor}
-            onPress={() => navigation.navigate('Add', { affaire: title })}
-          />
+          <IconView>
+            <Icons
+              name={"md-camera"}
+              size={Layout.icon.default}
+              color={Colors.mainColor}
+              onPress={() => navigation.navigate('AddPic', { affaire: title }) }
+            />
+            <Icons
+              name={"md-add"}
+              size={Layout.icon.default}
+              color={Colors.mainColor}
+              onPress={() => navigation.navigate('AddDoc', { affaire: title })}
+            />
+          </IconView>
         </SectionWrapper>
         {this.state.showRea && this.displayRea()}
       </BusinessWrapper>
