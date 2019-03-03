@@ -23,7 +23,7 @@ const Title = styled(Text)`
 `
 
 
-const HeaderTitle = ({ title, noLogo = false }) => {
+const HeaderTitle = ({ title, noLogo }) => {
   const displayTitle = title.length > 25 ? title.substring(0, 25) + '(...)' : title
   return (
     <Wrapper> 
@@ -37,11 +37,13 @@ const HeaderTitle = ({ title, noLogo = false }) => {
 }
 
 HeaderTitle.propTypes = {
-  title: PropTypes.string
+  title: PropTypes.string,
+  noLogo: PropTypes.bool
 }
 
 HeaderTitle.defaultProps = {
-  title: ''
+  title: '',
+  noLogo: false
 }
 
 export default HeaderTitle;

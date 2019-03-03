@@ -20,6 +20,7 @@ import Folder from '../constants/Folder'
 
 import { editFile } from '../redux/actions/user'
 import { addNewDoc } from '../redux/actions/business'
+import Sentry from '../services/sentry'
 
 const { width, height } = Dimensions.get('window');
 const rootDir = RNFS.DocumentDirectoryPath;
@@ -126,7 +127,7 @@ const checkAccess = async () => {
         )
       }
     } catch (err) {
-      console.warn(err);
+      Sentry.captureMessage(err, { func: 'checkAccessCAMERA', doc: 'AddPictureScreen.js' });
     }
   }
 }
@@ -162,13 +163,7 @@ class AddPictureScreen extends React.Component {
       chooseFromLibraryButtonTitle: 'Choisir une photo dans la galerie...',
     };
     ImagePicker.showImagePicker(options, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      } else {
+      if (!response.didCancel && !response.error) {
         const now = new Date();
         const date = now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '.' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '.' + now.getFullYear()
         this.setState({
@@ -240,11 +235,11 @@ class AddPictureScreen extends React.Component {
             return this.props.addNewDoc(newDoc)
           })
           .catch(e => {
-            console.log({ copyFile: e })
+            Sentry.captureException(e, { func: 'copyFile', doc: 'AddPictureScreen.js' })
             this.setState({ creatingFile: false })
           })))
       .catch((e) => {
-        console.log({ onCreatePicture: e })
+        Sentry.captureException(e, { func: 'onCreatePicture', doc: 'AddPictureScreen.js' })
         this.setState({ creatingFile: false })
       })
   }

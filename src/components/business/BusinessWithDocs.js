@@ -263,6 +263,17 @@ BusinessWithDocs.propTypes = {
   downloadBusiness: PropTypes.func.isRequired,
   userId: PropTypes.string.isRequired,
   navigation: PropTypes.object.isRequired,
+  isConnected: PropTypes.bool.isRequired,
+  affaires: PropTypes.array.isRequired,
+  modeleDownloaded: PropTypes.string.isRequired,
+  editedDocs: PropTypes.array.isRequired,
+  subFolder: PropTypes.array.isRequired,
+  uploadingFile: PropTypes.func.isRequired,
+  uploadingDocs: PropTypes.array.isRequired,
+  mssqlConnected: PropTypes.bool.isRequired,
+  createFile: PropTypes.func.isRequired,
+  uploadFile: PropTypes.func.isRequired,
+  name: PropTypes.string.isRequired
 }
 
 BusinessWithDocs.defaultProps = {

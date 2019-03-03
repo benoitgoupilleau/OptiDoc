@@ -1,5 +1,6 @@
 import MSSQL from '../../services/mssql';
 import Tables from '../../constants/Tables';
+import Sentry from '../../services/sentry'
 
 import {
   SET_DOCS,
@@ -16,7 +17,7 @@ import {
 
 export const getDocs = (editedDocs) => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_docs}`)
   .then((res) => dispatch(setDocs(editedDocs, res)))
-  .catch(e => console.log({ getDocs: e }))
+  .catch(e => Sentry.captureException(e, { func: 'getDocs', doc: 'businessActions' }))
 
 const setDocs = (editedDocs, docs) => ({
   type: SET_DOCS,
@@ -31,7 +32,7 @@ export const addDoc = (doc) => ({
 
 export const getModeles = () => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_modeles}`)
   .then((res) => dispatch(setModeles(res)))
-  .catch(e => console.log({ getModeles: e }))
+  .catch(e => Sentry.captureException(e, { func: 'getModeles', doc: 'businessActions' }))
 
 const setModeles = (modeles) => ({
   type: SET_MODELES,
@@ -48,7 +49,7 @@ export const updatePrepared = (fileId, Prepared, PreparedOn, PreparedBy) => ({
 
 export const getBusiness = () => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_business}`)
   .then((res) => dispatch(setBusiness(res)))
-  .catch(e => console.log({ getBusiness: e }))
+  .catch(e => Sentry.captureException(e, { func: 'getBusiness', doc: 'businessActions' }))
 
 const setBusiness = (business) => ({
   type: SET_BUSINESS,
@@ -67,7 +68,7 @@ export const removeNewDoc = id => ({
 
 export const getAffaires = () => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_affaires}`)
   .then((res) => dispatch(setAffaires(res)))
-  .catch(e => console.log({ getAffaires: e }))
+  .catch(e => Sentry.captureException(e, { func: 'getAffaires', doc: 'businessActions' }))
 
 const setAffaires = (affaires) => ({
   type: SET_AFFAIRES,
@@ -76,7 +77,7 @@ const setAffaires = (affaires) => ({
 
 export const getArbo = () => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_arbo}`)
   .then((res) => dispatch(setArbo(res)))
-  .catch(e => console.log({ getArbo: e }))
+  .catch(e => Sentry.captureException(e, { func: 'getArbo', doc: 'businessActions' }))
 
 const setArbo = (subFolder) => ({
   type: SET_ARBO,

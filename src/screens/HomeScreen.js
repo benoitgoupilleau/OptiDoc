@@ -54,7 +54,7 @@ class HomeScreen extends React.Component {
       this.props.getAffaires()
       this.props.getArbo()
     }
-    if (this.props.modeleDownloaded !== 'in progress' && this.props.isConnected) {
+    if (this.props.modeleDownloaded !== 'in progress' && this.props.mssqlConnected) {
       this.props.downloadModels(this.props.modeleDocs);
     }
   }
@@ -125,6 +125,15 @@ HomeScreen.propTypes = {
   refreshNews: PropTypes.func.isRequired,
   loaded: PropTypes.bool.isRequired,
   mssqlConnected: PropTypes.bool.isRequired,
+  getBusiness: PropTypes.func.isRequired,
+  getModeles: PropTypes.func.isRequired,
+  getUser: PropTypes.func.isRequired,
+  getAffaires: PropTypes.func.isRequired,
+  getArbo: PropTypes.func.isRequired,
+  downloadModels: PropTypes.func.isRequired,
+  modeleDocs: PropTypes.array.isRequired,
+  editedDocs: PropTypes.array.isRequired,
+  modeleDownloaded: PropTypes.string.isRequired,
 }
 
 

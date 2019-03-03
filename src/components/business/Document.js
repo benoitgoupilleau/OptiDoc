@@ -11,6 +11,7 @@ import { withNavigation } from 'react-navigation';
 import { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, editPrepare, removePrepare, createFile } from '../../redux/actions/user'
 import { updatePrepared, removeNewDoc } from '../../redux/actions/business';
 import { openFile } from '../../services/openfile'
+import Sentry from '../../services/sentry';
 
 import Layout from '../../constants/Layout';
 import Folder from '../../constants/Folder';
@@ -151,7 +152,7 @@ class Document extends React.Component {
       try {
         await RNFS.unlink(externalPath)
       } catch (error) {
-        console.log({removeWoPFile: error })
+        Sentry.captureException(error, { func: 'removeWoPFile', doc: 'Document.js' })
       }
     }
   }
@@ -169,7 +170,7 @@ class Document extends React.Component {
               navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type, isEdited, Prepared, Reviewed, isPrepared, Locked })
             )
           )
-          .catch((e) => console.log({e}))
+          .catch((e) => Sentry.captureException(e, { func: 'onOpenFile', doc: 'Document.js'}))
       } else {
         return navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type, isEdited, Prepared, Reviewed, isPrepared, Locked })
       } 
@@ -278,7 +279,18 @@ Document.propTypes = {
   removeFromEdit: PropTypes.func.isRequired,
   downLoadOneFile: PropTypes.func.isRequired,
   isNew: PropTypes.bool,
-  isDownloaded: PropTypes.bool
+  isDownloaded: PropTypes.bool,
+  Reviewed: PropTypes.string.isRequired,
+  Prepared: PropTypes.string.isRequired,
+  Locked: PropTypes.string.isRequired,
+  isConnected: PropTypes.bool.isRequired,
+  mssqlConnected: PropTypes.bool.isRequired,
+  modeleDownloaded: PropTypes.string.isRequired,
+  updatePrepared: PropTypes.func.isRequired,
+  removeNewDoc: PropTypes.func.isRequired,
+  editPrepare: PropTypes.func.isRequired,
+  removePrepare: PropTypes.func.isRequired,
+  createFile: PropTypes.func.isRequired,
 }
 
 Document.defaultProps = {

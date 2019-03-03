@@ -11,13 +11,14 @@ import networkReducer from '../reducers/network'
 import teamReducer from '../reducers/team';
 import userReducer from '../reducers/user';
 import businessReducer from '../reducers/business';
+import Sentry from '../../services/sentry'
 
 const composeEnhancers = ENV && ENV === 'dev' ? (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose) : compose;
 
 const encryptor = createEncryptor({
   secretKey: PERSIST_KEY,
   onError: function (error) {
-    console.log(error)
+    Sentry.captureException(error, { func: 'encryptor', doc: 'store.js'})
   }
 })
 

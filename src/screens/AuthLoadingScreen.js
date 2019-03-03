@@ -8,6 +8,7 @@ import { connectDbOut, connectDbHome } from '../redux/actions/network';
 import { getUser } from '../redux/actions/team'
 import { getDocs } from '../redux/actions/business'
 import { downloadModels } from '../redux/actions/user'
+import Sentry from '../services/sentry'
 
 const checkAccess = async () => {
   const isAuthorised = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
@@ -37,7 +38,7 @@ const checkAccess = async () => {
         )
       }
     } catch (err) {
-      console.warn(err);
+      Sentry.captureMessage(err, { func: 'checkAccessWRITE_EXTERNAL_STORAGE', doc: 'AuthLoadingScreen.js' });
     }
   }
 }
@@ -85,6 +86,13 @@ AuthLoadingScreen.propTypes = {
   mssqlConnected: PropTypes.bool.isRequired,
   mssqlConnectionFailed: PropTypes.bool.isRequired,
   connectDbOut: PropTypes.func.isRequired,
+  usersLoaded: PropTypes.bool.isRequired,
+  connectDbHome: PropTypes.func.isRequired,
+  connectedHome: PropTypes.bool.isRequired,
+  getUser: PropTypes.func.isRequired,
+  downloadModels: PropTypes.func.isRequired,
+  modeleDocs: PropTypes.array.isRequired,
+  editedDocs: PropTypes.array.isRequired,
 }
 
 const mapStateToProps = state => ({

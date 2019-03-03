@@ -35,7 +35,7 @@ class BusinessScreen extends React.Component {
 
   componentDidMount() {
     Orientation.lockToPortrait();
-    if (this.props.modeleDownloaded !== 'in progress' && this.props.isConnected) {
+    if (this.props.modeleDownloaded !== 'in progress' && this.props.mssqlConnected) {
       this.props.downloadModels(this.props.modeleDocs);
     }
   }
@@ -65,7 +65,7 @@ BusinessScreen.propTypes = {
   businesses: PropTypes.array.isRequired,
   docs: PropTypes.object.isRequired,
   newDocs: PropTypes.object.isRequired,
-  isConnected: PropTypes.bool.isRequired,
+  mssqlConnected: PropTypes.bool.isRequired,
   modeleDownloaded: PropTypes.string.isRequired,
   modeleDocs: PropTypes.array.isRequired,
   downloadModels: PropTypes.func.isRequired
@@ -81,7 +81,7 @@ const mapStateToProps = ({ user, business, network }) => {
     docs,
     newDocs,
     modeleDownloaded: user.modeleDownloaded,
-    isConnected: network.isConnected,
+    mssqlConnected: network.mssqlConnected,
     modeleDocs: business.docs.filter(d => (d.Dossier1 && d.Dossier1 === 'Modele')),
   })
 }

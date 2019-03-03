@@ -132,6 +132,11 @@ Business.propTypes = {
   downloadBusiness: PropTypes.func.isRequired,
   userId: PropTypes.string.isRequired,
   navigation: PropTypes.object.isRequired,
+  nbDocBusiness: PropTypes.number.isRequired,
+  totalDocBusiness: PropTypes.number.isRequired,
+  isConnected: PropTypes.bool.isRequired,
+  modeleDownloaded: PropTypes.string.isRequired,
+  affaires: PropTypes.array.isRequired
 }
 
 Business.defaultProps = {

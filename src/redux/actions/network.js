@@ -5,6 +5,7 @@ import {
   MSSQL_CONNECTED,
   MSSQL_FAILED,
 } from './types';
+import Sentry from '../../services/sentry'
 
 export const connectDbOut = () => dispatch => MSSQL.connect(configOut)
   .then(() => {
@@ -12,7 +13,7 @@ export const connectDbOut = () => dispatch => MSSQL.connect(configOut)
     return dispatch(dbSuccess(false))
   })
   .catch(e => {
-    console.log({ connectDbOut: e })
+    Sentry.captureException(e, { func: 'connectDbOut', doc: 'networkActions' })
     return dispatch(dbFailed())
   })
 
@@ -22,7 +23,7 @@ export const connectDbHome = () => dispatch => MSSQL.connect(configHome)
     return dispatch(dbSuccess(true))
   })
   .catch(e => {
-    console.log({ connectDbHome: e })
+    Sentry.captureException(e, { func: 'connectDbHome', doc: 'networkActions' })
     return dispatch(dbFailed())
   })
 
@@ -42,7 +43,7 @@ export const switchDb = (connectHome = false) => dispatch => MSSQL.close()
       })
   })
   .catch(e => {
-    console.log({ switchDb: e })
+    Sentry.captureException(e, { func: 'switchDb', doc: 'networkActions' })
     return dispatch(dbFailed())
   })
 

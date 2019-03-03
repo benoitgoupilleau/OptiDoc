@@ -126,6 +126,13 @@ Logout.propTypes = {
   getBusiness: PropTypes.func.isRequired,
   getModeles: PropTypes.func.isRequired,
   getUser: PropTypes.func.isRequired,
+  getAffaires: PropTypes.func.isRequired,
+  getArbo: PropTypes.func.isRequired,
+  editedDocs: PropTypes.array.isRequired,
+  connectedHome: PropTypes.bool.isRequired,
+  loadingBusiness: PropTypes.array.isRequired,
+  uploadingDocs: PropTypes.array.isRequired,
+  switchDb: PropTypes.func.isRequired,
 }
 
 Logout.defaultProps = {

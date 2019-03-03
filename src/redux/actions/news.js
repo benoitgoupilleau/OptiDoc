@@ -1,5 +1,6 @@
 import MSSQL from '../../services/mssql';
 import Tables from '../../constants/Tables';
+import Sentry from '../../services/sentry'
 
 import {
   SET_NEWS,
@@ -9,7 +10,7 @@ import {
 
 export const getNews = () => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_news}`)
   .then((res) => dispatch(setNews(res)))
-  .catch(e => console.log({ getNews: e }))
+  .catch(e => Sentry.captureException(e, { func: 'getNews', doc: 'newsActions' }))
   
 const setNews = (news) => ({
   type: SET_NEWS,

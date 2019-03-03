@@ -73,6 +73,19 @@ class OfflineNotice extends PureComponent {
   }
 }
 
+OfflineNotice.propTypes = {
+  isConnected: PropTypes.bool.isRequired,
+  mssqlFailed: PropTypes.bool.isRequired,
+  connectivityChange: PropTypes.func.isRequired,
+  connectDbOut: PropTypes.func.isRequired,
+  connectedHome: PropTypes.bool.isRequired,
+  modeleDownloaded: PropTypes.string.isRequired,
+  nbDownloaded: PropTypes.number.isRequired,
+  totalModeles: PropTypes.number.isRequired,
+  mssqlConnected: PropTypes.bool.isRequired,
+  connectDbHome: PropTypes.func.isRequired,
+}
+
 const mapStateToProps = state => ({
   isConnected: state.network.isConnected,
   mssqlFailed: state.network.mssqlConnectionFailed,
@@ -82,13 +95,5 @@ const mapStateToProps = state => ({
   totalModeles: state.user.totalModeles,
   connectedHome: state.network.connectedHome
 })
-
-OfflineNotice.propTypes = {
-  isConnected: PropTypes.bool.isRequired,
-  mssqlFailed: PropTypes.bool.isRequired,
-  connectivityChange: PropTypes.func.isRequired,
-  connectDbOut: PropTypes.func.isRequired,
-}
-
 
 export default connect(mapStateToProps, { connectivityChange, connectDbOut, connectDbHome })(OfflineNotice);

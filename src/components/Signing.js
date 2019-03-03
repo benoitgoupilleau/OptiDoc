@@ -170,6 +170,13 @@ Signin.propTypes = {
   login: PropTypes.func.isRequired,
   locked: PropTypes.bool.isRequired,
   isConnected: PropTypes.bool.isRequired,
+  connectedHome: PropTypes.bool.isRequired,
+  switchDb: PropTypes.func.isRequired,
+  getUser: PropTypes.func.isRequired,
+  mssqlConnected: PropTypes.bool.isRequired,
+  users: PropTypes.array.isRequired,
+  userName: PropTypes.string.isRequired,
+  usersLoaded: PropTypes.bool.isRequired
 }
 
 const mapStateToProps = state => ({

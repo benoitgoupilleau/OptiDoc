@@ -1,9 +1,10 @@
 import React from 'react';
 import RNFS from 'react-native-fs';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import Orientation from 'react-native-orientation';
 import { Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
-import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
+import { PDFDocument, PDFPage } from 'react-native-pdf-lib';
 import styled from 'styled-components'
 import { EXTERNAL_PATH } from 'react-native-dotenv';
 
@@ -15,6 +16,7 @@ import Modele from '../components/business/Modele';
 import Layout from '../constants/Layout'
 import Colors from '../constants/Colors'
 import Folder from '../constants/Folder'
+import Sentry from '../services/sentry'
 
 import { editFile, downloadModels } from '../redux/actions/user'
 import { addNewDoc } from '../redux/actions/business'
@@ -108,7 +110,7 @@ class AddFileScreen extends React.Component {
 
   componentDidMount() {
     Orientation.lockToPortrait();
-    if (this.props.modeleDownloaded !== 'in progress' && this.props.isConnected) {
+    if (this.props.modeleDownloaded !== 'in progress' && this.props.mssqlConnected) {
       this.props.downloadModels(this.props.modeleDocs);
     }
   }
@@ -193,16 +195,16 @@ class AddFileScreen extends React.Component {
                 return this.props.addNewDoc(newDoc)
               })
               .catch(e => {
-                console.log({ modifyPages: e})
+                Sentry.captureException(e, { func: 'modifyPages', doc: 'AddFileScreen.js' })
                 this.setState({creatingFile: false})
               })
           })
           .catch(e => {
-            console.log({ copyFile: e})
+            Sentry.captureException(e, { func: 'copyFile', doc: 'AddFileScreen.js' })
             this.setState({creatingFile: false})
           }))
         .catch((e) => {
-          console.log({ onCreateFile: e})
+          Sentry.captureException(e, { func: 'onCreateFile', doc: 'AddFileScreen.js' })
           this.setState({creatingFile: false})
         })
     }
@@ -259,10 +261,23 @@ class AddFileScreen extends React.Component {
   }
 }
 
+AddFileScreen.propTypes = {
+  navigation: PropTypes.object.isRequired,
+  affaires: PropTypes.array.isRequired,
+  user: PropTypes.object.isRequired,
+  editFile: PropTypes.func.isRequired,
+  addNewDoc: PropTypes.func.isRequired,
+  downloadModels: PropTypes.func.isRequired,
+  modeles: PropTypes.array.isRequired,
+  modeleDownloaded: PropTypes.string.isRequired,
+  modeleDocs: PropTypes.array.isRequired,
+  mssqlConnected: PropTypes.bool.isRequired
+}
+
 const mapStateToProps = state => ({
-  isConnected: state.network.isConnected,
   modeleDocs: state.business.docs.filter(d => (d.Dossier1 && d.Dossier1 === 'Modele')),
   modeles: state.business.modeles,
+  mssqlConnected: state.network.mssqlConnected,
   user: state.user,
   affaires: state.business.affaires,
   modeleDownloaded: state.user.modeleDownloaded

@@ -3,6 +3,7 @@ import FTP from '../../services/ftp';
 import { FTP_USERNAME, FTP_PASSWORD } from 'react-native-dotenv';
 import FileViewer from 'react-native-file-viewer';
 import MSSQL from '../../services/mssql';
+import Sentry from '../../services/sentry'
 
 import {
   LOGIN,
@@ -63,7 +64,7 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
               await FTP.downloadFile(`./${prep[i].ServerPath}`, `${rootDir}/${userId}/${businessId}/${Folder.prep}`)
             }
           } catch (error) {
-            console.log({ prepDoc: prep[i], "FTP.downloadFile": error })
+            Sentry.captureException(error, { prepDoc: prep[i], func: "FTP.downloadFile", doc: 'userActions' })
             return dispatch(cancelDownload(businessId))
           }
         }
@@ -79,7 +80,7 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
               await FTP.downloadFile(`./${rea[i].ServerPath}`, `${rootDir}/${userId}/${businessId}/${Folder.rea}`)
             }
           } catch (error) {
-            console.log({ reaDoc: rea[i], "FTP.downloadFile": error })
+            Sentry.captureException(error, { reaDoc: rea[i], func: "FTP.downloadFile", doc: 'userActions' })
             return dispatch(cancelDownload(businessId))
           }
         }
@@ -89,7 +90,7 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
       return dispatch(businessDownloaded(businessId))
     })
   ).catch(async (e) => {
-    console.log({ downloadBusiness: e})
+    Sentry.captureException(e, { func: 'downloadBusiness', doc: 'userActions' })
     isDownloadingFiles = false;
     await FTP.logout()  
     return dispatch(cancelDownload(businessId))
@@ -148,7 +149,7 @@ export const downloadModels = (modeleDocs) => dispatch => {
               await FTP.downloadFile(`./${modeleDocs[i].ServerPath}`, `${rootDir}/${Folder.modeleDocs}`)
             } catch (error) {
               await RNFS.unlink(`${rootDir}/${Folder.modeleDocs}/${modeleDocs[i].ID}.${modeleDocs[i].Extension}`)
-              console.log({ modeleDoc: modeleDocs[i], "FTP.downloadFile": error })
+              Sentry.captureException(error, { modeleDoc: modeleDocs[i], func: "FTP.downloadFile", doc: 'userActions' })
             }
           }
         }
@@ -160,7 +161,7 @@ export const downloadModels = (modeleDocs) => dispatch => {
     ).catch(async (e) => {
       dispatch(cancelDownloadModel())
       isDownloadingModeles = false;
-      console.log({ downloadModels: e })
+      Sentry.captureException(e, { func: 'downloadModels', doc: 'userActions' })
       return await FTP.logout()
     })
 }
@@ -198,7 +199,7 @@ export const uploadFile = (filePath, file, remoteDir) => async (dispatch) => FTP
     }))
   .catch((e) => {
     dispatch(cancelUploadingFile(file.ID))
-    console.log({ uploadFile: e })
+    Sentry.captureException(e, { func: 'uploadFile', doc: 'userActions' })
   })
 
 export const removeFromEdit = (id) => ({
@@ -228,5 +229,5 @@ export const createFile = (filePath, file, remoteDir) => async (dispatch) => FTP
     }))
   .catch((e) => {
     dispatch(cancelUploadingFile(file.ID))
-    console.log({ createFile: e })
+    Sentry.captureException(e, { func: 'createFile', doc: 'userActions' })
   })
