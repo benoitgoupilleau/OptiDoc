@@ -49,6 +49,7 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
     return dispatch(cancelDownload(businessId))
   }
   isDownloadingFiles = true;
+  dispatch(downloading(businessId, 0, 0))
   return RNFS.mkdir(`${rootDir}/${userId}/${businessId}`)
     .then(() => FTP.login(FTP_USERNAME, FTP_PASSWORD).then(async () => {
       const total = prep.length + rea.length;

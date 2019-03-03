@@ -49,7 +49,7 @@ class Business extends React.Component {
     if (loadingBusiness.includes(title)) {
       return (
         <View>
-          <Text>{nbDocBusiness}/{totalDocBusiness}</Text>
+          {totalDocBusiness > 0 && <Text>{nbDocBusiness}/{totalDocBusiness}</Text>}
           <ActivityIndicator />
         </View>)
     } else if (downloadedBusiness.includes(title)) {

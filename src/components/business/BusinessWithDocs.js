@@ -66,6 +66,10 @@ const Icons = styled(Ionicons)`
   padding: 0 ${Layout.space.medium};
 `;
 
+const AddIcons = styled(Icons)`
+  padding: 0 ${Layout.space.large};
+`;
+
 const checkIfNew = (docs, id) => {
   const doc = docs.filter(d => d.ID === id)
   if (doc.length > 0 && !!doc[0].isNew) {
@@ -233,15 +237,15 @@ class BusinessWithDocs extends React.Component {
           />
           <Section onPress={this.toggleRea} >Réalisation</Section>
           <IconView>
-            <Icons
+            <AddIcons
               name={"md-camera"}
-              size={Layout.icon.default}
+              size={Layout.icon.large}
               color={Colors.mainColor}
               onPress={() => navigation.navigate('AddPic', { affaire: title }) }
             />
-            <Icons
+            <AddIcons
               name={"md-add"}
-              size={Layout.icon.default}
+              size={Layout.icon.large}
               color={Colors.mainColor}
               onPress={() => navigation.navigate('AddDoc', { affaire: title })}
             />
