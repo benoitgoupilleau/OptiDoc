@@ -231,14 +231,14 @@ class Document extends React.Component {
                   color={Colors.secondColor}
                   onPress={this.onUpload}
                 /> : <ActivityIndicator style={{ paddingLeft: 10, paddingRight: 10 }}/>}
+                <Icons
+                  name="md-checkbox-outline"
+                  size={Layout.icon.default}
+                  color={Prepared === 'O' ? "green" : Colors.thirdColor}
+                  onPress={Locked === 'O' || (Prepared === 'O' && !isEdited) ? () => { } : this.onPrepare}
+                />
               </EditIcons>
             )}
-            <Icons
-              name="md-checkbox-outline"
-              size={Layout.icon.default}
-              color={Prepared === 'O' ? "green" : Colors.thirdColor}
-              onPress={Locked === 'O' || (Prepared === 'O' && !isEdited) ? () => {} : this.onPrepare}
-            />
             {Locked === 'O' ? 
             <Icons
               name="md-lock"

@@ -80,7 +80,7 @@ export default (state = defaultState, action) => {
     case LOGOUT:
       return {
         ...state,
-        ...omit(defaultState, ['userName', 'downloadedBusiness'])
+        ...omit(defaultState, ['userName', 'downloadedBusiness', 'editedDocs'])
       }
     case DOWNLOADING_BUSINESS: {
       const currentBusiness = state.loadingBusiness.includes(action.id) ? [...state.loadingBusiness] : [...state.loadingBusiness, action.id];
