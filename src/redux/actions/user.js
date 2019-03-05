@@ -192,12 +192,13 @@ export const cancelUploadingFile = (fileId) => ({
 })
 
 export const uploadFile = (filePath, file, remoteDir) => async (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
-  .then(() => FTP.uploadFile(filePath, remoteDir)
-    .then(() => {
-      //MSSQL update
-      return MSSQL.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}', Locked='N' WHERE ID='${file.ID}'`)
-        .then(() => dispatch(removeFromEdit(file.ID)))
-    }))
+  .then(() => FTP.makedir(filePath)
+    .then(() => FTP.uploadFile(filePath, remoteDir)
+      .then(() => {
+        //MSSQL update
+        return MSSQL.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}', Locked='N' WHERE ID='${file.ID}'`)
+          .then(() => dispatch(removeFromEdit(file.ID)))
+      })))
   .catch((e) => {
     dispatch(cancelUploadingFile(file.ID))
     Sentry.captureException(e, { func: 'uploadFile', doc: 'userActions' })
