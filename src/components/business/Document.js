@@ -52,6 +52,14 @@ const Icons = styled(Ionicons)`
 `;
 
 class Document extends React.Component {
+  state = {
+    isDownloaded: false,
+  }
+
+  componentDidMount() {
+    this.checkIfDownloaded();
+  }
+
   onEdit = async () => {
     const { type, ID, Extension, Dossier1, userId, loadingBusiness, prep, rea, editedDocs, Dossier3 } = this.props;
     const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
@@ -206,22 +214,30 @@ class Document extends React.Component {
     }
   }
 
-  displayLeftIcon = async () => {
+  checkIfDownloaded = async () => {
     const { ID, Extension, Dossier1, Dossier2, userId } = this.props;
-    const isDownloaded = await RNFS.exists(`${rootDir}/${userId}/${Dossier1}/${Dossier2}/${ID}.${Extension}`)
+    const filepath = `${rootDir}/${userId}/${Dossier1}/${Dossier2}/${ID}.${Extension}`
+    const isDownloaded = await RNFS.exists(filepath)
+    this.setState({ isDownloaded })
+  }
+
+  displayLeftIcon = () => {
+    const { ID, loadingFiles } = this.props;
+    const isDownloaded = this.state.isDownloaded
     if (!isDownloaded || this.props.fileToDownload.includes(ID)) {
       return (
-        this.props.loadingFiles.includes(ID) ? 
+        loadingFiles.includes(ID) ? 
           <ActivityIndicator style={{ paddingLeft: 10, paddingRight: 10 }} />
         :
           <Icons
             name={'md-cloud-download'}
             size={Layout.icon.small}
+            color={Colors.secondColor}
             onPress={() => this.onDownloadFile()}
           />
       )
     }
-    return null;
+    return undefined;
   }
 
   render() {
@@ -251,7 +267,7 @@ class Document extends React.Component {
                   size={Layout.icon.default}
                   color={Colors.secondColor}
                   onPress={this.onUpload}
-                /> : <ActivityIndicator style={{ paddingLeft: 10, paddingRight: 10 }}/>}
+                /> : <ActivityIndicator style={{ paddingLeft: 5, paddingRight: 5 }}/>}
                 <Icons
                   name="md-checkbox-outline"
                   size={Layout.icon.default}
