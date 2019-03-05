@@ -64,7 +64,7 @@ class Logout extends React.Component {
   refreshData = () => {
     this.setState({ refreshing: true})
     this.props.getNews()
-    this.props.getDocs(this.props.editedDocs)
+    this.props.getDocs(this.props.docs, this.props.downloadedBusiness, this.props.editedDocs)
     this.props.getAffaires()
     this.props.getArbo()
     this.props.getBusiness();
@@ -113,7 +113,9 @@ Logout.propTypes = {
   getArbo: PropTypes.func.isRequired,
   editedDocs: PropTypes.array.isRequired,
   loadingBusiness: PropTypes.array.isRequired,
-  uploadingDocs: PropTypes.array.isRequired
+  uploadingDocs: PropTypes.array.isRequired,
+  downloadedBusiness: PropTypes.array.isRequired,
+  docs: PropTypes.array.isRequired
 }
 
 Logout.defaultProps = {
@@ -124,6 +126,8 @@ const mapStateToProps = state => ({
   hasEditFiles: state.user.editedDocs.length > 0,
   userId: state.user.id,
   editedDocs: state.user.editedDocs,
+  docs: state.business.docs,
+  downloadedBusiness: state.user.downloadedBusiness,
   loadingBusiness: state.user.loadingBusiness,
   uploadingDocs: state.user.uploadingDocs
 })

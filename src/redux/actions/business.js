@@ -12,17 +12,41 @@ import {
   ADD_DOC,
   SET_AFFAIRES,
   SET_ARBO,
+  SET_DOCS_TO_DOWNLOAD
 } from './types';
 
 
-export const getDocs = (editedDocs) => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_docs}`)
-  .then((res) => dispatch(setDocs(editedDocs, res)))
+export const getDocs = (currentDocs, downloadedAffaire, editedDocs) => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_docs}`)
+  .then((res) => {
+    const fileToDownload = [];
+    for (let i = 0; i < downloadedAffaire.length; i++) {
+      const currentBusinessFile = currentDocs.filter(c => c.Dossier1 === downloadedAffaire[i]);
+      const newBusinessFile = res.filter(c => c.Dossier1 === downloadedAffaire[i]);
+      for (let j = 0; j < newBusinessFile.length; j++) {
+        const indexDoc = currentBusinessFile.findIndex(d => d.ID === newBusinessFile[i].ID)
+        if (indexDoc > -1) {
+          if (currentBusinessFile[indexDoc].UpLoadedOn < newBusinessFile[i].UpLoadedOn) {
+            fileToDownload.push(newBusinessFile[i].ID)
+          }
+        }
+      }
+    }
+    if (fileToDownload.length > 0) {
+      dispatch(setDocsToDownload(fileToDownload))
+    }
+    return dispatch(setDocs(editedDocs, res))
+  })
   .catch(e => Sentry.captureException(e, { func: 'getDocs', doc: 'businessActions' }))
 
 const setDocs = (editedDocs, docs) => ({
   type: SET_DOCS,
   docs,
   editedDocs
+})
+
+const setDocsToDownload = (fileToDownload) => ({
+  type: SET_DOCS_TO_DOWNLOAD,
+  fileToDownload
 })
 
 export const addDoc = (doc) => ({

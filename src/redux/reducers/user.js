@@ -18,7 +18,8 @@ import {
   CANCEL_UPLOAD,
   CANCEL_DOWNLOAD_FILE,
   FILE_DOWNLOADED,
-  DOWNLOADING_FILE
+  DOWNLOADING_FILE,
+  SET_DOCS_TO_DOWNLOAD
 } from '../actions/types';
 
 const defaultState = {
@@ -142,6 +143,13 @@ export default (state = defaultState, action) => {
         ...state,
         loadingFiles: [...downloading.slice(0, indexToRemove), ...downloading.slice(indexToRemove + 1)],
         fileToDownload: leftToDownload
+      }
+    }
+    case SET_DOCS_TO_DOWNLOAD: {
+      const currentFiles = [...state.fileToDownload]
+      return {
+        ...state,
+        fileToDownload: [...currentFiles, ...action.fileToDownload]
       }
     }
     case EDIT_FILE: {
