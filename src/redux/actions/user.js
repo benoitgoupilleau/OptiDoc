@@ -18,7 +18,10 @@ import {
   REMOVE_EDIT_FILE,
   UPLOADING_FILE,
   CANCEL_UPLOAD,
-  REMOVE_EDIT_PREPARE
+  REMOVE_EDIT_PREPARE,
+  CANCEL_DOWNLOAD_FILE,
+  FILE_DOWNLOADED,
+  DOWNLOADING_FILE
 } from './types';
 
 import { removeNewDoc, addDoc } from './business'
@@ -43,6 +46,41 @@ export const login = (userName, user, bearerToken) => ({
 export const logout = () => ({
   type: LOGOUT
 });
+
+export const downLoadOneFile = (id, serverPath, localPath) => dispatch => {
+  if (isDownloadingFiles) {
+    return dispatch(cancelDownloadOneFile(id))
+  }
+  return FTP.login(FTP_USERNAME, FTP_PASSWORD)
+    .then(() => {
+      dispatch(downloadingFile(id))
+      return FTP.downloadFile(serverPath, localPath).then(async () => {
+        await FTP.logout()
+        return dispatch(fileDownloaded(id))
+      })
+    })
+    .catch(async (e) => {
+      Sentry.captureException(e, { func: 'downLoadOneFile', doc: 'userActions' })
+      isDownloadingFiles = false;
+      await FTP.logout()
+      return dispatch(cancelDownloadOneFile(id))
+    })
+}
+
+const downloadingFile = (id) => ({
+  type: DOWNLOADING_FILE,
+  id
+})
+
+const cancelDownloadOneFile = (id) => ({
+  type: CANCEL_DOWNLOAD_FILE,
+  id
+});
+
+const fileDownloaded = (id) => ({
+  type: FILE_DOWNLOADED,
+  id
+})
 
 export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
   if (isDownloadingModeles) {
@@ -90,12 +128,12 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
       await FTP.logout()
       return dispatch(businessDownloaded(businessId))
     })
-  ).catch(async (e) => {
-    Sentry.captureException(e, { func: 'downloadBusiness', doc: 'userActions' })
-    isDownloadingFiles = false;
-    await FTP.logout()  
-    return dispatch(cancelDownload(businessId))
-  })
+    ).catch(async (e) => {
+      Sentry.captureException(e, { func: 'downloadBusiness', doc: 'userActions' })
+      isDownloadingFiles = false;
+      await FTP.logout()
+      return dispatch(cancelDownload(businessId))
+    })
 }
 
 const cancelDownload = (id) => ({
@@ -208,13 +246,6 @@ export const removeFromEdit = (id) => ({
   type: REMOVE_EDIT_FILE,
   id
 })
-
-export const downLoadOneFile = (serverPath, localPath) => async () => {
-  await FTP.login(FTP_USERNAME, FTP_PASSWORD);
-  await FTP.downloadFile(serverPath,localPath)
-  await FTP.logout()
-  return true
-}
 
 export const createFile = (filePath, file, remoteDir) => async (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
   .then(() => FTP.uploadFile(filePath, remoteDir)

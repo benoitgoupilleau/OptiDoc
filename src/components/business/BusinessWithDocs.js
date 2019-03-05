@@ -177,7 +177,7 @@ class BusinessWithDocs extends React.Component {
   }
 
   displayPrep = () => {
-    const { title, prep, rea, downloadedBusiness, subFolder } = this.props;
+    const { prep, rea, subFolder } = this.props;
     const listArbo = [];
     for (let i = 0; i < prep.length; i++) {
       const indexArbo = listArbo.findIndex(a => (a.NomDossier === prep[i].Dossier3 && a.Etape === 'Preparation'))
@@ -188,12 +188,12 @@ class BusinessWithDocs extends React.Component {
     }
     listArbo.sort((a, b) => (a.NomDossier > b.NomDossier ? 1 : -1));
     return listArbo.map(arbo => <SubArbo key={'Prep' + arbo.NomDossier} title={arbo.Designation}>{prep.filter(p => p.Dossier3 === arbo.NomDossier)
-      .map(p => <Document key={p.ID} {...p} type={Folder.prep} prep={prep} rea={rea} isDownloaded={downloadedBusiness.includes(title)}/>)}
+      .map(p => <Document key={p.ID} {...p} type={Folder.prep} prep={prep} rea={rea} />)}
       </SubArbo>)
   }
 
   displayRea = () => {
-    const { title, prep, rea, editedDocs, downloadedBusiness, subFolder } = this.props;
+    const { prep, rea, editedDocs, subFolder } = this.props;
     const listArbo = [];
     for (let i = 0; i < rea.length; i++) {
       const indexArbo = listArbo.findIndex(a => (a.NomDossier === rea[i].Dossier3 && a.Etape === 'Realisation'))
@@ -204,7 +204,7 @@ class BusinessWithDocs extends React.Component {
     }
     listArbo.sort((a, b) => (a.NomDossier > b.NomDossier ? 1 : -1));
     return listArbo.map(arbo => <SubArbo key={'Rea' + arbo.NomDossier} title={arbo.Designation}>{rea.filter(r => r.Dossier3 === arbo.NomDossier)
-      .map(r => <Document key={r.ID} isNew={checkIfNew(editedDocs, r.ID)} {...r} type={Folder.rea} prep={prep} rea={rea} isDownloaded={downloadedBusiness.includes(title)}/>)}
+      .map(r => <Document key={r.ID} isNew={checkIfNew(editedDocs, r.ID)} {...r} type={Folder.rea} prep={prep} rea={rea} />)}
       </SubArbo>)
   }
 
@@ -262,7 +262,6 @@ BusinessWithDocs.propTypes = {
   prep: PropTypes.array,
   rea: PropTypes.array,
   modeleDocs: PropTypes.array.isRequired,
-  downloadedBusiness: PropTypes.array.isRequired,
   loadingBusiness: PropTypes.array.isRequired,
   downloadBusiness: PropTypes.func.isRequired,
   userId: PropTypes.string.isRequired,
@@ -288,7 +287,6 @@ BusinessWithDocs.defaultProps = {
 const mapStateToProps = state => ({
   isConnected: state.network.isConnected,
   mssqlConnected: state.network.mssqlConnected,
-  downloadedBusiness: state.user.downloadedBusiness,
   loadingBusiness: state.user.loadingBusiness,
   nbDocBusiness: state.user.nbDocBusiness,
   uploadingDocs: state.user.uploadingDocs,

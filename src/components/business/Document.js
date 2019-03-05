@@ -159,9 +159,10 @@ class Document extends React.Component {
   }
 
   onOpenFile = async () => {
-    const { FileName, type, navigation, ID, Dossier3, Extension, Dossier1, isDownloaded, userId, prep, rea, loadingBusiness, editedDocs, Prepared, Reviewed, Locked} = this.props;
+    const { FileName, type, navigation, ID, Dossier3, Extension, Dossier1, Dossier2, userId, ServerPath, loadingBusiness, editedDocs, Prepared, Reviewed, Locked} = this.props;
     const isEdited = editedDocs.filter(e => e.ID === ID && !!e.editPath).length > 0;
     const isPrepared = editedDocs.filter(e => e.ID === ID && e.prepared).length > 0;
+    const isDownloaded = await RNFS.exists(`${rootDir}/${userId}/${Dossier1}/${Dossier2}/${ID}.${Extension}`)
     if (isDownloaded) {
       const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${ID}(0).${Extension}`);
       if (secondVersion && isEdited) {
@@ -180,16 +181,7 @@ class Document extends React.Component {
       if (this.props.modeleDownloaded === 'in progress') {
         return Alert.alert('Modèle en cours de téléchargement', 'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants', [{ text: 'Ok' }]);
       } else {
-        if (this.props.isConnected) {
-          this.props.downloadBusiness(userId, Dossier1, prep, rea)
-          return ToastAndroid.showWithGravity(
-            "Affaire en cours de téléchargement",
-            ToastAndroid.SHORT,
-            ToastAndroid.CENTER,
-          );
-        } else {
-          Alert.alert('Vous êtes en mode hors-ligne', 'Vous pourrez télécharger cette affaire une fois votre connexion rétablie', [{ text: 'Ok' }]);
-        }
+        this.onDownloadFile();
       }
     }
     return ToastAndroid.showWithGravity(
@@ -200,18 +192,47 @@ class Document extends React.Component {
     
   }
 
+  onDownloadFile = () => {
+    const { ID, Dossier1, Dossier2, userId, ServerPath } = this.props;
+    if (this.props.isConnected) {
+      this.props.downLoadOneFile(ID, ServerPath, `${rootDir}/${userId}/${Dossier1}/${Dossier2}`)
+      return ToastAndroid.showWithGravity(
+        "Fichier en cours de téléchargement",
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+    } else {
+      return Alert.alert('Vous êtes en mode hors-ligne', 'Vous pourrez télécharger cette affaire une fois votre connexion rétablie', [{ text: 'Ok' }]);
+    }
+  }
+
+  displayLeftIcon = async () => {
+    const { ID, Extension, Dossier1, Dossier2, userId } = this.props;
+    const isDownloaded = await RNFS.exists(`${rootDir}/${userId}/${Dossier1}/${Dossier2}/${ID}.${Extension}`)
+    if (!isDownloaded || this.props.fileToDownload.includes(ID)) {
+      return (
+        this.props.loadingFiles.includes(ID) ? 
+          <ActivityIndicator style={{ paddingLeft: 10, paddingRight: 10 }} />
+        :
+          <Icons
+            name={'md-cloud-download'}
+            size={Layout.icon.small}
+            onPress={() => this.onDownloadFile()}
+          />
+      )
+    }
+    return null;
+  }
+
   render() {
-    const { FileName, type, ID, Extension, editedDocs, uploadingDocs, Reviewed, Prepared, Locked } = this.props;
+    const { FileName, type, ID, editedDocs, uploadingDocs, Reviewed, Prepared, Locked } = this.props;
     const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
     return (
       <DocumentWrapper
         onPress={this.onOpenFile}
       > 
         <File>
-          <Icons
-            name={['png', 'jpg'].includes(Extension) ? 'md-image' : 'md-document'}
-            size={Layout.icon.small}
-          />
+          {this.displayLeftIcon()}
           <Title>{FileName}</Title>
         </File>
         {type === Folder.rea && 
@@ -280,7 +301,9 @@ Document.propTypes = {
   removeFromEdit: PropTypes.func.isRequired,
   downLoadOneFile: PropTypes.func.isRequired,
   isNew: PropTypes.bool,
-  isDownloaded: PropTypes.bool,
+  Dossier2: PropTypes.string.isRequired,
+  fileToDownload: PropTypes.array.isRequired,
+  loadingFiles: PropTypes.array.isRequired,
   Reviewed: PropTypes.string.isRequired,
   Prepared: PropTypes.string.isRequired,
   Locked: PropTypes.string.isRequired,
@@ -297,7 +320,6 @@ Document.propTypes = {
 Document.defaultProps = {
   type: Folder.prep,
   isNew: false,
-  isDownloaded: false
 }
 
 const mapStateToProps = state => ({
@@ -307,6 +329,8 @@ const mapStateToProps = state => ({
   loadingBusiness: state.user.loadingBusiness,
   editedDocs: state.user.editedDocs,
   uploadingDocs: state.user.uploadingDocs,
+  fileToDownload: state.user.fileToDownload,
+  loadingFiles: state.user.loadingFiles,
   userId: state.user.id,
   name: state.user.name,
   modeleDocs: state.business.docs.filter(d => (d.Dossier1 && d.Dossier1 === 'Modele')),

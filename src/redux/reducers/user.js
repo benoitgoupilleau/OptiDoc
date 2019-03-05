@@ -15,7 +15,10 @@ import {
   REMOVE_EDIT_FILE,
   UPLOADING_FILE,
   REMOVE_EDIT_PREPARE,
-  CANCEL_UPLOAD
+  CANCEL_UPLOAD,
+  CANCEL_DOWNLOAD_FILE,
+  FILE_DOWNLOADED,
+  DOWNLOADING_FILE
 } from '../actions/types';
 
 const defaultState = {
@@ -26,6 +29,8 @@ const defaultState = {
   name: '',
   downloadedBusiness: [],
   loadingBusiness: [],
+  loadingFiles: [],
+  fileToDownload: [],
   nbDocBusiness: 0,
   totalDocBusiness: 0,
   editedDocs: [],
@@ -109,6 +114,34 @@ export default (state = defaultState, action) => {
       return {
         ...state,
         loadingBusiness: [...downloading.slice(0, indexToRemove), ...downloading.slice(indexToRemove + 1)]
+      }
+    }
+    case DOWNLOADING_FILE: {
+      const currentFiles = state.loadingFiles.includes(action.id) ? [...state.loadingFiles] : [...state.loadingFiles, action.id];
+      return {
+        ...state,
+        loadingFiles: currentFiles
+      }
+    }
+    case CANCEL_DOWNLOAD_FILE: {
+      const downloading = [...state.loadingFiles];
+      const indexToRemove = downloading.findIndex(el => el === action.id);
+      return {
+        ...state,
+        loadingFiles: [...downloading.slice(0, indexToRemove), ...downloading.slice(indexToRemove + 1)]
+      }
+    }
+    case FILE_DOWNLOADED: {
+      const downloading = [...state.loadingFiles];
+      const indexToRemove = downloading.findIndex(el => el === action.id);
+      const currentfileToDownload = [...state.fileToDownload];
+      const indexToDownload = currentfileToDownload.findIndex(el => el === action.id);
+      const leftToDownload = indexToDownload > -1 ? [...currentfileToDownload.slice(0, indexToDownload), ...currentfileToDownload.slice(indexToDownload +1)]
+       : currentfileToDownload
+      return {
+        ...state,
+        loadingFiles: [...downloading.slice(0, indexToRemove), ...downloading.slice(indexToRemove + 1)],
+        fileToDownload: leftToDownload
       }
     }
     case EDIT_FILE: {
