@@ -11,7 +11,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Document from './Document'
 import SubArbo from './SubArbo';
-import { downloadBusiness, uploadFile, uploadingFile, createFile } from '../../redux/actions/user'
+import { downloadBusiness, uploadFile, uploadingFile, createFile, uploadMultipleFiles, uploadingMulti } from '../../redux/actions/user'
 
 import Colors from '../../constants/Colors';
 import Layout from '../../constants/Layout'
@@ -92,7 +92,12 @@ class BusinessWithDocs extends React.Component {
     if (this.state.upLoading) {
       return (
         <View>
-          <Text>{this.state.nbFiles}/{this.state.totalFiles}</Text>
+          <ActivityIndicator />
+        </View>)
+    } else if (this.props.multipleUploadDocs.length > 0) {
+      return (
+        <View style={{alignItems: 'center'}}>
+          <Text>{this.props.multipleUploadDocs.length}</Text>
           <ActivityIndicator />
         </View>)
     } else if (editedBusiness.length > 0) {
@@ -114,7 +119,9 @@ class BusinessWithDocs extends React.Component {
         Alert.alert('Envoi en cours', "Vous pourrez envoyer vos fichiers une fois l'envoi terminé", [{ text: 'Ok' }]);
       } else {
         const editedBusiness = this.props.editedDocs.filter(e => e.affaire === this.props.title)
-        this.setState({upLoading: true, totalFiles: editedBusiness.length})
+        this.setState({upLoading: true });
+        const filesToUpload = [];
+        const multiUpload = [];
         for (let i = 0; i < editedBusiness.length; i++) {
           this.setState({nbFiles: i + 1});
           const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${editedBusiness[i].ID}(0).${editedBusiness[i].Extension}`);
@@ -124,7 +131,14 @@ class BusinessWithDocs extends React.Component {
           }
           const filePath = `${EXTERNAL_PATH}${editedBusiness[i].ID}.${editedBusiness[i].Extension}`;
           const destPath = `${rootDir}/${this.props.userId}/${this.props.title}/${Folder.rea}/${editedBusiness[i].ID}.${editedBusiness[i].Extension}`;
-          const file = pick(this.props, Tables.docField);
+          let file = {}
+          if (editedBusiness[i].isNew) {
+            file = { ...this.props.newDocs.filter(n => n.ID === editedBusiness[i].ID)[0] }
+          } else {
+            file = { ...this.props.docs.filter(n => n.ID === editedBusiness[i].ID)[0] }
+          }
+          multiUpload.push({ affaire: this.props.title, fileId: editedBusiness[i].ID});
+          pick(this.props, Tables.docField);
           await RNFS.copyFile(filePath, destPath);
           const remoteDir = `./${this.props.title}/Realisation/${editedBusiness[i].Dossier3}`
           const userName = this.props.name;
@@ -139,12 +153,14 @@ class BusinessWithDocs extends React.Component {
           }
           this.props.uploadingFile(editedBusiness[i].ID);
           if (editedBusiness[i].isNew) {
-            this.props.createFile(filePath, fileToUpLoad, remoteDir)
+            filesToUpload.push({ ...fileToUpLoad, filePath, remoteDir, isNew: true})
           } else {
-            this.props.uploadFile(filePath, fileToUpLoad, remoteDir);
+            filesToUpload.push({ ...fileToUpLoad, filePath, remoteDir, isNew: false })
           }
         }
-        this.setState({upLoading: false})
+        this.props.uploadingMulti(multiUpload)
+        this.props.uploadMultipleFiles(filesToUpload);
+        this.setState({ upLoading: false });
       }
     } else {
       Alert.alert('Connexion impossible', 'Vous pourrez envoyer votre fichier une fois votre connexion rétablie', [{ text: 'Ok' }]);
@@ -278,15 +294,23 @@ BusinessWithDocs.propTypes = {
   mssqlConnected: PropTypes.bool.isRequired,
   createFile: PropTypes.func.isRequired,
   uploadFile: PropTypes.func.isRequired,
-  name: PropTypes.string.isRequired
+  name: PropTypes.string.isRequired,
+  multipleUploadDocs: PropTypes.array,
+  uploadingMulti: PropTypes.func.isRequired,
+  uploadMultipleFiles: PropTypes.func.isRequired,
+  docs: PropTypes.array,
+  newDocs: PropTypes.array
 }
 
 BusinessWithDocs.defaultProps = {
   prep: [],
-  rea: []
+  rea: [],
+  multipleUploadDocs: [],
+  docs: [],
+  newDocs: []
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state, props) => ({
   isConnected: state.network.isConnected,
   mssqlConnected: state.network.mssqlConnected,
   loadingBusiness: state.user.loadingBusiness,
@@ -297,9 +321,12 @@ const mapStateToProps = state => ({
   name: state.user.name,
   editedDocs: state.user.editedDocs,
   modeleDocs: state.business.docs.filter(d => (d.Dossier1 && d.Dossier1 === 'Modele')),
+  multipleUploadDocs: state.user.multipleUploadDocs.filter(m => m.affaire === props.title),
+  docs: state.business.docs,
+  newDocs: state.business.newDocs,
   subFolder: state.business.subFolder,
   affaires: state.business.affaires,
   modeleDownloaded: state.user.modeleDownloaded
 })
 
-export default withNavigation(connect(mapStateToProps, { downloadBusiness, uploadingFile, createFile, uploadFile })(BusinessWithDocs));
+export default withNavigation(connect(mapStateToProps, { downloadBusiness, uploadingFile, createFile, uploadFile, uploadMultipleFiles, uploadingMulti })(BusinessWithDocs));

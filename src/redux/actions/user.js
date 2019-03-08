@@ -1,4 +1,5 @@
 import RNFS from 'react-native-fs';
+import omit from 'lodash.omit';
 import FTP from '../../services/ftp';
 import { FTP_USERNAME, FTP_PASSWORD } from 'react-native-dotenv';
 import FileViewer from 'react-native-file-viewer';
@@ -21,7 +22,8 @@ import {
   REMOVE_EDIT_PREPARE,
   CANCEL_DOWNLOAD_FILE,
   FILE_DOWNLOADED,
-  DOWNLOADING_FILE
+  DOWNLOADING_FILE,
+  MULTI_UPLOAD
 } from './types';
 
 import { removeNewDoc, addDoc } from './business'
@@ -230,7 +232,7 @@ export const cancelUploadingFile = (fileId) => ({
 })
 
 export const uploadFile = (filePath, file, remoteDir) => async (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
-  .then(() => FTP.makedir(filePath)
+  .then(() => FTP.makedir(remoteDir)
     .then(() => FTP.uploadFile(filePath, remoteDir)
       .then(() => {
         //MSSQL update
@@ -238,8 +240,8 @@ export const uploadFile = (filePath, file, remoteDir) => async (dispatch) => FTP
           .then(() => dispatch(removeFromEdit(file.ID)))
       })))
   .catch((e) => {
-    dispatch(cancelUploadingFile(file.ID))
     Sentry.captureException(e, { func: 'uploadFile', doc: 'userActions' })
+    return dispatch(cancelUploadingFile(file.ID))
   })
 
 export const removeFromEdit = (id) => ({
@@ -247,8 +249,8 @@ export const removeFromEdit = (id) => ({
   id
 })
 
-export const createFile = (filePath, file, remoteDir) => async (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
-  .then(() => FTP.makedir(filePath)
+export const createFile = (filePath, file, remoteDir) => (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
+  .then(() => FTP.makedir(remoteDir)
     .then(() => FTP.uploadFile(filePath, remoteDir)
       .then(() => {
         //MSSQL update
@@ -262,6 +264,45 @@ export const createFile = (filePath, file, remoteDir) => async (dispatch) => FTP
           })
       })))
   .catch((e) => {
-    dispatch(cancelUploadingFile(file.ID))
     Sentry.captureException(e, { func: 'createFile', doc: 'userActions' })
+    return dispatch(cancelUploadingFile(file.ID))
   })
+
+export const uploadingMulti = (uploads) => ({
+  type: MULTI_UPLOAD,
+  uploads
+})
+
+
+export const uploadMultipleFiles = (files) => (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
+  .then(async () => {
+    for (let i = 0; i < files.length; i++) {
+      try {
+        await FTP.makedir(files[i].remoteDir);
+        await FTP.uploadFile(files[i].filePath, files[i].remoteDir);
+        if (files[i].isNew) {
+          MSSQL.executeUpdate(`INSERT INTO ${Tables.t_docs} 
+          (LocalPath, Prepared, PreparedOn, PageNumber, ReviewedOn, PreparedBy, Revisable, Size, CreatedBy, Dossier2, UpLoadedOn, FileName, CreatedOn, Dossier1, ID, UpdatedOn, UpdatedBy, Commentaire, Dossier3, ServerPath, ReviewedBy, Extension, Reviewed, Locked, UpLoadedBy) 
+          VALUES ('${files[i].LocalPath}', '${files[i].Prepared}', '${files[i].PreparedOn}', '${files[i].PageNumber}', '${files[i].ReviewedOn}', '${files[i].PreparedBy}', '${files[i].Revisable}', '${files[i].Size}', '${files[i].CreatedBy}', '${files[i].Dossier2}', '${files[i].UpLoadedOn}', '${files[i].FileName}', '${files[i].CreatedOn}', '${files[i].Dossier1}', '${files[i].ID}', '${files[i].UpdatedOn}', '${files[i].UpdatedBy}', '${files[i].Commentaire}', '${files[i].Dossier3}', '${files[i].ServerPath}', '${files[i].ReviewedBy}', '${files[i].Extension}', '${files[i].Reviewed}', '${files[i].Locked}', '${files[i].UpLoadedBy}');`)
+            .then(() => {
+              dispatch(removeNewDoc(files[i].ID))
+              dispatch(addDoc(omit(files[i], ['remoteDir', 'isNew', 'filePath'])))
+              dispatch(removeFromEdit(files[i].ID))
+            })
+        } else {
+          MSSQL.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${files[i].UpLoadedOn}', UpdatedOn='${files[i].UpdatedOn}', UpdatedBy='${files[i].UpdatedBy}', UpLoadedBy='${files[i].UpLoadedBy}', Prepared='${files[i].Prepared}', PreparedOn='${files[i].PreparedOn}', PreparedBy='${files[i].PreparedBy}' WHERE ID='${files[i].ID}'`)
+            .then(() => dispatch(removeFromEdit(files[i].ID)))
+        }
+      } catch (e) {
+        Sentry.captureException(e, { func: 'uploadMultipleFiles', doc: 'userActions' })
+        dispatch(cancelUploadingFile(files[i].ID))
+      }
+    }
+  })
+  .catch((e) => {
+    Sentry.captureException(e, { func: 'uploadMultipleFiles', doc: 'userActions' })
+    for (let i = 0; i < files.length; i++) {
+      dispatch(cancelUploadingFile(files[i].ID))
+    }
+  })
+

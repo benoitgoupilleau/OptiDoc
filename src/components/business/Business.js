@@ -91,7 +91,7 @@ class Business extends React.Component {
       if (modeleDownloaded === 'in progress') {
         Alert.alert('Modèle en cours de téléchargement', 'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants', [{ text: 'Ok' }]);
       } else {
-        if (loadingBusiness.includes(title)) {
+        if (loadingBusiness.length > 0) {
           Alert.alert('Un téléchargement est en cours', "Merci d'attendre la fin du téléchargement", [{ text: 'Ok' }]);
         } else {
           downloadBusiness(userId, title, prep, rea)

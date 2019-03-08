@@ -1,8 +1,8 @@
-export const listAffaires =  (rights, userId) => {
+export const listAffaires =  (rights = [], userId = '') => {
   return rights.filter(r => r.ID_User === userId).map(filtered => filtered.ID_Affaire);
 }
 
-export const listDocs = (docs, newDoc, businesses) => {
+export const listDocs = (docs = [], newDoc = [], businesses = []) => {
   const docList = {}
   for (let i = 0; i < businesses.length; i += 1) {
     const affaire = businesses[i]
@@ -16,7 +16,7 @@ export const listDocs = (docs, newDoc, businesses) => {
   return docList;
 }
 
-export const listNewDocs = (docs, businesses) => {
+export const listNewDocs = (docs = [], businesses = []) => {
   const docList = {}
   for (let i = 0; i < businesses.length; i += 1) {
     const affaire = businesses[i]

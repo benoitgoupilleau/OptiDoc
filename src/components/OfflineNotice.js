@@ -44,7 +44,8 @@ class OfflineNotice extends PureComponent {
   }
 
   testDb = () => {
-    this.props.connectedHome ? this.props.connectDbHome() : this.props.connectDbOut();
+    if(this.props.connectedHome) return this.props.connectDbHome();
+    return this.props.connectDbOut();
   }
 
   render() {

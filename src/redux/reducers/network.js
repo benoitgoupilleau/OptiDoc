@@ -21,11 +21,14 @@ export default (state = defaultState, action) => {
         connectedHome
       }
     }
-    case UPDATE_NET_STATUS:
+    case UPDATE_NET_STATUS: {
+      const mssqlConnected = action.isConnected ? state.mssqlConnected : false;
       return {
         ...state,
-        isConnected: action.isConnected
+        isConnected: action.isConnected,
+        mssqlConnected
       }
+    }
     case MSSQL_CONNECTED:
       return {
         ...state,

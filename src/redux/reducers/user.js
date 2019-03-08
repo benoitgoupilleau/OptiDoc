@@ -19,7 +19,8 @@ import {
   CANCEL_DOWNLOAD_FILE,
   FILE_DOWNLOADED,
   DOWNLOADING_FILE,
-  SET_DOCS_TO_DOWNLOAD
+  SET_DOCS_TO_DOWNLOAD,
+  MULTI_UPLOAD
 } from '../actions/types';
 
 const defaultState = {
@@ -36,6 +37,7 @@ const defaultState = {
   totalDocBusiness: 0,
   editedDocs: [],
   uploadingDocs: [],
+  multipleUploadDocs: [],
   locked: false,
   modeleDownloaded: 'no',
   nbDownloaded: 0,
@@ -43,10 +45,13 @@ const defaultState = {
 }
 
 const checkToken = async (token) => {
-  const verify = jwt.verify(token, JWT_SECRET, { alg: 'hs256' })
-  const now = new Date().getTime();
-  const isStillValid = verify.exp && verify.exp > now;
-  return isStillValid;
+  if (token !== '') {
+    const verify = jwt.verify(token, JWT_SECRET, { alg: 'hs256' })
+    const now = new Date().getTime();
+    const isStillValid = verify.exp && verify.exp > now;
+    return isStillValid;
+  }
+  return false;
 }
 
 export default (state = defaultState, action) => {
@@ -55,10 +60,10 @@ export default (state = defaultState, action) => {
       let unValidToken = false;
       let omitToken = {}
       let omitLoading = {}
-      if (action.payload && action.payload.user && action.payload.user.bearerToken) {
+      if (action.payload && action.payload.user) {
         unValidToken = !checkToken(action.payload.user.bearerToken);
-        omitToken = { ...omit(action.payload.user, 'bearerToken') }
-        omitLoading = { ...omit(action.payload.user, 'loadingBusiness') }
+        omitToken = { ...omit(action.payload.user, ['bearerToken', 'modeleDownloaded']) }
+        omitLoading = { ...omit(action.payload.user, ['loadingBusiness', 'modeleDownloaded']) }
       }
       const modeleDownloaded = action.payload && action.payload.user && (action.payload.user.modeleDownloaded === 'yes' || action.payload.user.modeleDownloaded === 'no') ? action.payload.user.modeleDownloaded : 'no';
       if (unValidToken) {
@@ -115,6 +120,13 @@ export default (state = defaultState, action) => {
       return {
         ...state,
         loadingBusiness: [...downloading.slice(0, indexToRemove), ...downloading.slice(indexToRemove + 1)]
+      }
+    }
+    case MULTI_UPLOAD: {
+      const newMultipleUploadDocs = [...state.multipleUploadDocs, ...action.uploads]
+      return {
+        ...state,
+        multipleUploadDocs: newMultipleUploadDocs,
       }
     }
     case DOWNLOADING_FILE: {
@@ -201,7 +213,16 @@ export default (state = defaultState, action) => {
     }
     case CANCEL_UPLOAD: {
       const currentFiles = [...state.uploadingDocs];
+      const multiDocs = [...state.multipleUploadDocs]
+      const indexMulti = multiDocs.findIndex(el => el.fileId === action.fileId)
       const indexToRemove = currentFiles.findIndex(el => el === action.fileId);
+      if (indexMulti > -1) {
+        return {
+          ...state,
+          multipleUploadDocs: [...multiDocs.slice(0, indexMulti), ...multiDocs.slice(indexMulti +1)],
+          uploadingDocs: [...currentFiles.slice(0, indexToRemove), ...currentFiles.slice(indexToRemove + 1)]
+        }
+      }
       return {
         ...state,
         uploadingDocs: [...currentFiles.slice(0, indexToRemove), ...currentFiles.slice(indexToRemove + 1)]
@@ -211,8 +232,19 @@ export default (state = defaultState, action) => {
       const currentFiles = [...state.editedDocs];
       const indexToRemove = currentFiles.findIndex(el => el.ID === action.id);
       const newFiles = [...currentFiles.slice(0, indexToRemove), ...currentFiles.slice(indexToRemove + 1)]
+      const multiDocs = [...state.multipleUploadDocs]
+      const indexMulti = multiDocs.findIndex(el => el.fileId === action.id)
       const currentUpload = [...state.uploadingDocs];
       const indexUpload = currentUpload.findIndex(el => el === action.id);
+      if (indexMulti > -1) {
+        return {
+          ...state,
+          editedDocs: newFiles,
+          multipleUploadDocs: [...multiDocs.slice(0, indexMulti), ...multiDocs.slice(indexMulti + 1)],
+          locked: (newFiles.length > 0),
+          uploadingDocs: [...currentUpload.slice(0, indexUpload), ...currentUpload.slice(indexUpload + 1)]
+        }
+      }
       return {
         ...state,
         editedDocs: newFiles,
