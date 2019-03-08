@@ -22,8 +22,9 @@ import { editFile } from '../redux/actions/user'
 import { addNewDoc } from '../redux/actions/business'
 import Sentry from '../services/sentry'
 
+import rootDir from '../services/rootDir';
+
 const { width, height } = Dimensions.get('window');
-const rootDir = RNFS.DocumentDirectoryPath;
 
 const Wrapper = styled(View)`
   padding: 40px;

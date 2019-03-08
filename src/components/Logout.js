@@ -90,7 +90,7 @@ class Logout extends React.Component {
           size={Layout.icon.default}
           onPress={this.refreshData}
         />}
-        <StyledButton onPress={this.signOut} disabled={this.props.loadingBusiness.length > 0 || this.props.uploadingDocs.length > 0}>
+        <StyledButton onPress={this.signOut}>
           <StyledText>{this.props.title}</StyledText>
         </StyledButton>
       </Wrapper>

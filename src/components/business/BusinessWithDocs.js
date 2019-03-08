@@ -18,7 +18,7 @@ import Layout from '../../constants/Layout'
 import Folder from '../../constants/Folder'
 import Tables from '../../constants/Tables';
 
-const rootDir = RNFS.DocumentDirectoryPath;
+import rootDir from '../../services/rootDir';
 
 const BusinessWrapper = styled(View)`
   background: ${Colors.antiBackground};
@@ -188,6 +188,7 @@ class BusinessWithDocs extends React.Component {
     }
     listArbo.sort((a, b) => (a.NomDossier > b.NomDossier ? 1 : -1));
     return listArbo.map(arbo => <SubArbo key={'Prep' + arbo.NomDossier} title={arbo.Designation}>{prep.filter(p => p.Dossier3 === arbo.NomDossier)
+      .sort((a, b) => (a.FileName > b.FileName ? 1 : -1))
       .map(p => <Document key={p.ID} {...p} type={Folder.prep} prep={prep} rea={rea} />)}
       </SubArbo>)
   }
@@ -204,6 +205,7 @@ class BusinessWithDocs extends React.Component {
     }
     listArbo.sort((a, b) => (a.NomDossier > b.NomDossier ? 1 : -1));
     return listArbo.map(arbo => <SubArbo key={'Rea' + arbo.NomDossier} title={arbo.Designation}>{rea.filter(r => r.Dossier3 === arbo.NomDossier)
+      .sort((a, b) => (a.FileName > b.FileName ? 1 : -1))
       .map(r => <Document key={r.ID} isNew={checkIfNew(editedDocs, r.ID)} {...r} type={Folder.rea} prep={prep} rea={rea} />)}
       </SubArbo>)
   }

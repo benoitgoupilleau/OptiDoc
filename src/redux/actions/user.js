@@ -29,7 +29,7 @@ import { removeNewDoc, addDoc } from './business'
 import Folder from '../../constants/Folder'
 import Tables from '../../constants/Tables';
 
-const rootDir = RNFS.DocumentDirectoryPath;
+import rootDir from '../../services/rootDir';
 
 let isDownloadingFiles = false;
 let isDownloadingModeles = false;
@@ -234,7 +234,7 @@ export const uploadFile = (filePath, file, remoteDir) => async (dispatch) => FTP
     .then(() => FTP.uploadFile(filePath, remoteDir)
       .then(() => {
         //MSSQL update
-        return MSSQL.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}', Locked='N' WHERE ID='${file.ID}'`)
+        return MSSQL.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}', PreparedBy='${file.PreparedBy}' WHERE ID='${file.ID}'`)
           .then(() => dispatch(removeFromEdit(file.ID)))
       })))
   .catch((e) => {
@@ -248,18 +248,19 @@ export const removeFromEdit = (id) => ({
 })
 
 export const createFile = (filePath, file, remoteDir) => async (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
-  .then(() => FTP.uploadFile(filePath, remoteDir)
-    .then(() => {
-      //MSSQL update
-      return MSSQL.executeUpdate(`INSERT INTO ${Tables.t_docs} 
-        (LocalPath, Prepared, PreparedOn, PageNumber, ReviewedOn, PreparedBy, Revisable, Size, CreatedBy, Dossier2, UpLoadedOn, FileName, CreatedOn, Dossier1, ID, UpdatedOn, UpdatedBy, Commentaire, Dossier3, ServerPath, ReviewedBy, Extension, Reviewed, Locked, UpLoadedBy) 
-        VALUES ('${file.LocalPath}', '${file.Prepared}', '${file.PreparedOn}', '${file.PageNumber}', '${file.ReviewedOn}', '${file.PreparedBy}', '${file.Revisable}', '${file.Size}', '${file.CreatedBy}', '${file.Dossier2}', '${file.UpLoadedOn}', '${file.FileName}', '${file.CreatedOn}', '${file.Dossier1}', '${file.ID}', '${file.UpdatedOn}', '${file.UpdatedBy}', '${file.Commentaire}', '${file.Dossier3}', '${file.ServerPath}', '${file.ReviewedBy}', '${file.Extension}', '${file.Reviewed}', '${file.Locked}', '${file.UpLoadedBy}');`)
-        .then(() => {
-          dispatch(removeNewDoc(file.ID))
-          dispatch(addDoc(file))
-          dispatch(removeFromEdit(file.ID))
-        })
-    }))
+  .then(() => FTP.makedir(filePath)
+    .then(() => FTP.uploadFile(filePath, remoteDir)
+      .then(() => {
+        //MSSQL update
+        return MSSQL.executeUpdate(`INSERT INTO ${Tables.t_docs} 
+          (LocalPath, Prepared, PreparedOn, PageNumber, ReviewedOn, PreparedBy, Revisable, Size, CreatedBy, Dossier2, UpLoadedOn, FileName, CreatedOn, Dossier1, ID, UpdatedOn, UpdatedBy, Commentaire, Dossier3, ServerPath, ReviewedBy, Extension, Reviewed, Locked, UpLoadedBy) 
+          VALUES ('${file.LocalPath}', '${file.Prepared}', '${file.PreparedOn}', '${file.PageNumber}', '${file.ReviewedOn}', '${file.PreparedBy}', '${file.Revisable}', '${file.Size}', '${file.CreatedBy}', '${file.Dossier2}', '${file.UpLoadedOn}', '${file.FileName}', '${file.CreatedOn}', '${file.Dossier1}', '${file.ID}', '${file.UpdatedOn}', '${file.UpdatedBy}', '${file.Commentaire}', '${file.Dossier3}', '${file.ServerPath}', '${file.ReviewedBy}', '${file.Extension}', '${file.Reviewed}', '${file.Locked}', '${file.UpLoadedBy}');`)
+          .then(() => {
+            dispatch(removeNewDoc(file.ID))
+            dispatch(addDoc(file))
+            dispatch(removeFromEdit(file.ID))
+          })
+      })))
   .catch((e) => {
     dispatch(cancelUploadingFile(file.ID))
     Sentry.captureException(e, { func: 'createFile', doc: 'userActions' })

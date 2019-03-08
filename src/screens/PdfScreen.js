@@ -1,5 +1,4 @@
 import React from 'react';
-import RNFS from 'react-native-fs';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Pdf from 'react-native-pdf';
@@ -18,7 +17,7 @@ import { openFile } from '../services/openfile'
 import Folder from '../constants/Folder'
 import Colors from '../constants/Colors';
 
-const rootDir = RNFS.DocumentDirectoryPath;
+import rootDir from '../services/rootDir';
 
 const Edit = styled(TouchableOpacity)`
   align-items: center;

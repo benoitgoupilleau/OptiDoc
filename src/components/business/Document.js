@@ -18,7 +18,8 @@ import Folder from '../../constants/Folder';
 import Colors from '../../constants/Colors';
 import Tables from '../../constants/Tables';
 
-const rootDir = RNFS.DocumentDirectoryPath;
+import rootDir from '../../services/rootDir';
+
 const { width } = Dimensions.get('window');
 
 const DocumentWrapper = styled(TouchableOpacity)`

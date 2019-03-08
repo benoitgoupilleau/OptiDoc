@@ -16,7 +16,7 @@ import {
 } from './types';
 
 
-export const getDocs = (currentDocs, downloadedAffaire, editedDocs) => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_docs}`)
+export const getDocs = (currentDocs = [], downloadedAffaire = [], editedDocs = []) => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_docs}`)
   .then((res) => {
     const fileToDownload = [];
     for (let i = 0; i < downloadedAffaire.length; i++) {

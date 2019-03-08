@@ -21,7 +21,7 @@ import Sentry from '../services/sentry'
 import { editFile, downloadModels } from '../redux/actions/user'
 import { addNewDoc } from '../redux/actions/business'
 
-const rootDir = RNFS.DocumentDirectoryPath;
+import rootDir from '../services/rootDir';
 
 const Wrapper = styled(View)`
   padding: 20px;

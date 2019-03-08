@@ -7,8 +7,11 @@ import AppNavigator from './src/navigation/AppNavigator'
 import { store, persistor } from './src/redux/store/store';
 
 import { setupSentry } from './src/services/sentry';
+import { setRootDir } from './src/services/rootDir';
 
 setupSentry();
+setRootDir();
+
 
 const App = () => (
   <Provider store={store} >
