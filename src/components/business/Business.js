@@ -94,7 +94,14 @@ class Business extends React.Component {
         if (loadingBusiness.length > 0) {
           Alert.alert('Un téléchargement est en cours', "Merci d'attendre la fin du téléchargement", [{ text: 'Ok' }]);
         } else {
-          downloadBusiness(userId, title, prep, rea)
+          Alert.alert('Confirmer le téléchargement', "Etes-vous sûr de vouloir télécharger cette affaire ?", [{
+            text: 'Annuler',
+            style: 'cancel',
+          }, { 
+            text: 'Oui',
+            onPress: () => downloadBusiness(userId, title, prep, rea)
+          }]);
+          
         }
       }
     } else {

@@ -85,38 +85,55 @@ class Document extends React.Component {
     }
   }
 
-  onUpload = async () => {
-    const { ID, Extension, isNew, userId, Dossier1, Dossier3, type, isConnected, mssqlConnected } = this.props;
+  confirmedOnUpload = async () => {
+    const { ID, Extension, isNew, userId, Dossier1, Dossier3, type } = this.props;
+    const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${ID}(0).${Extension}`);
+    if (secondVersion) {
+      await RNFS.copyFile(`${EXTERNAL_PATH}${ID}(0).${Extension}`, `${EXTERNAL_PATH}${ID}.${Extension}`);
+      await RNFS.unlink(`${EXTERNAL_PATH}${ID}(0).${Extension}`)
+    }
+    const filePath = `${EXTERNAL_PATH}${ID}.${Extension}`;
+    const destPath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
+    const file = pick(this.props, Tables.docField);
+    await RNFS.copyFile(filePath, destPath);
+    const remoteDir = `./${Dossier1}/Realisation${Dossier3 !== '' ? `/${Dossier3}` : ''}`
+    const userName = this.props.name;
+    const now = new Date();
+    const date = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
+    const fileToUpLoad = {
+      ...file,
+      UpLoadedOn: date,
+      UpdatedOn: date,
+      UpdatedBy: userName,
+      UpLoadedBy: userName
+    }
+    this.props.uploadingFile(ID);
+    if (isNew) {
+      return this.props.createFile(filePath, fileToUpLoad, remoteDir)
+    } else {
+      return this.props.uploadFile(filePath, fileToUpLoad, remoteDir);
+    }
+  }
+
+  onUpload = () => {
+    const { isConnected, mssqlConnected } = this.props;
     if (isConnected && mssqlConnected) {
-      const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${ID}(0).${Extension}`);
-      if (secondVersion) {
-        await RNFS.copyFile(`${EXTERNAL_PATH}${ID}(0).${Extension}`, `${EXTERNAL_PATH}${ID}.${Extension}`);
-        await RNFS.unlink(`${EXTERNAL_PATH}${ID}(0).${Extension}`)
-      }
-      const filePath = `${EXTERNAL_PATH}${ID}.${Extension}`;
-      const destPath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
-      const file = pick(this.props, Tables.docField);
-      await RNFS.copyFile(filePath, destPath);
-      const remoteDir = `./${Dossier1}/Realisation${Dossier3 !== '' ? `/${Dossier3}` : ''}`
-      const userName = this.props.name;
-      const now = new Date();
-      const date = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
-      const fileToUpLoad = {
-        ...file,
-        UpLoadedOn: date,
-        UpdatedOn: date,
-        UpdatedBy: userName,
-        UpLoadedBy: userName
-      }
-      this.props.uploadingFile(ID);
-      if (isNew) {
-        return this.props.createFile(filePath, fileToUpLoad, remoteDir)
-      } else {
-        return this.props.uploadFile(filePath, fileToUpLoad, remoteDir);
-      }
+      Alert.alert("Confirmer l'envoi", "Etes-vous sûr de vouloir envoyer ce fichier ?", [{
+        text: 'Annuler',
+        style: 'cancel',
+      }, {
+        text: 'Oui',
+        onPress: () => this.confirmedOnUpload()
+      }]);
     } else {
       Alert.alert('Connexion impossible', 'Vous pourrez envoyer votre fichier une fois votre connexion rétablie', [{ text: 'Ok' }]);
     }
+  }
+
+  confirmedOnPrepare = (newPrepared, now) => {
+    const PreparedOn = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
+    this.props.updatePrepared(this.props.ID, newPrepared, PreparedOn, this.props.name);
+    this.props.editPrepare({ ID: this.props.ID, prepared: true, affaire: this.props.Dossier1, Extension: this.props.Extension, Dossier3: this.props.Dossier3 })
   }
 
   onPrepare = () => {
@@ -128,9 +145,13 @@ class Document extends React.Component {
       this.props.updatePrepared(this.props.ID, newPrepared, PreparedOn, PreparedBy);
       this.props.removePrepare(this.props.ID)
     } else {
-      const PreparedOn = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
-      this.props.updatePrepared(this.props.ID, newPrepared, PreparedOn, this.props.name);
-      this.props.editPrepare({ID: this.props.ID, prepared: true, affaire: this.props.Dossier1, Extension: this.props.Extension, Dossier3: this.props.Dossier3})
+      Alert.alert("Confirmer la préparation", "Etes-vous sûr de vouloir cocher ce fichier comme préparé ?", [{
+        text: 'Annuler',
+        style: 'cancel',
+      }, {
+        text: 'Oui',
+        onPress: () => this.confirmedOnPrepare(newPrepared, now)
+      }]);
     }
   }
 
@@ -139,7 +160,7 @@ class Document extends React.Component {
       'Etes-vous sûr de vouloir annuler les modifications ?',
       'Les modifications seront perdues définitivement',
       [
-        { text: 'Annuler'},
+        { text: 'Annuler', style: 'cancel'},
         { text: 'Oui', onPress: this.removeFile },
       ],
     )
@@ -234,7 +255,7 @@ class Document extends React.Component {
             name={'md-cloud-download'}
             size={Layout.icon.small}
             color={Colors.secondColor}
-            onPress={() => this.onDownloadFile()}
+            onPress={this.onDownloadFile}
           />
       )
     }
@@ -281,7 +302,13 @@ class Document extends React.Component {
             <Icons
               name="md-lock"
               size={Layout.icon.default}
-            /> : (Reviewed === 'O' || (Prepared === 'O' && !isEdited)) ? undefined :
+            /> : (Reviewed === 'O' || (Prepared === 'O' && !isEdited)) ? 
+              <Icons
+                name="md-checkbox-outline"
+                size={Layout.icon.default}
+                color={"green"}
+                onPress={() => { }}
+              /> :
             <Icons
               name="md-create"
               size={Layout.icon.default}

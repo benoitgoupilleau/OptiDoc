@@ -47,7 +47,7 @@ class Logout extends React.Component {
         'Etes-vous sûr de vouloir vous déconnecter ?',
         "Vous avez encore des fichiers modifiés en local que vous n'avez pas envoyés",
         [
-          { text: 'Annuler'},
+          { text: 'Annuler', style: 'cancel'},
           { text: 'Oui', onPress: this.signOutAsync },
         ],
       )

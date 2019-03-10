@@ -113,54 +113,64 @@ class BusinessWithDocs extends React.Component {
     return null;
   }
 
-  onUpload = async () => {
+  confirmedOnUpload = async () => {
+    const editedBusiness = this.props.editedDocs.filter(e => e.affaire === this.props.title)
+    this.setState({ upLoading: true });
+    const filesToUpload = [];
+    const multiUpload = [];
+    for (let i = 0; i < editedBusiness.length; i++) {
+      this.setState({ nbFiles: i + 1 });
+      const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${editedBusiness[i].ID}(0).${editedBusiness[i].Extension}`);
+      if (secondVersion) {
+        await RNFS.copyFile(`${EXTERNAL_PATH}${editedBusiness[i].ID}(0).${editedBusiness[i].Extension}`, `${EXTERNAL_PATH}${editedBusiness[i].ID}.${editedBusiness[i].Extension}`);
+        await RNFS.unlink(`${EXTERNAL_PATH}${editedBusiness[i].ID}(0).${editedBusiness[i].Extension}`)
+      }
+      const filePath = `${EXTERNAL_PATH}${editedBusiness[i].ID}.${editedBusiness[i].Extension}`;
+      const destPath = `${rootDir}/${this.props.userId}/${this.props.title}/${Folder.rea}/${editedBusiness[i].ID}.${editedBusiness[i].Extension}`;
+      let file = {}
+      if (editedBusiness[i].isNew) {
+        file = { ...this.props.newDocs.filter(n => n.ID === editedBusiness[i].ID)[0] }
+      } else {
+        file = { ...this.props.docs.filter(n => n.ID === editedBusiness[i].ID)[0] }
+      }
+      multiUpload.push({ affaire: this.props.title, fileId: editedBusiness[i].ID });
+      pick(this.props, Tables.docField);
+      await RNFS.copyFile(filePath, destPath);
+      const remoteDir = `./${this.props.title}/Realisation/${editedBusiness[i].Dossier3}`
+      const userName = this.props.name;
+      const now = new Date();
+      const date = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
+      const fileToUpLoad = {
+        ...file,
+        UpLoadedOn: date,
+        UpdatedOn: date,
+        UpdatedBy: userName,
+        UpLoadedBy: userName
+      }
+      this.props.uploadingFile(editedBusiness[i].ID);
+      if (editedBusiness[i].isNew) {
+        filesToUpload.push({ ...fileToUpLoad, filePath, remoteDir, isNew: true })
+      } else {
+        filesToUpload.push({ ...fileToUpLoad, filePath, remoteDir, isNew: false })
+      }
+    }
+    this.props.uploadingMulti(multiUpload)
+    this.props.uploadMultipleFiles(filesToUpload);
+    this.setState({ upLoading: false });
+  }
+
+  onUpload = () => {
     if (this.props.isConnected && this.props.mssqlConnected) {
       if (this.props.uploadingDocs.length > 0) {
         Alert.alert('Envoi en cours', "Vous pourrez envoyer vos fichiers une fois l'envoi terminé", [{ text: 'Ok' }]);
       } else {
-        const editedBusiness = this.props.editedDocs.filter(e => e.affaire === this.props.title)
-        this.setState({upLoading: true });
-        const filesToUpload = [];
-        const multiUpload = [];
-        for (let i = 0; i < editedBusiness.length; i++) {
-          this.setState({nbFiles: i + 1});
-          const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${editedBusiness[i].ID}(0).${editedBusiness[i].Extension}`);
-          if (secondVersion) {
-            await RNFS.copyFile(`${EXTERNAL_PATH}${editedBusiness[i].ID}(0).${editedBusiness[i].Extension}`, `${EXTERNAL_PATH}${editedBusiness[i].ID}.${editedBusiness[i].Extension}`);
-            await RNFS.unlink(`${EXTERNAL_PATH}${editedBusiness[i].ID}(0).${editedBusiness[i].Extension}`)
-          }
-          const filePath = `${EXTERNAL_PATH}${editedBusiness[i].ID}.${editedBusiness[i].Extension}`;
-          const destPath = `${rootDir}/${this.props.userId}/${this.props.title}/${Folder.rea}/${editedBusiness[i].ID}.${editedBusiness[i].Extension}`;
-          let file = {}
-          if (editedBusiness[i].isNew) {
-            file = { ...this.props.newDocs.filter(n => n.ID === editedBusiness[i].ID)[0] }
-          } else {
-            file = { ...this.props.docs.filter(n => n.ID === editedBusiness[i].ID)[0] }
-          }
-          multiUpload.push({ affaire: this.props.title, fileId: editedBusiness[i].ID});
-          pick(this.props, Tables.docField);
-          await RNFS.copyFile(filePath, destPath);
-          const remoteDir = `./${this.props.title}/Realisation/${editedBusiness[i].Dossier3}`
-          const userName = this.props.name;
-          const now = new Date();
-          const date = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
-          const fileToUpLoad = {
-            ...file,
-            UpLoadedOn: date,
-            UpdatedOn: date,
-            UpdatedBy: userName,
-            UpLoadedBy: userName
-          }
-          this.props.uploadingFile(editedBusiness[i].ID);
-          if (editedBusiness[i].isNew) {
-            filesToUpload.push({ ...fileToUpLoad, filePath, remoteDir, isNew: true})
-          } else {
-            filesToUpload.push({ ...fileToUpLoad, filePath, remoteDir, isNew: false })
-          }
-        }
-        this.props.uploadingMulti(multiUpload)
-        this.props.uploadMultipleFiles(filesToUpload);
-        this.setState({ upLoading: false });
+        Alert.alert("Confirmer l'envoi", "Etes-vous sûr de vouloir envoyer l'ensemble des fichiers modifiés de cette affaire ?", [{
+          text: 'Annuler',
+          style: 'cancel',
+        }, {
+          text: 'Oui',
+          onPress: () => this.confirmedOnUpload()
+        }]);
       }
     } else {
       Alert.alert('Connexion impossible', 'Vous pourrez envoyer votre fichier une fois votre connexion rétablie', [{ text: 'Ok' }]);
