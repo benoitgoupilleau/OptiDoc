@@ -155,7 +155,7 @@ class BusinessWithDocs extends React.Component {
       }
     }
     this.props.uploadingMulti(multiUpload)
-    this.props.uploadMultipleFiles(filesToUpload);
+    this.props.uploadMultipleFiles(this.props.connectedHome, filesToUpload);
     this.setState({ upLoading: false });
   }
 
@@ -309,7 +309,8 @@ BusinessWithDocs.propTypes = {
   uploadingMulti: PropTypes.func.isRequired,
   uploadMultipleFiles: PropTypes.func.isRequired,
   docs: PropTypes.array,
-  newDocs: PropTypes.array
+  newDocs: PropTypes.array,
+  connectedHome: PropTypes.bool.isRequired
 }
 
 BusinessWithDocs.defaultProps = {
@@ -336,7 +337,8 @@ const mapStateToProps = (state, props) => ({
   newDocs: state.business.newDocs,
   subFolder: state.business.subFolder,
   affaires: state.business.affaires,
-  modeleDownloaded: state.user.modeleDownloaded
+  modeleDownloaded: state.user.modeleDownloaded,
+  connectedHome: state.network.connectedHome,
 })
 
 export default withNavigation(connect(mapStateToProps, { downloadBusiness, uploadingFile, createFile, uploadFile, uploadMultipleFiles, uploadingMulti })(BusinessWithDocs));

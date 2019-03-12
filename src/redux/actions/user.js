@@ -3,7 +3,8 @@ import omit from 'lodash.omit';
 import FTP from '../../services/ftp';
 import { FTP_USERNAME, FTP_PASSWORD } from 'react-native-dotenv';
 import FileViewer from 'react-native-file-viewer';
-import MSSQL from '../../services/mssql';
+import MSSQL_Out from '../../services/mssqlOut';
+import MSSQL_Home from '../../services/mssqlHome';
 import Sentry from '../../services/sentry'
 
 import {
@@ -231,12 +232,16 @@ export const cancelUploadingFile = (fileId) => ({
   fileId
 })
 
-export const uploadFile = (filePath, file, remoteDir) => async (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
+export const uploadFile = (connectedHome = false, filePath, file, remoteDir) => async (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
   .then(() => FTP.makedir(remoteDir)
     .then(() => FTP.uploadFile(filePath, remoteDir)
       .then(() => {
         //MSSQL update
-        return MSSQL.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}', PreparedBy='${file.PreparedBy}' WHERE ID='${file.ID}'`)
+        if (connectedHome) {
+          return MSSQL_Home.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}', PreparedBy='${file.PreparedBy}' WHERE ID='${file.ID}'`)
+            .then(() => dispatch(removeFromEdit(file.ID)))
+        }
+        return MSSQL_Out.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}', PreparedBy='${file.PreparedBy}' WHERE ID='${file.ID}'`)
           .then(() => dispatch(removeFromEdit(file.ID)))
       })))
   .catch((e) => {
@@ -249,12 +254,22 @@ export const removeFromEdit = (id) => ({
   id
 })
 
-export const createFile = (filePath, file, remoteDir) => (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
+export const createFile = (connectedHome = false, filePath, file, remoteDir) => (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
   .then(() => FTP.makedir(remoteDir)
     .then(() => FTP.uploadFile(filePath, remoteDir)
       .then(() => {
         //MSSQL update
-        return MSSQL.executeUpdate(`INSERT INTO ${Tables.t_docs} 
+        if (connectedHome) {
+          return MSSQL_Home.executeUpdate(`INSERT INTO ${Tables.t_docs} 
+          (LocalPath, Prepared, PreparedOn, PageNumber, ReviewedOn, PreparedBy, Revisable, Size, CreatedBy, Dossier2, UpLoadedOn, FileName, CreatedOn, Dossier1, ID, UpdatedOn, UpdatedBy, Commentaire, Dossier3, ServerPath, ReviewedBy, Extension, Reviewed, Locked, UpLoadedBy) 
+          VALUES ('${file.LocalPath}', '${file.Prepared}', '${file.PreparedOn}', '${file.PageNumber}', '${file.ReviewedOn}', '${file.PreparedBy}', '${file.Revisable}', '${file.Size}', '${file.CreatedBy}', '${file.Dossier2}', '${file.UpLoadedOn}', '${file.FileName}', '${file.CreatedOn}', '${file.Dossier1}', '${file.ID}', '${file.UpdatedOn}', '${file.UpdatedBy}', '${file.Commentaire}', '${file.Dossier3}', '${file.ServerPath}', '${file.ReviewedBy}', '${file.Extension}', '${file.Reviewed}', '${file.Locked}', '${file.UpLoadedBy}');`)
+            .then(() => {
+              dispatch(removeNewDoc(file.ID))
+              dispatch(addDoc(file))
+              dispatch(removeFromEdit(file.ID))
+            })
+        }
+        return MSSQL_Out.executeUpdate(`INSERT INTO ${Tables.t_docs} 
           (LocalPath, Prepared, PreparedOn, PageNumber, ReviewedOn, PreparedBy, Revisable, Size, CreatedBy, Dossier2, UpLoadedOn, FileName, CreatedOn, Dossier1, ID, UpdatedOn, UpdatedBy, Commentaire, Dossier3, ServerPath, ReviewedBy, Extension, Reviewed, Locked, UpLoadedBy) 
           VALUES ('${file.LocalPath}', '${file.Prepared}', '${file.PreparedOn}', '${file.PageNumber}', '${file.ReviewedOn}', '${file.PreparedBy}', '${file.Revisable}', '${file.Size}', '${file.CreatedBy}', '${file.Dossier2}', '${file.UpLoadedOn}', '${file.FileName}', '${file.CreatedOn}', '${file.Dossier1}', '${file.ID}', '${file.UpdatedOn}', '${file.UpdatedBy}', '${file.Commentaire}', '${file.Dossier3}', '${file.ServerPath}', '${file.ReviewedBy}', '${file.Extension}', '${file.Reviewed}', '${file.Locked}', '${file.UpLoadedBy}');`)
           .then(() => {
@@ -274,24 +289,41 @@ export const uploadingMulti = (uploads) => ({
 })
 
 
-export const uploadMultipleFiles = (files) => (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
+export const uploadMultipleFiles = (connectedHome = false, files) => (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
   .then(async () => {
     for (let i = 0; i < files.length; i++) {
       try {
         await FTP.makedir(files[i].remoteDir);
         await FTP.uploadFile(files[i].filePath, files[i].remoteDir);
         if (files[i].isNew) {
-          MSSQL.executeUpdate(`INSERT INTO ${Tables.t_docs} 
-          (LocalPath, Prepared, PreparedOn, PageNumber, ReviewedOn, PreparedBy, Revisable, Size, CreatedBy, Dossier2, UpLoadedOn, FileName, CreatedOn, Dossier1, ID, UpdatedOn, UpdatedBy, Commentaire, Dossier3, ServerPath, ReviewedBy, Extension, Reviewed, Locked, UpLoadedBy) 
-          VALUES ('${files[i].LocalPath}', '${files[i].Prepared}', '${files[i].PreparedOn}', '${files[i].PageNumber}', '${files[i].ReviewedOn}', '${files[i].PreparedBy}', '${files[i].Revisable}', '${files[i].Size}', '${files[i].CreatedBy}', '${files[i].Dossier2}', '${files[i].UpLoadedOn}', '${files[i].FileName}', '${files[i].CreatedOn}', '${files[i].Dossier1}', '${files[i].ID}', '${files[i].UpdatedOn}', '${files[i].UpdatedBy}', '${files[i].Commentaire}', '${files[i].Dossier3}', '${files[i].ServerPath}', '${files[i].ReviewedBy}', '${files[i].Extension}', '${files[i].Reviewed}', '${files[i].Locked}', '${files[i].UpLoadedBy}');`)
-            .then(() => {
-              dispatch(removeNewDoc(files[i].ID))
-              dispatch(addDoc(omit(files[i], ['remoteDir', 'isNew', 'filePath'])))
-              dispatch(removeFromEdit(files[i].ID))
-            })
+          if (connectedHome) {
+            MSSQL_Home.executeUpdate(`INSERT INTO ${Tables.t_docs} 
+            (LocalPath, Prepared, PreparedOn, PageNumber, ReviewedOn, PreparedBy, Revisable, Size, CreatedBy, Dossier2, UpLoadedOn, FileName, CreatedOn, Dossier1, ID, UpdatedOn, UpdatedBy, Commentaire, Dossier3, ServerPath, ReviewedBy, Extension, Reviewed, Locked, UpLoadedBy) 
+            VALUES ('${files[i].LocalPath}', '${files[i].Prepared}', '${files[i].PreparedOn}', '${files[i].PageNumber}', '${files[i].ReviewedOn}', '${files[i].PreparedBy}', '${files[i].Revisable}', '${files[i].Size}', '${files[i].CreatedBy}', '${files[i].Dossier2}', '${files[i].UpLoadedOn}', '${files[i].FileName}', '${files[i].CreatedOn}', '${files[i].Dossier1}', '${files[i].ID}', '${files[i].UpdatedOn}', '${files[i].UpdatedBy}', '${files[i].Commentaire}', '${files[i].Dossier3}', '${files[i].ServerPath}', '${files[i].ReviewedBy}', '${files[i].Extension}', '${files[i].Reviewed}', '${files[i].Locked}', '${files[i].UpLoadedBy}');`)
+              .then(() => {
+                dispatch(removeNewDoc(files[i].ID))
+                dispatch(addDoc(omit(files[i], ['remoteDir', 'isNew', 'filePath'])))
+                dispatch(removeFromEdit(files[i].ID))
+              })
+          } else {
+            MSSQL_Out.executeUpdate(`INSERT INTO ${Tables.t_docs} 
+            (LocalPath, Prepared, PreparedOn, PageNumber, ReviewedOn, PreparedBy, Revisable, Size, CreatedBy, Dossier2, UpLoadedOn, FileName, CreatedOn, Dossier1, ID, UpdatedOn, UpdatedBy, Commentaire, Dossier3, ServerPath, ReviewedBy, Extension, Reviewed, Locked, UpLoadedBy) 
+            VALUES ('${files[i].LocalPath}', '${files[i].Prepared}', '${files[i].PreparedOn}', '${files[i].PageNumber}', '${files[i].ReviewedOn}', '${files[i].PreparedBy}', '${files[i].Revisable}', '${files[i].Size}', '${files[i].CreatedBy}', '${files[i].Dossier2}', '${files[i].UpLoadedOn}', '${files[i].FileName}', '${files[i].CreatedOn}', '${files[i].Dossier1}', '${files[i].ID}', '${files[i].UpdatedOn}', '${files[i].UpdatedBy}', '${files[i].Commentaire}', '${files[i].Dossier3}', '${files[i].ServerPath}', '${files[i].ReviewedBy}', '${files[i].Extension}', '${files[i].Reviewed}', '${files[i].Locked}', '${files[i].UpLoadedBy}');`)
+              .then(() => {
+                dispatch(removeNewDoc(files[i].ID))
+                dispatch(addDoc(omit(files[i], ['remoteDir', 'isNew', 'filePath'])))
+                dispatch(removeFromEdit(files[i].ID))
+              })
+          }
+          
         } else {
-          MSSQL.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${files[i].UpLoadedOn}', UpdatedOn='${files[i].UpdatedOn}', UpdatedBy='${files[i].UpdatedBy}', UpLoadedBy='${files[i].UpLoadedBy}', Prepared='${files[i].Prepared}', PreparedOn='${files[i].PreparedOn}', PreparedBy='${files[i].PreparedBy}' WHERE ID='${files[i].ID}'`)
-            .then(() => dispatch(removeFromEdit(files[i].ID)))
+          if (connectedHome) {
+            MSSQL_Home.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${files[i].UpLoadedOn}', UpdatedOn='${files[i].UpdatedOn}', UpdatedBy='${files[i].UpdatedBy}', UpLoadedBy='${files[i].UpLoadedBy}', Prepared='${files[i].Prepared}', PreparedOn='${files[i].PreparedOn}', PreparedBy='${files[i].PreparedBy}' WHERE ID='${files[i].ID}'`)
+              .then(() => dispatch(removeFromEdit(files[i].ID)))
+          } else {
+            MSSQL_Out.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${files[i].UpLoadedOn}', UpdatedOn='${files[i].UpdatedOn}', UpdatedBy='${files[i].UpdatedBy}', UpLoadedBy='${files[i].UpLoadedBy}', Prepared='${files[i].Prepared}', PreparedOn='${files[i].PreparedOn}', PreparedBy='${files[i].PreparedBy}' WHERE ID='${files[i].ID}'`)
+              .then(() => dispatch(removeFromEdit(files[i].ID)))
+          }
         }
       } catch (e) {
         Sentry.captureException(e, { func: 'uploadMultipleFiles', doc: 'userActions' })

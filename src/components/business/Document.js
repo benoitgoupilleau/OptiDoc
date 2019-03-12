@@ -86,7 +86,7 @@ class Document extends React.Component {
   }
 
   confirmedOnUpload = async () => {
-    const { ID, Extension, isNew, userId, Dossier1, Dossier3, type } = this.props;
+    const { ID, Extension, isNew, userId, Dossier1, Dossier3, type, connectedHome } = this.props;
     const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${ID}(0).${Extension}`);
     if (secondVersion) {
       await RNFS.copyFile(`${EXTERNAL_PATH}${ID}(0).${Extension}`, `${EXTERNAL_PATH}${ID}.${Extension}`);
@@ -109,9 +109,9 @@ class Document extends React.Component {
     }
     this.props.uploadingFile(ID);
     if (isNew) {
-      return this.props.createFile(filePath, fileToUpLoad, remoteDir)
+      return this.props.createFile(connectedHome, filePath, fileToUpLoad, remoteDir)
     } else {
-      return this.props.uploadFile(filePath, fileToUpLoad, remoteDir);
+      return this.props.uploadFile(connectedHome, filePath, fileToUpLoad, remoteDir);
     }
   }
 
@@ -359,6 +359,7 @@ Document.propTypes = {
   editPrepare: PropTypes.func.isRequired,
   removePrepare: PropTypes.func.isRequired,
   createFile: PropTypes.func.isRequired,
+  connectedHome: PropTypes.bool.isRequired,
 }
 
 Document.defaultProps = {
@@ -379,6 +380,7 @@ const mapStateToProps = state => ({
   name: state.user.name,
   modeleDocs: state.business.docs.filter(d => (d.Dossier1 && d.Dossier1 === 'Modele')),
   modeleDownloaded: state.user.modeleDownloaded,
+  connectedHome: state.network.connectedHome,
 })
 
 export default withNavigation(connect(mapStateToProps, { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, updatePrepared, editPrepare, removePrepare, removeNewDoc, createFile })(Document));
