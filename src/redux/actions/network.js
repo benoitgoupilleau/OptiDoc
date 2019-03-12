@@ -1,17 +1,20 @@
-import MSSQL, { configOut, configHome } from '../../services/mssql';
+import MSSQL_Out, { configOut } from '../../services/mssqlOut';
+import MSSQL_Home, { configHome } from '../../services/mssqlHome';
 import { setUpFTPHome, setUpFTPOut } from '../../services/ftp'
 import {
   UPDATE_NET_STATUS,
   MSSQL_CONNECTED,
   MSSQL_FAILED,
+  UPD_CONNECTED_HOME,
 } from './types';
 import Sentry from '../../services/sentry'
 
 export const connectDbOut = () => dispatch => {
-  return MSSQL.connect(configOut)
+  dispatch(updateConnectedHome(false))
+  setUpFTPOut();
+  return MSSQL_Out.connect(configOut)
     .then(() => {
-      setUpFTPOut();
-      return dispatch(dbSuccess(false))
+      return dispatch(dbSuccess())
     })
     .catch(e => {
       Sentry.captureException(e, { func: 'connectDbOut', doc: 'networkActions' })
@@ -20,10 +23,11 @@ export const connectDbOut = () => dispatch => {
 }
 
 export const connectDbHome = () => dispatch => {
-  return MSSQL.connect(configHome)
+  dispatch(updateConnectedHome(true))
+  setUpFTPHome();
+  return MSSQL_Home.connect(configHome)
     .then(() => {
-      setUpFTPHome();
-      return dispatch(dbSuccess(true))
+      return dispatch(dbSuccess())
     })
     .catch(e => {
       Sentry.captureException(e, { func: 'connectDbHome', doc: 'networkActions' })
@@ -31,28 +35,38 @@ export const connectDbHome = () => dispatch => {
     })
 }
 
-export const switchDb = (connectHome = false) => dispatch => MSSQL.close()
-  .then(() => {
-    if (connectHome) {
-      return MSSQL.connect(configHome)
-        .then(() => {
-          setUpFTPHome();
-          return dispatch(dbSuccess(true))
-        })
-    }
-    return MSSQL.connect(configOut)
+export const switchDb = (connectHome = false) => dispatch => {
+  if (connectHome) {
+    dispatch(updateConnectedHome(true))
+    setUpFTPHome();
+    return MSSQL_Home.connect(configHome)
       .then(() => {
-        setUpFTPOut();
-        return dispatch(dbSuccess(false))
+        return dispatch(dbSuccess())
       })
-  })
-  .catch(e => {
-    Sentry.captureException(e, { func: 'switchDb', doc: 'networkActions' })
-    return dispatch(dbFailed())
-  })
+      .catch(e => {
+        Sentry.captureException(e, { func: 'switchDb', doc: 'networkActions' })
+        return dispatch(dbFailed())
+      })
+  }
+  dispatch(updateConnectedHome(false))
+  setUpFTPOut();
+  return MSSQL_Out.connect(configOut)
+    .then(() => {
+      return dispatch(dbSuccess())
+    })
+    .catch(e => {
+      Sentry.captureException(e, { func: 'switchDb', doc: 'networkActions' })
+      return dispatch(dbFailed())
+    })
+  
+}
 
-const dbSuccess = (connectedHome = false) => ({
+const dbSuccess = () => ({
   type: MSSQL_CONNECTED,
+})
+
+const updateConnectedHome = (connectedHome = false) => ({
+  type: UPD_CONNECTED_HOME,
   connectedHome
 })
 

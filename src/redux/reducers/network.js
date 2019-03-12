@@ -3,6 +3,7 @@ import {
   UPDATE_NET_STATUS,
   MSSQL_CONNECTED,
   MSSQL_FAILED,
+  UPD_CONNECTED_HOME,
 } from '../actions/types';
 
 const defaultState = {
@@ -29,12 +30,17 @@ export default (state = defaultState, action) => {
         mssqlConnected
       }
     }
+    case UPD_CONNECTED_HOME: {
+      return {
+        ...state,
+        connectedHome: action.connectedHome
+      }
+    }
     case MSSQL_CONNECTED:
       return {
         ...state,
         mssqlConnected: true,
         mssqlConnectionFailed: false,
-        connectedHome: action.connectedHome
       }
     case MSSQL_FAILED:
       return {

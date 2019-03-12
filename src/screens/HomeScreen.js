@@ -46,7 +46,7 @@ class HomeScreen extends React.Component {
   componentDidMount() {
     Orientation.lockToPortrait();
     if (this.props.mssqlConnected) {
-      this.props.getNews();
+      this.props.getNews(this.props.connectedHome);
       this.props.getDocs(this.props.docs, this.props.downloadedBusiness, this.props.editedDocs);
       this.props.getBusiness()
       this.props.getModeles()
@@ -69,13 +69,13 @@ class HomeScreen extends React.Component {
     if (this.props.mssqlConnected) {
       this.setState({ refreshing: true });
       this.props.refreshNews();
-      this.props.getNews()
+      this.props.getNews(this.props.connectedHome)
     }
   }
 
   render() {
     if (this.props.mssqlConnected && !this.state.hasFetchedData){
-      this.props.getNews();
+      this.props.getNews(this.props.connectedHome);
       this.props.getDocs(this.props.docs, this.props.downloadedBusiness, this.props.editedDocs);
       this.props.getBusiness()
       this.props.getModeles()
@@ -138,6 +138,7 @@ HomeScreen.propTypes = {
   downloadedBusiness: PropTypes.array.isRequired,
   docs: PropTypes.array.isRequired,
   modeleDownloaded: PropTypes.string.isRequired,
+  connectedHome: PropTypes.bool.isRequired
 }
 
 
@@ -152,7 +153,8 @@ const mapStateToProps = (state) => ({
   downloadedBusiness: state.user.downloadedBusiness,
   docs: state.business.docs,
   modeleDocs: state.business.docs.filter(d => (d.Dossier1 && d.Dossier1 === 'Modele')),
-  modeleDownloaded: state.user.modeleDownloaded
+  modeleDownloaded: state.user.modeleDownloaded,
+  connectedHome: state.network.connectedHome
 })
 
 export default connect(mapStateToProps, { getNews, refreshNews, getDocs, getModeles, getBusiness, getUser, downloadModels, getAffaires, getArbo })(HomeScreen);
