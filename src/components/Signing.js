@@ -81,7 +81,7 @@ class Signin extends React.Component {
   componentDidMount(){
     const userName = this.props.userName;
     if (this.props.mssqlConnected) {
-      this.props.getUser()
+      this.props.getUser(this.props.connectedHome)
     }
     this.setState({ userName })
   }
@@ -111,7 +111,7 @@ class Signin extends React.Component {
 
   render() {
     if (this.props.mssqlConnected && !this.state.hasFetchedData) {
-      this.props.getUser()
+      this.props.getUser(this.props.connectedHome)
       this.setState({hasFetchedData: true})
     }
     return (

@@ -66,7 +66,7 @@ const  AuthLoadingScreen = ({token,
       navigation.navigate('Auth');
     }
   } else {
-    getUser();
+    getUser(connectedHome);
     getDocs(docs, downloadedBusiness, editedDocs)
     downloadModels(modeleDocs)
     if (usersLoaded) {

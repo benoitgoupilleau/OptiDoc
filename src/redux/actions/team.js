@@ -1,4 +1,5 @@
-import MSSQL from '../../services/mssql';
+import MSSQL_Out from '../../services/mssqlOut';
+import MSSQL_Home from '../../services/mssqlHome';
 import Tables from '../../constants/Tables';
 import Sentry from '../../services/sentry'
 
@@ -7,9 +8,16 @@ import {
 } from './types';
 
 
-export const getUser = () => dispatch =>  MSSQL.executeQuery(`SELECT * FROM ${Tables.t_users}`)
-  .then((res) => dispatch(setUser(res)))
-  .catch(e => Sentry.captureException(e, { func: 'getUser', doc: 'teamActions' }))
+export const getUser = (connectHome = false) => dispatch =>  {
+  if (connectHome) {
+    return MSSQL_Home.executeQuery(`SELECT * FROM ${Tables.t_users}`)
+      .then((res) => dispatch(setUser(res)))
+      .catch(e => Sentry.captureException(e, { func: 'getUser', doc: 'teamActions' }))
+  }
+  return MSSQL_Out.executeQuery(`SELECT * FROM ${Tables.t_users}`)
+    .then((res) => dispatch(setUser(res)))
+    .catch(e => Sentry.captureException(e, { func: 'getUser', doc: 'teamActions' }))
+}
 
 const setUser = (users) => ({
   type: SET_USER,

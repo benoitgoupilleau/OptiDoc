@@ -50,7 +50,7 @@ class HomeScreen extends React.Component {
       this.props.getDocs(this.props.docs, this.props.downloadedBusiness, this.props.editedDocs);
       this.props.getBusiness()
       this.props.getModeles()
-      this.props.getUser()
+      this.props.getUser(this.props.connectedHome)
       this.props.getAffaires()
       this.props.getArbo()
     }
@@ -79,7 +79,7 @@ class HomeScreen extends React.Component {
       this.props.getDocs(this.props.docs, this.props.downloadedBusiness, this.props.editedDocs);
       this.props.getBusiness()
       this.props.getModeles()
-      this.props.getUser()
+      this.props.getUser(this.props.connectedHome)
       this.props.getAffaires()
       this.props.getArbo()
       if(this.props.modeleDownloaded !== 'in progress') this.props.downloadModels(this.props.modeleDocs)
