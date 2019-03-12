@@ -1,4 +1,5 @@
-import MSSQL from '../../services/mssql';
+import MSSQL_Out from '../../services/mssqlOut';
+import MSSQL_Home from '../../services/mssqlHome';
 import Tables from '../../constants/Tables';
 import Sentry from '../../services/sentry'
 
@@ -16,27 +17,52 @@ import {
 } from './types';
 
 
-export const getDocs = (currentDocs = [], downloadedAffaire = [], editedDocs = []) => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_docs}`)
-  .then((res) => {
-    const fileToDownload = [];
-    for (let i = 0; i < downloadedAffaire.length; i++) {
-      const currentBusinessFile = currentDocs.filter(c => c.Dossier1 === downloadedAffaire[i]);
-      const newBusinessFile = res.filter(c => c.Dossier1 === downloadedAffaire[i]);
-      for (let j = 0; j < newBusinessFile.length; j++) {
-        const indexDoc = currentBusinessFile.findIndex(d => d.ID === newBusinessFile[i].ID)
-        if (indexDoc > -1) {
-          if (currentBusinessFile[indexDoc].UpLoadedOn < newBusinessFile[i].UpLoadedOn) {
-            fileToDownload.push(newBusinessFile[i].ID)
+export const getDocs = (connectHome = false, currentDocs = [], downloadedAffaire = [], editedDocs = []) => dispatch => {
+  if (connectHome) {
+    return MSSQL_Home.executeQuery(`SELECT * FROM ${Tables.t_docs}`)
+      .then((res) => {
+        const fileToDownload = [];
+        for (let i = 0; i < downloadedAffaire.length; i++) {
+          const currentBusinessFile = currentDocs.filter(c => c.Dossier1 === downloadedAffaire[i]);
+          const newBusinessFile = res.filter(c => c.Dossier1 === downloadedAffaire[i]);
+          for (let j = 0; j < newBusinessFile.length; j++) {
+            const indexDoc = currentBusinessFile.findIndex(d => d.ID === newBusinessFile[i].ID)
+            if (indexDoc > -1) {
+              if (currentBusinessFile[indexDoc].UpLoadedOn < newBusinessFile[i].UpLoadedOn) {
+                fileToDownload.push(newBusinessFile[i].ID)
+              }
+            }
+          }
+        }
+        if (fileToDownload.length > 0) {
+          dispatch(setDocsToDownload(fileToDownload))
+        }
+        return dispatch(setDocs(editedDocs, res))
+      })
+      .catch(e => Sentry.captureException(e, { func: 'getDocs', doc: 'businessActions' }))
+  }
+  return MSSQL_Out.executeQuery(`SELECT * FROM ${Tables.t_docs}`)
+    .then((res) => {
+      const fileToDownload = [];
+      for (let i = 0; i < downloadedAffaire.length; i++) {
+        const currentBusinessFile = currentDocs.filter(c => c.Dossier1 === downloadedAffaire[i]);
+        const newBusinessFile = res.filter(c => c.Dossier1 === downloadedAffaire[i]);
+        for (let j = 0; j < newBusinessFile.length; j++) {
+          const indexDoc = currentBusinessFile.findIndex(d => d.ID === newBusinessFile[i].ID)
+          if (indexDoc > -1) {
+            if (currentBusinessFile[indexDoc].UpLoadedOn < newBusinessFile[i].UpLoadedOn) {
+              fileToDownload.push(newBusinessFile[i].ID)
+            }
           }
         }
       }
-    }
-    if (fileToDownload.length > 0) {
-      dispatch(setDocsToDownload(fileToDownload))
-    }
-    return dispatch(setDocs(editedDocs, res))
-  })
-  .catch(e => Sentry.captureException(e, { func: 'getDocs', doc: 'businessActions' }))
+      if (fileToDownload.length > 0) {
+        dispatch(setDocsToDownload(fileToDownload))
+      }
+      return dispatch(setDocs(editedDocs, res))
+    })
+    .catch(e => Sentry.captureException(e, { func: 'getDocs', doc: 'businessActions' }))
+}
 
 const setDocs = (editedDocs, docs) => ({
   type: SET_DOCS,
@@ -54,9 +80,16 @@ export const addDoc = (doc) => ({
   doc
 })
 
-export const getModeles = () => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_modeles}`)
-  .then((res) => dispatch(setModeles(res)))
-  .catch(e => Sentry.captureException(e, { func: 'getModeles', doc: 'businessActions' }))
+export const getModeles = (connectHome = false) => dispatch => {
+  if (connectHome) {
+    return MSSQL_Home.executeQuery(`SELECT * FROM ${Tables.t_modeles}`)
+      .then((res) => dispatch(setModeles(res)))
+      .catch(e => Sentry.captureException(e, { func: 'getModeles', doc: 'businessActions' }))
+  }
+  return MSSQL_Out.executeQuery(`SELECT * FROM ${Tables.t_modeles}`)
+    .then((res) => dispatch(setModeles(res)))
+    .catch(e => Sentry.captureException(e, { func: 'getModeles', doc: 'businessActions' }))
+}
 
 const setModeles = (modeles) => ({
   type: SET_MODELES,
@@ -71,9 +104,16 @@ export const updatePrepared = (fileId, Prepared, PreparedOn, PreparedBy) => ({
   PreparedBy
 })
 
-export const getBusiness = () => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_business}`)
-  .then((res) => dispatch(setBusiness(res)))
-  .catch(e => Sentry.captureException(e, { func: 'getBusiness', doc: 'businessActions' }))
+export const getBusiness = (connectHome = false) => dispatch => {
+  if (connectHome) {
+    return MSSQL_Home.executeQuery(`SELECT * FROM ${Tables.t_business}`)
+      .then((res) => dispatch(setBusiness(res)))
+      .catch(e => Sentry.captureException(e, { func: 'getBusiness', doc: 'businessActions' }))
+  }
+  return MSSQL_Out.executeQuery(`SELECT * FROM ${Tables.t_business}`)
+    .then((res) => dispatch(setBusiness(res)))
+    .catch(e => Sentry.captureException(e, { func: 'getBusiness', doc: 'businessActions' }))
+}
 
 const setBusiness = (business) => ({
   type: SET_BUSINESS,
@@ -90,18 +130,32 @@ export const removeNewDoc = id => ({
   id
 })
 
-export const getAffaires = () => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_affaires}`)
-  .then((res) => dispatch(setAffaires(res)))
-  .catch(e => Sentry.captureException(e, { func: 'getAffaires', doc: 'businessActions' }))
+export const getAffaires = (connectHome = false) => dispatch => {
+  if (connectHome) {
+    return MSSQL_Home.executeQuery(`SELECT * FROM ${Tables.t_affaires}`)
+      .then((res) => dispatch(setAffaires(res)))
+      .catch(e => Sentry.captureException(e, { func: 'getAffaires', doc: 'businessActions' }))
+  }
+  return MSSQL_Out.executeQuery(`SELECT * FROM ${Tables.t_affaires}`)
+    .then((res) => dispatch(setAffaires(res)))
+    .catch(e => Sentry.captureException(e, { func: 'getAffaires', doc: 'businessActions' }))
+}
 
 const setAffaires = (affaires) => ({
   type: SET_AFFAIRES,
   affaires
 })
 
-export const getArbo = () => dispatch => MSSQL.executeQuery(`SELECT * FROM ${Tables.t_arbo}`)
-  .then((res) => dispatch(setArbo(res)))
-  .catch(e => Sentry.captureException(e, { func: 'getArbo', doc: 'businessActions' }))
+export const getArbo = (connectHome = false) => dispatch => {
+  if (connectHome) {
+    return MSSQL_Home.executeQuery(`SELECT * FROM ${Tables.t_arbo}`)
+      .then((res) => dispatch(setArbo(res)))
+      .catch(e => Sentry.captureException(e, { func: 'getArbo', doc: 'businessActions' }))
+  }
+  return MSSQL_Out.executeQuery(`SELECT * FROM ${Tables.t_arbo}`)
+    .then((res) => dispatch(setArbo(res)))
+    .catch(e => Sentry.captureException(e, { func: 'getArbo', doc: 'businessActions' }))
+}
 
 const setArbo = (subFolder) => ({
   type: SET_ARBO,

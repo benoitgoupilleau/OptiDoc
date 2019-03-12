@@ -47,12 +47,12 @@ class HomeScreen extends React.Component {
     Orientation.lockToPortrait();
     if (this.props.mssqlConnected) {
       this.props.getNews(this.props.connectedHome);
-      this.props.getDocs(this.props.docs, this.props.downloadedBusiness, this.props.editedDocs);
-      this.props.getBusiness()
-      this.props.getModeles()
+      this.props.getDocs(this.props.connectedHome, this.props.docs, this.props.downloadedBusiness, this.props.editedDocs);
+      this.props.getBusiness(this.props.connectedHome)
+      this.props.getModeles(this.props.connectedHome)
       this.props.getUser(this.props.connectedHome)
-      this.props.getAffaires()
-      this.props.getArbo()
+      this.props.getAffaires(this.props.connectedHome)
+      this.props.getArbo(this.props.connectedHome)
     }
     if (this.props.modeleDownloaded !== 'in progress' && this.props.mssqlConnected) {
       this.props.downloadModels(this.props.modeleDocs);
@@ -76,12 +76,12 @@ class HomeScreen extends React.Component {
   render() {
     if (this.props.mssqlConnected && !this.state.hasFetchedData){
       this.props.getNews(this.props.connectedHome);
-      this.props.getDocs(this.props.docs, this.props.downloadedBusiness, this.props.editedDocs);
-      this.props.getBusiness()
-      this.props.getModeles()
+      this.props.getDocs(this.props.connectedHome, this.props.docs, this.props.downloadedBusiness, this.props.editedDocs);
+      this.props.getBusiness(this.props.connectedHome)
+      this.props.getModeles(this.props.connectedHome)
       this.props.getUser(this.props.connectedHome)
-      this.props.getAffaires()
-      this.props.getArbo()
+      this.props.getAffaires(this.props.connectedHome)
+      this.props.getArbo(this.props.connectedHome)
       if(this.props.modeleDownloaded !== 'in progress') this.props.downloadModels(this.props.modeleDocs)
       this.setState({hasFetchedData: true})
     } 

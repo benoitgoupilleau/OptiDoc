@@ -64,11 +64,11 @@ class Logout extends React.Component {
   refreshData = () => {
     this.setState({ refreshing: true})
     this.props.getNews(this.props.connectedHome)
-    this.props.getDocs(this.props.docs, this.props.downloadedBusiness, this.props.editedDocs)
-    this.props.getAffaires()
-    this.props.getArbo()
-    this.props.getBusiness();
-    this.props.getModeles()
+    this.props.getDocs(this.props.connectedHome, this.props.docs, this.props.downloadedBusiness, this.props.editedDocs)
+    this.props.getAffaires(this.props.connectedHome)
+    this.props.getArbo(this.props.connectedHome)
+    this.props.getBusiness(this.props.connectedHome);
+    this.props.getModeles(this.props.connectedHome)
     this.props.getUser(this.props.connectedHome)
     setTimeout(() => {
       this.setState({ refreshing: false})

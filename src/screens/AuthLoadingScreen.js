@@ -67,7 +67,7 @@ const  AuthLoadingScreen = ({token,
     }
   } else {
     getUser(connectedHome);
-    getDocs(docs, downloadedBusiness, editedDocs)
+    getDocs(connectedHome, docs, downloadedBusiness, editedDocs)
     downloadModels(modeleDocs)
     if (usersLoaded) {
       navigation.navigate(token !== '' ? 'App' : 'Auth');
