@@ -90,13 +90,13 @@ export default (state = defaultState, action) => {
       const indexDocToUpdate = currentDoc.findIndex(el => el.ID === action.fileId);
       const indexNewDocToUpdate = currentNewDoc.findIndex(el => el.ID === action.fileId);
       if (indexNewDocToUpdate > -1) {
-        const newDoc = { ...currentNewDoc[indexNewDocToUpdate], Prepared: action.Prepared, PreparedOn: action.PreparedOn, PreparedBy: action.PreparedBy }
+        const newDoc = { ...currentNewDoc[indexNewDocToUpdate], Prepared: action.Prepared, PreparedOn: action.PreparedOn, PreparedBy: action.PreparedBy, Revisable: action.Revisable }
         return {
           ...state,
           newDocs: [...currentNewDoc.slice(0, indexNewDocToUpdate), newDoc, ...currentNewDoc.slice(indexNewDocToUpdate+1)]
         }
       } else {
-        const newDoc = { ...currentDoc[indexDocToUpdate], Prepared: action.Prepared, PreparedOn: action.PreparedOn, PreparedBy: action.PreparedBy }
+        const newDoc = { ...currentDoc[indexDocToUpdate], Prepared: action.Prepared, PreparedOn: action.PreparedOn, PreparedBy: action.PreparedBy, Revisable: action.Revisable }
         return {
           ...state,
           docs: [...currentDoc.slice(0, indexDocToUpdate), newDoc, ...currentDoc.slice(indexDocToUpdate+1)]

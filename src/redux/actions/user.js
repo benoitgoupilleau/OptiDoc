@@ -238,10 +238,10 @@ export const uploadFile = (connectedHome = false, filePath, file, remoteDir) => 
       .then(() => {
         //MSSQL update
         if (connectedHome) {
-          return MSSQL_Home.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}', PreparedBy='${file.PreparedBy}' WHERE ID='${file.ID}'`)
+          return MSSQL_Home.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}', PreparedBy='${file.PreparedBy}', Revisable='${file.Revisable}' WHERE ID='${file.ID}'`)
             .then(() => dispatch(removeFromEdit(file.ID)))
         }
-        return MSSQL_Out.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}', PreparedBy='${file.PreparedBy}' WHERE ID='${file.ID}'`)
+        return MSSQL_Out.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}', PreparedBy='${file.PreparedBy}', Revisable='${file.Revisable}' WHERE ID='${file.ID}'`)
           .then(() => dispatch(removeFromEdit(file.ID)))
       })))
   .catch((e) => {
@@ -318,10 +318,10 @@ export const uploadMultipleFiles = (connectedHome = false, files) => (dispatch) 
           
         } else {
           if (connectedHome) {
-            MSSQL_Home.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${files[i].UpLoadedOn}', UpdatedOn='${files[i].UpdatedOn}', UpdatedBy='${files[i].UpdatedBy}', UpLoadedBy='${files[i].UpLoadedBy}', Prepared='${files[i].Prepared}', PreparedOn='${files[i].PreparedOn}', PreparedBy='${files[i].PreparedBy}' WHERE ID='${files[i].ID}'`)
+            MSSQL_Home.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${files[i].UpLoadedOn}', UpdatedOn='${files[i].UpdatedOn}', UpdatedBy='${files[i].UpdatedBy}', UpLoadedBy='${files[i].UpLoadedBy}', Prepared='${files[i].Prepared}', PreparedOn='${files[i].PreparedOn}', PreparedBy='${files[i].PreparedBy}', Revisable='${files[i].Revisable}' WHERE ID='${files[i].ID}'`)
               .then(() => dispatch(removeFromEdit(files[i].ID)))
           } else {
-            MSSQL_Out.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${files[i].UpLoadedOn}', UpdatedOn='${files[i].UpdatedOn}', UpdatedBy='${files[i].UpdatedBy}', UpLoadedBy='${files[i].UpLoadedBy}', Prepared='${files[i].Prepared}', PreparedOn='${files[i].PreparedOn}', PreparedBy='${files[i].PreparedBy}' WHERE ID='${files[i].ID}'`)
+            MSSQL_Out.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${files[i].UpLoadedOn}', UpdatedOn='${files[i].UpdatedOn}', UpdatedBy='${files[i].UpdatedBy}', UpLoadedBy='${files[i].UpLoadedBy}', Prepared='${files[i].Prepared}', PreparedOn='${files[i].PreparedOn}', PreparedBy='${files[i].PreparedBy}', Revisable='${files[i].Revisable}' WHERE ID='${files[i].ID}'`)
               .then(() => dispatch(removeFromEdit(files[i].ID)))
           }
         }

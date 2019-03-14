@@ -132,7 +132,8 @@ class Document extends React.Component {
 
   confirmedOnPrepare = (newPrepared, now) => {
     const PreparedOn = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
-    this.props.updatePrepared(this.props.ID, newPrepared, PreparedOn, this.props.name);
+    const Revisable = 'O';
+    this.props.updatePrepared(this.props.ID, newPrepared, PreparedOn, this.props.name, Revisable);
     this.props.editPrepare({ ID: this.props.ID, prepared: true, affaire: this.props.Dossier1, Extension: this.props.Extension, Dossier3: this.props.Dossier3 })
   }
 
@@ -141,8 +142,9 @@ class Document extends React.Component {
     const now = new Date();
     if (newPrepared === 'N') {
       const PreparedOn = '1900-01-01';
+      const Revisable = 'N';
       const PreparedBy = '';
-      this.props.updatePrepared(this.props.ID, newPrepared, PreparedOn, PreparedBy);
+      this.props.updatePrepared(this.props.ID, newPrepared, PreparedOn, PreparedBy, Revisable);
       this.props.removePrepare(this.props.ID)
     } else {
       Alert.alert("Confirmer la préparation", "Etes-vous sûr de vouloir cocher ce fichier comme préparé ?", [{
