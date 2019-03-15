@@ -28,6 +28,7 @@ export const UPDATE_NET_STATUS = 'UPDATE_NET_STATUS';
 export const MSSQL_CONNECTED = 'MSSQL_CONNECTED'
 export const MSSQL_FAILED = 'MSSQL_FAILED';
 export const UPD_CONNECTED_HOME = 'UPD_CONNECTED_HOME';
+export const CONNECTING = 'CONNECTING';
 
 // Team actions
 export const SET_USER = 'SET_USER';

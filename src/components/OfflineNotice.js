@@ -58,9 +58,11 @@ class OfflineNotice extends PureComponent {
     } else if (this.props.isConnected && !this.props.mssqlConnected) {
       return (
         <Wrapper type="warning">
+          {this.props.connecting ? 
+            <Message type="warning" >Connexion en cours ...</Message> :
           <TouchableOpacity onPress={this.testDb} style={{ height: 30 }}>
             <Message type="warning" >Connexion perdue avec la base de données. Cliquer pour réessayer</Message>
-          </TouchableOpacity>
+          </TouchableOpacity>}
         </Wrapper>
       );
     } else if (this.props.modeleDownloaded === 'in progress') {
@@ -85,6 +87,7 @@ OfflineNotice.propTypes = {
   totalModeles: PropTypes.number.isRequired,
   mssqlConnected: PropTypes.bool.isRequired,
   connectDbHome: PropTypes.func.isRequired,
+  connecting: PropTypes.bool.isRequired
 }
 
 const mapStateToProps = state => ({
@@ -94,7 +97,8 @@ const mapStateToProps = state => ({
   modeleDownloaded: state.user.modeleDownloaded,
   nbDownloaded: state.user.nbDownloaded,
   totalModeles: state.user.totalModeles,
-  connectedHome: state.network.connectedHome
+  connectedHome: state.network.connectedHome,
+  connecting: state.network.connecting
 })
 
 export default connect(mapStateToProps, { connectivityChange, connectDbOut, connectDbHome })(OfflineNotice);

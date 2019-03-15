@@ -125,17 +125,18 @@ class Signin extends React.Component {
         <Title>OptiDoc</Title>
         <View style={{alignItems : "center"}}>
           <SwitchSelector
+            disabled={this.props.connecting}
             initial={this.props.connectedHome ? 1 : 0}
             onPress={value => this.props.switchDb(value)}
-            textColor={Colors.mainColor}
+            textColor={this.props.connecting ? Colors.thirdColor : Colors.mainColor}
             selectedColor="#fff"
-            buttonColor={Colors.mainColor}
-            borderColor={Colors.mainColor}
+            buttonColor={this.props.connecting ? Colors.thirdColor : Colors.mainColor}
+            borderColor={this.props.connecting ? Colors.thirdColor : Colors.mainColor}
             hasPadding
             style={{ width: 80, margin: 10 }}
             options={[
-              { value: false, customIcon: <Ionicons color={this.props.connectedHome ? Colors.mainColor : '#fff'} name="md-briefcase" size={Layout.icon.small} /> },
-              { value: true, customIcon: <Ionicons color={!this.props.connectedHome ? Colors.mainColor : '#fff'} name="md-home" size={Layout.icon.small} /> },
+              { value: false, customIcon: <Ionicons color={this.props.connectedHome ? this.props.connecting ? Colors.thirdColor : Colors.mainColor : '#fff'} name="md-briefcase" size={Layout.icon.small} /> },
+              { value: true, customIcon: <Ionicons color={!this.props.connectedHome ? this.props.connecting ? Colors.thirdColor : Colors.mainColor : '#fff'} name="md-home" size={Layout.icon.small} /> },
             ]}
           />
         </View>
@@ -176,7 +177,8 @@ Signin.propTypes = {
   mssqlConnected: PropTypes.bool.isRequired,
   users: PropTypes.array.isRequired,
   userName: PropTypes.string.isRequired,
-  usersLoaded: PropTypes.bool.isRequired
+  usersLoaded: PropTypes.bool.isRequired,
+  connecting: PropTypes.bool.isRequired
 }
 
 const mapStateToProps = state => ({
@@ -186,7 +188,8 @@ const mapStateToProps = state => ({
   locked: state.user.locked,
   users: state.teams.users,
   usersLoaded: state.teams.usersLoaded,
-  connectedHome: state.network.connectedHome
+  connectedHome: state.network.connectedHome,
+  connecting: state.network.connecting
 })
 
 export default withNavigation(connect(mapStateToProps, { login, getUser, switchDb })(Signin));

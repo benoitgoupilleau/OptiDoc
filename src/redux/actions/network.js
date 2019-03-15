@@ -6,11 +6,17 @@ import {
   MSSQL_CONNECTED,
   MSSQL_FAILED,
   UPD_CONNECTED_HOME,
+  CONNECTING,
 } from './types';
 import Sentry from '../../services/sentry'
 
+const connecting = () => ({
+  type: CONNECTING
+})
+
 export const connectDbOut = () => dispatch => {
   dispatch(updateConnectedHome(false))
+  dispatch(connecting())
   setUpFTPOut();
   return MSSQL_Out.connect(configOut)
     .then(() => {
@@ -24,6 +30,7 @@ export const connectDbOut = () => dispatch => {
 
 export const connectDbHome = () => dispatch => {
   dispatch(updateConnectedHome(true))
+  dispatch(connecting())
   setUpFTPHome();
   return MSSQL_Home.connect(configHome)
     .then(() => {
@@ -35,10 +42,23 @@ export const connectDbHome = () => dispatch => {
     })
 }
 
-export const switchDb = (connectHome = false) => dispatch => {
+export const switchDb = (connectHome = false, mssqlConnected = false) => dispatch => {
+  dispatch(dbFailed())
+  dispatch(connecting())
   if (connectHome) {
     dispatch(updateConnectedHome(true))
     setUpFTPHome();
+    if (mssqlConnected) {
+      return MSSQL_Out.close().then(() => MSSQL_Home.connect(configHome)
+        .then(() => {
+          return dispatch(dbSuccess())
+        })
+        .catch(e => {
+          Sentry.captureException(e, { func: 'switchDb', doc: 'networkActions' })
+          return dispatch(dbFailed())
+        })
+      )
+    }
     return MSSQL_Home.connect(configHome)
       .then(() => {
         return dispatch(dbSuccess())
@@ -50,6 +70,17 @@ export const switchDb = (connectHome = false) => dispatch => {
   }
   dispatch(updateConnectedHome(false))
   setUpFTPOut();
+  if (mssqlConnected) {
+    return MSSQL_Home.close().then(() => MSSQL_Out.connect(configOut)
+      .then(() => {
+        return dispatch(dbSuccess())
+      })
+      .catch(e => {
+        Sentry.captureException(e, { func: 'switchDb', doc: 'networkActions' })
+        return dispatch(dbFailed())
+      })
+    )
+  }
   return MSSQL_Out.connect(configOut)
     .then(() => {
       return dispatch(dbSuccess())
@@ -58,7 +89,6 @@ export const switchDb = (connectHome = false) => dispatch => {
       Sentry.captureException(e, { func: 'switchDb', doc: 'networkActions' })
       return dispatch(dbFailed())
     })
-  
 }
 
 const dbSuccess = () => ({

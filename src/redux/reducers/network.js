@@ -4,10 +4,12 @@ import {
   MSSQL_CONNECTED,
   MSSQL_FAILED,
   UPD_CONNECTED_HOME,
+  CONNECTING,
 } from '../actions/types';
 
 const defaultState = {
   isConnected: true,
+  connecting: true,
   mssqlConnected: false,
   mssqlConnectionFailed: false,
   connectedHome: false
@@ -30,6 +32,12 @@ export default (state = defaultState, action) => {
         mssqlConnected
       }
     }
+    case CONNECTING: {
+      return {
+        ...state,
+        connecting: true
+      }
+    }
     case UPD_CONNECTED_HOME: {
       return {
         ...state,
@@ -41,12 +49,14 @@ export default (state = defaultState, action) => {
         ...state,
         mssqlConnected: true,
         mssqlConnectionFailed: false,
+        connecting: false,
       }
     case MSSQL_FAILED:
       return {
         ...state,
         mssqlConnected: false,
-        mssqlConnectionFailed: true
+        mssqlConnectionFailed: true,
+        connecting: false,
       }
     default:
       return state;
