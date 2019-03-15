@@ -29,7 +29,7 @@ const HeaderTitle = ({ title, noLogo }) => {
     <Wrapper> 
       {logo && !noLogo && <Image
         source={logo}
-        style={{ width: 95, height: 50 }}
+        style={{ width: 75, height: 45 }}
       />}
       {displayTitle.length > 0 && <Title>{displayTitle}</Title> }
     </Wrapper>
