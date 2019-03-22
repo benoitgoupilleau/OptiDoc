@@ -186,17 +186,25 @@ class AddPictureScreen extends React.Component {
 
   handleSelectPicture = (pictureName) => {
     const now = new Date();
-    const date = now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '.' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '.' + now.getFullYear()
-    this.setState({ pictureName, pictureNameFinal: 'Photo ' + date })
+    const day = now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }).toString()
+    const month = (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }).toString();
+    const year = now.getFullYear()
+    const date = `${day}.${month}.${year}`;
+    this.setState({ pictureName, pictureNameFinal: `Photo ${date}` })
   }
 
   onCreatePicture = () => {
     this.setState({ creatingFile: true })
     const businessId = this.props.navigation.getParam('affaire', '')
     const now = new Date();
-    const CreatedOn = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
-    const date = now.getFullYear() + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) +
-      + now.getHours().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + now.getMinutes().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + now.getMilliseconds().toLocaleString('fr-FR', { minimumIntegerDigits: 3 })
+    const day = now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }).toString()
+    const month = (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }).toString();
+    const year = now.getFullYear();
+    const hours = now.getHours().toLocaleString('fr-FR', { minimumIntegerDigits: 2 });
+    const minutes = now.getMinutes().toLocaleString('fr-FR', { minimumIntegerDigits: 2 });
+    const secondes = now.getMilliseconds().toLocaleString('fr-FR', { minimumIntegerDigits: 3 })
+    const CreatedOn = `${year}-${month}-${day}`;
+    const date = `${year}${month}${day}${hours}${minutes}${secondes}`;
     const fileID = 'DOC_' + date;
     const Dossier3 = 'DOSS_5';
     const destPath = `${rootDir}/${this.props.user.id}/${businessId}/${Folder.rea}/${fileID}.pdf`;

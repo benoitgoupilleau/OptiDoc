@@ -117,8 +117,11 @@ class AddFileScreen extends React.Component {
 
   handleSelectModele = (ModeleID, FileName, filePath) => {
     const now = new Date();
-    const date = now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '.' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '.' + now.getFullYear()
-    this.setState({ ModeleID, FileName, FileNameFinal: FileName + ' ' + date, filePath })
+    const day = now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }).toString()
+    const month = (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }).toString();
+    const year = now.getFullYear()
+    const date = `${day}.${month}.${year}`;
+    this.setState({ ModeleID, FileName, FileNameFinal: `${FileName} ${date}`, filePath })
   }
 
   onCreateFile = () => {
@@ -130,9 +133,14 @@ class AddFileScreen extends React.Component {
       const now = new Date();
       const affaire = this.props.affaires.filter(a => a.ID === businessId)[0]
       const clientName = affaire ? `${affaire.Client} - ${affaire.Designation}` : businessId;
-      const CreatedOn = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
-      const date = now.getFullYear() + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + 
-        + now.getHours().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + now.getMinutes().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + now.getMilliseconds().toLocaleString('fr-FR', { minimumIntegerDigits: 3 })
+      const day = now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }).toString()
+      const month = (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }).toString();
+      const year = now.getFullYear();
+      const hours = now.getHours().toLocaleString('fr-FR', { minimumIntegerDigits: 2 });
+      const minutes = now.getMinutes().toLocaleString('fr-FR', { minimumIntegerDigits: 2 });
+      const secondes = now.getMilliseconds().toLocaleString('fr-FR', { minimumIntegerDigits: 3 })
+      const CreatedOn = `${year}-${month}-${day}`;
+      const date = `${year}${month}${day}${hours}${minutes}${secondes}`;
       const fileID= 'DOC_' + date;
       const modeleSelected = this.props.modeles.filter(m => m.ID_Document === this.state.ModeleID)[0]
       const Dossier3 = modeleSelected.DossierDestination;

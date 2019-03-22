@@ -212,11 +212,14 @@ class BusinessWithDocs extends React.Component {
         listArbo.push(newArbo)
       }
     }
-    listArbo.sort((a, b) => (a.NomDossier > b.NomDossier ? 1 : -1));
-    return listArbo.map(arbo => <SubArbo key={'Prep' + arbo.NomDossier} title={arbo.Designation}>{prep.filter(p => p.Dossier3 === arbo.NomDossier)
-      .sort((a, b) => (a.FileName > b.FileName ? 1 : -1))
-      .map(p => <Document key={p.ID} {...p} type={Folder.prep} prep={prep} rea={rea} />)}
-      </SubArbo>)
+    if (listArbo.length > 0) {
+      listArbo.sort((a, b) => (a.NomDossier > b.NomDossier ? 1 : -1));
+      return listArbo.map(arbo => <SubArbo key={'Prep' + arbo.NomDossier} title={arbo.Designation}>{prep.filter(p => p.Dossier3 === arbo.NomDossier)
+        .sort((a, b) => (a.FileName > b.FileName ? 1 : -1))
+        .map(p => <Document key={p.ID} {...p} type={Folder.prep} prep={prep} rea={rea} />)}
+        </SubArbo>)
+    }
+    return <React.Fragment></React.Fragment>
   }
 
   displayRea = () => {
@@ -229,11 +232,14 @@ class BusinessWithDocs extends React.Component {
         listArbo.push(newArbo)
       }
     }
-    listArbo.sort((a, b) => (a.NomDossier > b.NomDossier ? 1 : -1));
-    return listArbo.map(arbo => <SubArbo key={'Rea' + arbo.NomDossier} title={arbo.Designation}>{rea.filter(r => r.Dossier3 === arbo.NomDossier)
-      .sort((a, b) => (a.FileName > b.FileName ? 1 : -1))
-      .map(r => <Document key={r.ID} isNew={checkIfNew(editedDocs, r.ID)} {...r} type={Folder.rea} prep={prep} rea={rea} />)}
+    if (listArbo.length > 0) {
+      listArbo.sort((a, b) => (a.NomDossier > b.NomDossier ? 1 : -1));
+      return listArbo.map(arbo => <SubArbo key={'Rea' + arbo.NomDossier} title={arbo.Designation}>{rea.filter(r => r.Dossier3 === arbo.NomDossier)
+        .sort((a, b) => (a.FileName > b.FileName ? 1 : -1))
+        .map(r => <Document key={r.ID} isNew={checkIfNew(editedDocs, r.ID)} {...r} type={Folder.rea} prep={prep} rea={rea} />)}
       </SubArbo>)
+    }
+    return <React.Fragment></React.Fragment>
   }
 
   render() {

@@ -275,7 +275,7 @@ class Document extends React.Component {
           {this.displayLeftIcon()}
           <Title>{FileName}</Title>
         </File>
-        {type === Folder.rea && 
+        {type === Folder.rea ? 
           <IconsWrapper>
             {isEdited && (
               <EditIcons>
@@ -316,6 +316,12 @@ class Document extends React.Component {
               size={Layout.icon.default}
               onPress={this.onEdit}
             />}
+          </IconsWrapper> :
+          <IconsWrapper>
+            <Icons
+              name="md-lock"
+              size={Layout.icon.default}
+            />
           </IconsWrapper>
         }
       </DocumentWrapper>

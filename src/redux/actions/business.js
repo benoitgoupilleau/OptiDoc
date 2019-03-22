@@ -26,11 +26,15 @@ export const getDocs = (connectHome = false, currentDocs = [], downloadedAffaire
           const currentBusinessFile = currentDocs.filter(c => c.Dossier1 === downloadedAffaire[i]);
           const newBusinessFile = res.filter(c => c.Dossier1 === downloadedAffaire[i]);
           for (let j = 0; j < newBusinessFile.length; j++) {
-            const indexDoc = currentBusinessFile.findIndex(d => d.ID === newBusinessFile[i].ID)
-            if (indexDoc > -1) {
-              if (currentBusinessFile[indexDoc].UpLoadedOn < newBusinessFile[i].UpLoadedOn) {
-                fileToDownload.push(newBusinessFile[i].ID)
+            if (currentBusinessFile.length > 0) {
+              const indexDoc = currentBusinessFile.findIndex(d => d.ID === newBusinessFile[i].ID)
+              if (indexDoc > -1) {
+                if (currentBusinessFile[indexDoc].UpLoadedOn < newBusinessFile[i].UpLoadedOn) {
+                  fileToDownload.push(newBusinessFile[i].ID)
+                }
               }
+            } else {
+              fileToDownload.push(newBusinessFile[i].ID)
             }
           }
         }
@@ -48,11 +52,15 @@ export const getDocs = (connectHome = false, currentDocs = [], downloadedAffaire
         const currentBusinessFile = currentDocs.filter(c => c.Dossier1 === downloadedAffaire[i]);
         const newBusinessFile = res.filter(c => c.Dossier1 === downloadedAffaire[i]);
         for (let j = 0; j < newBusinessFile.length; j++) {
-          const indexDoc = currentBusinessFile.findIndex(d => d.ID === newBusinessFile[i].ID)
-          if (indexDoc > -1) {
-            if (currentBusinessFile[indexDoc].UpLoadedOn < newBusinessFile[i].UpLoadedOn) {
-              fileToDownload.push(newBusinessFile[i].ID)
+          if (currentBusinessFile.length > 0) {
+            const indexDoc = currentBusinessFile.findIndex(d => d.ID === newBusinessFile[i].ID)
+            if (indexDoc > -1) {
+              if (currentBusinessFile[indexDoc].UpLoadedOn < newBusinessFile[i].UpLoadedOn) {
+                fileToDownload.push(newBusinessFile[i].ID)
+              }
             }
+          } else {
+            fileToDownload.push(newBusinessFile[i].ID)
           }
         }
       }
