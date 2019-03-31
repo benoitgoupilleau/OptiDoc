@@ -116,15 +116,19 @@ class Document extends React.Component {
   }
 
   onUpload = () => {
-    const { isConnected, mssqlConnected } = this.props;
+    const { isConnected, mssqlConnected, Prepared } = this.props;
     if (isConnected && mssqlConnected) {
-      Alert.alert("Confirmer l'envoi", "Etes-vous sûr de vouloir envoyer ce fichier ?", [{
-        text: 'Annuler',
-        style: 'cancel',
-      }, {
-        text: 'Oui',
-        onPress: () => this.confirmedOnUpload()
-      }]);
+      if (Prepared === 'O') {
+        Alert.alert("Confirmer l'envoi", "Etes-vous sûr de vouloir envoyer ce fichier ?", [{
+          text: 'Annuler',
+          style: 'cancel',
+        }, {
+          text: 'Oui',
+          onPress: () => this.confirmedOnUpload()
+        }]);
+      } else {
+        Alert.alert('Envoi impossible', "Le fichier n'est pas coché comme 'Préparé'", [{ text: 'Ok' }]);
+      }
     } else {
       Alert.alert('Connexion impossible', 'Vous pourrez envoyer votre fichier une fois votre connexion rétablie', [{ text: 'Ok' }]);
     }

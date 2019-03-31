@@ -164,13 +164,19 @@ class BusinessWithDocs extends React.Component {
       if (this.props.uploadingDocs.length > 0) {
         Alert.alert('Envoi en cours', "Vous pourrez envoyer vos fichiers une fois l'envoi terminé", [{ text: 'Ok' }]);
       } else {
-        Alert.alert("Confirmer l'envoi", "Etes-vous sûr de vouloir envoyer l'ensemble des fichiers modifiés de cette affaire ?", [{
-          text: 'Annuler',
-          style: 'cancel',
-        }, {
-          text: 'Oui',
-          onPress: () => this.confirmedOnUpload()
-        }]);
+        const editedBusiness = this.props.editedDocs.filter(e => e.affaire === this.props.title)
+        const unPreparedDocs = editedBusiness.filter(d => !(d.prepared && d.prepared === true))
+        if (unPreparedDocs.length > 0) {
+          Alert.alert('Envoi impossible', "Les fichiers ne sont pas tous cochés comme 'Préparé'", [{ text: 'Ok' }]);
+        } else {
+          Alert.alert("Confirmer l'envoi", "Etes-vous sûr de vouloir envoyer l'ensemble des fichiers modifiés de cette affaire ?", [{
+            text: 'Annuler',
+            style: 'cancel',
+          }, {
+            text: 'Oui',
+            onPress: () => this.confirmedOnUpload()
+          }]);
+        }
       }
     } else {
       Alert.alert('Connexion impossible', 'Vous pourrez envoyer votre fichier une fois votre connexion rétablie', [{ text: 'Ok' }]);
