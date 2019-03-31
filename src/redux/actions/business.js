@@ -16,15 +16,18 @@ import {
   SET_DOCS_TO_DOWNLOAD
 } from './types';
 
+import FilesToExclude from '../../constants/FilesToExclude';
+
 
 export const getDocs = (connectHome = false, currentDocs = [], downloadedAffaire = [], editedDocs = []) => dispatch => {
   if (connectHome) {
     return MSSQL_Home.executeQuery(`SELECT * FROM ${Tables.t_docs}`)
       .then((res) => {
+        const files = res.filter(d => !FilesToExclude.includes(d.Dossier3))
         const fileToDownload = [];
         for (let i = 0; i < downloadedAffaire.length; i++) {
           const currentBusinessFile = currentDocs.filter(c => c.Dossier1 === downloadedAffaire[i]);
-          const newBusinessFile = res.filter(c => c.Dossier1 === downloadedAffaire[i]);
+          const newBusinessFile = files.filter(c => c.Dossier1 === downloadedAffaire[i]);
           for (let j = 0; j < newBusinessFile.length; j++) {
             if (currentBusinessFile.length > 0) {
               const indexDoc = currentBusinessFile.findIndex(d => d.ID === newBusinessFile[i].ID)
@@ -41,16 +44,17 @@ export const getDocs = (connectHome = false, currentDocs = [], downloadedAffaire
         if (fileToDownload.length > 0) {
           dispatch(setDocsToDownload(fileToDownload))
         }
-        return dispatch(setDocs(editedDocs, res))
+        return dispatch(setDocs(editedDocs, files))
       })
       .catch(e => Sentry.captureException(e, { func: 'getDocs', doc: 'businessActions' }))
   }
   return MSSQL_Out.executeQuery(`SELECT * FROM ${Tables.t_docs}`)
     .then((res) => {
+      const files = res.filter(d => !FilesToExclude.includes(d.Dossier3))
       const fileToDownload = [];
       for (let i = 0; i < downloadedAffaire.length; i++) {
         const currentBusinessFile = currentDocs.filter(c => c.Dossier1 === downloadedAffaire[i]);
-        const newBusinessFile = res.filter(c => c.Dossier1 === downloadedAffaire[i]);
+        const newBusinessFile = files.filter(c => c.Dossier1 === downloadedAffaire[i]);
         for (let j = 0; j < newBusinessFile.length; j++) {
           if (currentBusinessFile.length > 0) {
             const indexDoc = currentBusinessFile.findIndex(d => d.ID === newBusinessFile[i].ID)
@@ -67,7 +71,7 @@ export const getDocs = (connectHome = false, currentDocs = [], downloadedAffaire
       if (fileToDownload.length > 0) {
         dispatch(setDocsToDownload(fileToDownload))
       }
-      return dispatch(setDocs(editedDocs, res))
+      return dispatch(setDocs(editedDocs, files))
     })
     .catch(e => Sentry.captureException(e, { func: 'getDocs', doc: 'businessActions' }))
 }

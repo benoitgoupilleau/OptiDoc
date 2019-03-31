@@ -1,3 +1,5 @@
+import FilesToExclude from '../../constants/FilesToExclude'
+
 export const listAffaires =  (rights = [], userId = '') => {
   return rights.filter(r => r.ID_User === userId).map(filtered => filtered.ID_Affaire);
 }
@@ -6,7 +8,7 @@ export const listDocs = (docs = [], newDoc = [], businesses = []) => {
   const docList = {}
   for (let i = 0; i < businesses.length; i += 1) {
     const affaire = businesses[i]
-    const prep = docs.filter(d => (d.Dossier1 && d.Dossier1 === affaire && d.Dossier2 === 'Preparation'))
+    const prep = docs.filter(d => (d.Dossier1 && d.Dossier1 === affaire && d.Dossier2 === 'Preparation' && !FilesToExclude.includes(d.Dossier3)))
     const rea = [...docs.filter(d => (d.Dossier1 && d.Dossier1 === affaire && d.Dossier2 === 'Realisation')), ...newDoc.filter(d => (d.Dossier1 && d.Dossier1 === affaire))]
     docList[affaire] = {
       prep,
