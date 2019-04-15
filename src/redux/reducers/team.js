@@ -13,7 +13,7 @@ export default (state = defaultState, action) => {
       return {
         ...state,
         users: action.users,
-        usersLoaded: true
+        usersLoaded: action.users.length > 0
       }
     default:
       return state;
