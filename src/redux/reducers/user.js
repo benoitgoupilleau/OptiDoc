@@ -46,10 +46,14 @@ const defaultState = {
 
 const checkToken = async (token) => {
   if (token !== '') {
-    const verify = jwt.verify(token, JWT_SECRET, { alg: 'hs256' })
-    const now = new Date().getTime();
-    const isStillValid = verify.exp && verify.exp > now;
-    return isStillValid;
+    try {
+      const verify = await jwt.verify(token, JWT_SECRET, { alg: 'hs256' })
+      const now = new Date().getTime();
+      const isStillValid = verify.exp && verify.exp > now;
+      return isStillValid;
+    } catch (e) {
+      return false;
+    }
   }
   return false;
 }

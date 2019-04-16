@@ -9,7 +9,11 @@ export const openFile = async (ID, Extension) => {
     RNFS.copyFile(`${EXTERNAL_PATH}${ID}(0).${Extension}`, `${EXTERNAL_PATH}${ID}.${Extension}`)
       .then(() => RNFS.unlink(`${EXTERNAL_PATH}${ID}(0).${Extension}`)
           .then(() => FileViewer.open(`${EXTERNAL_PATH}${ID}.${Extension}`, { showOpenWithDialog: true }))
-      ).catch((e) => Sentry.captureException(e, { func: 'openFile', doc: 'openFileService'}))
+      ).catch((e) => {
+        Sentry.captureException(e, { func: 'openFile', doc: 'openFileService' })
+        console.error({ e, func: 'openFile', doc: 'openFileService' })
+        return;
+      })
   } else {
     return FileViewer.open(`${EXTERNAL_PATH}${ID}.${Extension}`, { showOpenWithDialog: true });
   } 

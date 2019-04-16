@@ -19,6 +19,8 @@ const encryptor = createEncryptor({
   secretKey: PERSIST_KEY,
   onError: function (error) {
     Sentry.captureException(error, { func: 'encryptor', doc: 'store.js'})
+    console.error({ error, func: 'encryptor', doc: 'store.js' })
+    return;
   }
 })
 

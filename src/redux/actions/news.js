@@ -13,11 +13,19 @@ export const getNews = (connectHome = false) => dispatch => {
   if (connectHome) {
     return MSSQL_Home.executeQuery(`SELECT * FROM ${Tables.t_news}`)
       .then((res) => dispatch(setNews(res)))
-      .catch(e => Sentry.captureException(e, { func: 'getNews', doc: 'newsActions' }))
+      .catch(e => {
+        Sentry.captureException(e, { func: 'getNews', doc: 'newsActions' })
+        console.error({ e, func: 'getNews', doc: 'newsActions' })
+        return;
+      })
   }
   return MSSQL_Out.executeQuery(`SELECT * FROM ${Tables.t_news}`)
     .then((res) => dispatch(setNews(res)))
-    .catch(e => Sentry.captureException(e, { func: 'getNews', doc: 'newsActions' }))
+    .catch(e => {
+      Sentry.captureException(e, { func: 'getNews', doc: 'newsActions' })
+      console.error({ e, func: 'getNews', doc: 'newsActions' })
+      return;
+    })
 }
   
 const setNews = (news) => ({

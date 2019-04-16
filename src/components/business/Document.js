@@ -190,6 +190,8 @@ class Document extends React.Component {
         await RNFS.unlink(externalPath)
       } catch (error) {
         Sentry.captureException(error, { func: 'removeWoPFile', doc: 'Document.js' })
+        console.error({ error, func: 'removeWoPFile', doc: 'Document.js' })
+        return;
       }
     }
   }
@@ -208,7 +210,11 @@ class Document extends React.Component {
               navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type, isEdited, Prepared, Reviewed, isPrepared, Locked })
             )
           )
-          .catch((e) => Sentry.captureException(e, { func: 'onOpenFile', doc: 'Document.js'}))
+          .catch((e) => {
+            Sentry.captureException(e, { func: 'onOpenFile', doc: 'Document.js'})
+            console.error({ e, func: 'onOpenFile', doc: 'Document.js' })
+            return;
+          })
       } else {
         return navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type, isEdited, Prepared, Reviewed, isPrepared, Locked })
       } 

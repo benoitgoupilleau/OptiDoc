@@ -57,16 +57,15 @@ export const downLoadOneFile = (id, serverPath, localPath) => dispatch => {
   return FTP.login(FTP_USERNAME, FTP_PASSWORD)
     .then(() => {
       dispatch(downloadingFile(id))
-      return FTP.downloadFile(serverPath, localPath).then(async () => {
-        await FTP.logout()
-        return dispatch(fileDownloaded(id))
-      })
+      return FTP.downloadFile(serverPath, localPath).then(() => 
+        FTP.logout().then(() => dispatch(fileDownloaded(id)))
+      )
     })
-    .catch(async (e) => {
+    .catch((e) => {
       Sentry.captureException(e, { func: 'downLoadOneFile', doc: 'userActions' })
+      console.error({ e, func: 'downLoadOneFile', doc: 'userActions' })
       isDownloadingFiles = false;
-      await FTP.logout()
-      return dispatch(cancelDownloadOneFile(id))
+      return FTP.logout().then(() => dispatch(cancelDownloadOneFile(id)))
     })
 }
 
@@ -107,6 +106,7 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
             }
           } catch (error) {
             Sentry.captureException(error, { prepDoc: prep[i], func: "FTP.downloadFile", doc: 'userActions' })
+            console.error({ error, prepDoc: prep[i], func: "FTP.downloadFile", doc: 'userActions' })
             return dispatch(cancelDownload(businessId))
           }
         }
@@ -123,6 +123,7 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
             }
           } catch (error) {
             Sentry.captureException(error, { reaDoc: rea[i], func: "FTP.downloadFile", doc: 'userActions' })
+            console.error({ error, reaDoc: rea[i], func: "FTP.downloadFile", doc: 'userActions' })
             return dispatch(cancelDownload(businessId))
           }
         }
@@ -133,6 +134,7 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
     })
     ).catch(async (e) => {
       Sentry.captureException(e, { func: 'downloadBusiness', doc: 'userActions' })
+      console.error({ e, func: 'downloadBusiness', doc: 'userActions' })
       isDownloadingFiles = false;
       await FTP.logout()
       return dispatch(cancelDownload(businessId))
@@ -192,6 +194,8 @@ export const downloadModels = (modeleDocs) => dispatch => {
             } catch (error) {
               await RNFS.unlink(`${rootDir}/${Folder.modeleDocs}/${modeleDocs[i].ID}.${modeleDocs[i].Extension}`)
               Sentry.captureException(error, { modeleDoc: modeleDocs[i], func: "FTP.downloadFile", doc: 'userActions' })
+              console.error({ error, modeleDoc: modeleDocs[i], func: "FTP.downloadFile", doc: 'userActions' })
+              return;
             }
           }
         }
@@ -204,6 +208,7 @@ export const downloadModels = (modeleDocs) => dispatch => {
       dispatch(cancelDownloadModel())
       isDownloadingModeles = false;
       Sentry.captureException(e, { func: 'downloadModels', doc: 'userActions' })
+      console.log({ e, func: 'downloadModels', doc: 'userActions' })
       return await FTP.logout()
     })
 }
@@ -246,6 +251,7 @@ export const uploadFile = (connectedHome = false, filePath, file, remoteDir) => 
       })))
   .catch((e) => {
     Sentry.captureException(e, { func: 'uploadFile', doc: 'userActions' })
+    console.error({ e, func: 'uploadFile', doc: 'userActions' })
     return dispatch(cancelUploadingFile(file.ID))
   })
 
@@ -280,6 +286,7 @@ export const createFile = (connectedHome = false, filePath, file, remoteDir) => 
       })))
   .catch((e) => {
     Sentry.captureException(e, { func: 'createFile', doc: 'userActions' })
+    console.error({ e, func: 'createFile', doc: 'userActions' })
     return dispatch(cancelUploadingFile(file.ID))
   })
 
@@ -327,14 +334,17 @@ export const uploadMultipleFiles = (connectedHome = false, files) => (dispatch) 
         }
       } catch (e) {
         Sentry.captureException(e, { func: 'uploadMultipleFiles', doc: 'userActions' })
-        dispatch(cancelUploadingFile(files[i].ID))
+        console.error({ e, func: 'uploadMultipleFiles', doc: 'userActions' })
+        return dispatch(cancelUploadingFile(files[i].ID))
       }
     }
   })
   .catch((e) => {
     Sentry.captureException(e, { func: 'uploadMultipleFiles', doc: 'userActions' })
+    console.error({ e, func: 'uploadMultipleFiles', doc: 'userActions' })
     for (let i = 0; i < files.length; i++) {
       dispatch(cancelUploadingFile(files[i].ID))
     }
+    return;
   })
 

@@ -245,11 +245,15 @@ class AddPictureScreen extends React.Component {
           })
           .catch(e => {
             Sentry.captureException(e, { func: 'copyFile', doc: 'AddPictureScreen.js' })
+            console.error({ e, func: 'copyFile', doc: 'AddPictureScreen.js' })
             this.setState({ creatingFile: false })
+            return;
           })))
       .catch((e) => {
         Sentry.captureException(e, { func: 'onCreatePicture', doc: 'AddPictureScreen.js' })
+        console.error({ e, func: 'onCreatePicture', doc: 'AddPictureScreen.js' })
         this.setState({ creatingFile: false })
+        return;
       })
   }
 

@@ -24,6 +24,7 @@ export const connectDbOut = () => dispatch => {
     })
     .catch(e => {
       Sentry.captureException(e, { func: 'connectDbOut', doc: 'networkActions' })
+      console.error({ e, func: 'connectDbOut', doc: 'networkActions' })
       return dispatch(dbFailed())
     })
 }
@@ -38,6 +39,7 @@ export const connectDbHome = () => dispatch => {
     })
     .catch(e => {
       Sentry.captureException(e, { func: 'connectDbHome', doc: 'networkActions' })
+      console.error({ e, func: 'connectDbHome', doc: 'networkActions' })
       return dispatch(dbFailed())
     })
 }
@@ -55,6 +57,7 @@ export const switchDb = (connectHome = false, mssqlConnected = false) => dispatc
         })
         .catch(e => {
           Sentry.captureException(e, { func: 'switchDb', doc: 'networkActions' })
+          console.error({ e, func: 'switchDb', doc: 'networkActions' })
           return dispatch(dbFailed())
         })
       )
@@ -65,6 +68,7 @@ export const switchDb = (connectHome = false, mssqlConnected = false) => dispatc
       })
       .catch(e => {
         Sentry.captureException(e, { func: 'switchDb', doc: 'networkActions' })
+        console.error({ e, func: 'switchDb', doc: 'networkActions' })
         return dispatch(dbFailed())
       })
   }
@@ -77,6 +81,7 @@ export const switchDb = (connectHome = false, mssqlConnected = false) => dispatc
       })
       .catch(e => {
         Sentry.captureException(e, { func: 'switchDb', doc: 'networkActions' })
+        console.error({ e, func: 'switchDb', doc: 'networkActions' })
         return dispatch(dbFailed())
       })
     )
@@ -87,6 +92,7 @@ export const switchDb = (connectHome = false, mssqlConnected = false) => dispatc
     })
     .catch(e => {
       Sentry.captureException(e, { func: 'switchDb', doc: 'networkActions' })
+      console.error({ e, func: 'switchDb', doc: 'networkActions' })
       return dispatch(dbFailed())
     })
 }

@@ -204,16 +204,22 @@ class AddFileScreen extends React.Component {
               })
               .catch(e => {
                 Sentry.captureException(e, { func: 'modifyPages', doc: 'AddFileScreen.js' })
+                console.error({ e, func: 'modifyPages', doc: 'AddFileScreen.js' })
                 this.setState({creatingFile: false})
+                return;
               })
           })
           .catch(e => {
             Sentry.captureException(e, { func: 'copyFile', doc: 'AddFileScreen.js' })
+            console.error({ e, func: 'copyFile', doc: 'AddFileScreen.js' })
             this.setState({creatingFile: false})
+            return;
           }))
         .catch((e) => {
           Sentry.captureException(e, { func: 'onCreateFile', doc: 'AddFileScreen.js' })
+          console.error({ e, func: 'onCreateFile', doc: 'AddFileScreen.js' })
           this.setState({creatingFile: false})
+          return;
         })
     }
   }
