@@ -18,30 +18,33 @@ import {
 
 import FilesToExclude from '../../constants/FilesToExclude';
 
+const identifyNewFiles = (downloadedAffaire, currentDocs, files) => {
+  const fileToDownload = [];
+  for (let i = 0; i < downloadedAffaire.length; i++) {
+    const currentBusinessFile = currentDocs.filter(c => c.Dossier1 === downloadedAffaire[i]);
+    const newBusinessFile = files.filter(c => c.Dossier1 === downloadedAffaire[i]);
+    for (let j = 0; j < newBusinessFile.length; j++) {
+      if (currentBusinessFile.length > 0) {
+        const indexDoc = currentBusinessFile.findIndex(d => d.ID === newBusinessFile[j].ID)
+        if (indexDoc > -1) {
+          if (currentBusinessFile[indexDoc].UpLoadedOn < newBusinessFile[j].UpLoadedOn) {
+            fileToDownload.push(newBusinessFile[j].ID)
+          }
+        }
+      } else {
+        fileToDownload.push(newBusinessFile[j].ID)
+      }
+    }
+  }
+  return fileToDownload;
+}
+
 export const getDocs = (connectHome = false, currentDocs = [], downloadedAffaire = [], editedDocs = []) => dispatch => {
   if (connectHome) {
     return MSSQL_Home.executeQuery(`SELECT * FROM ${Tables.t_docs}`)
       .then((res) => {
         const files = res.filter(d => !FilesToExclude.includes(d.Dossier3))
-        const fileToDownload = [];
-        for (let i = 0; i < downloadedAffaire.length; i++) {
-          const currentBusinessFile = currentDocs.filter(c => c.Dossier1 === downloadedAffaire[i]);
-          const newBusinessFile = files.filter(c => c.Dossier1 === downloadedAffaire[i]);
-          if (newBusinessFile.length > 0) {
-            for (let j = 0; j < newBusinessFile.length; j++) {
-              if (currentBusinessFile.length > 0) {
-                const indexDoc = currentBusinessFile.findIndex(d => d.ID === newBusinessFile[i].ID)
-                if (indexDoc > -1) {
-                  if (currentBusinessFile[indexDoc].UpLoadedOn < newBusinessFile[i].UpLoadedOn) {
-                    fileToDownload.push(newBusinessFile[i].ID)
-                  }
-                }
-              } else {
-                fileToDownload.push(newBusinessFile[i].ID)
-              }
-            }
-          }
-        }
+        const fileToDownload = identifyNewFiles(downloadedAffaire, currentDocs, files);
         if (fileToDownload.length > 0) {
           dispatch(setDocsToDownload(fileToDownload))
         }
@@ -56,25 +59,7 @@ export const getDocs = (connectHome = false, currentDocs = [], downloadedAffaire
   return MSSQL_Out.executeQuery(`SELECT * FROM ${Tables.t_docs}`)
     .then((res) => {
       const files = res.filter(d => !FilesToExclude.includes(d.Dossier3))
-      const fileToDownload = [];
-      for (let i = 0; i < downloadedAffaire.length; i++) {
-        const currentBusinessFile = currentDocs.filter(c => c.Dossier1 === downloadedAffaire[i]);
-        const newBusinessFile = files.filter(c => c.Dossier1 === downloadedAffaire[i]);
-        if (newBusinessFile.length > 0) {
-          for (let j = 0; j < newBusinessFile.length; j++) {
-            if (currentBusinessFile.length > 0) {
-              const indexDoc = currentBusinessFile.findIndex(d => d.ID === newBusinessFile[i].ID)
-              if (indexDoc > -1) {
-                if (currentBusinessFile[indexDoc].UpLoadedOn < newBusinessFile[i].UpLoadedOn) {
-                  fileToDownload.push(newBusinessFile[i].ID)
-                }
-              }
-            } else {
-              fileToDownload.push(newBusinessFile[i].ID)
-            }
-          }
-        }
-      }
+      const fileToDownload = identifyNewFiles(downloadedAffaire, currentDocs, files);
       if (fileToDownload.length > 0) {
         dispatch(setDocsToDownload(fileToDownload))
       }
