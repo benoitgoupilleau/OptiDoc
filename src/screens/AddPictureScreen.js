@@ -23,6 +23,7 @@ import { addNewDoc } from '../redux/actions/business'
 import Sentry from '../services/sentry'
 
 import rootDir from '../services/rootDir';
+import { getDateFormat } from '../services/dateFormat';
 
 const { width, height } = Dimensions.get('window');
 
@@ -166,7 +167,8 @@ class AddPictureScreen extends React.Component {
     ImagePicker.showImagePicker(options, (response) => {
       if (!response.didCancel && !response.error) {
         const now = new Date();
-        const date = now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '.' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '.' + now.getFullYear()
+        const { day, month, year } = getDateFormat(now);
+        const date = `${day}.${month}.${year}`;
         this.setState({
           ...response,
           pictureNameFinal: 'Photo ' + date 
@@ -186,9 +188,7 @@ class AddPictureScreen extends React.Component {
 
   handleSelectPicture = (pictureName) => {
     const now = new Date();
-    const day = now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }).toString()
-    const month = (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }).toString();
-    const year = now.getFullYear()
+    const { day, month, year } = getDateFormat(now);
     const date = `${day}.${month}.${year}`;
     this.setState({ pictureName, pictureNameFinal: `Photo ${date}` })
   }
@@ -197,12 +197,7 @@ class AddPictureScreen extends React.Component {
     this.setState({ creatingFile: true })
     const businessId = this.props.navigation.getParam('affaire', '')
     const now = new Date();
-    const day = now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }).toString()
-    const month = (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }).toString();
-    const year = now.getFullYear();
-    const hours = now.getHours().toLocaleString('fr-FR', { minimumIntegerDigits: 2 });
-    const minutes = now.getMinutes().toLocaleString('fr-FR', { minimumIntegerDigits: 2 });
-    const secondes = now.getMilliseconds().toLocaleString('fr-FR', { minimumIntegerDigits: 3 })
+    const { day, month, year, hours, minutes, secondes } = getDateFormat(now);
     const CreatedOn = `${year}-${month}-${day}`;
     const date = `${year}${month}${day}${hours}${minutes}${secondes}`;
     const fileID = 'DOC_' + date;

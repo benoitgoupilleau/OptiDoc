@@ -57,15 +57,17 @@ export const downLoadOneFile = (id, serverPath, localPath) => dispatch => {
   return FTP.login(FTP_USERNAME, FTP_PASSWORD)
     .then(() => {
       dispatch(downloadingFile(id))
-      return FTP.downloadFile(serverPath, localPath).then(() => 
-        FTP.logout().then(() => dispatch(fileDownloaded(id)))
-      )
+      return FTP.downloadFile(serverPath, localPath).then(() => {
+        dispatch(fileDownloaded(id));
+        return FTP.logout();
+      })
     })
     .catch((e) => {
       Sentry.captureException(e, { func: 'downLoadOneFile', doc: 'userActions' })
       console.error({ e, func: 'downLoadOneFile', doc: 'userActions' })
       isDownloadingFiles = false;
-      return FTP.logout().then(() => dispatch(cancelDownloadOneFile(id)))
+      dispatch(cancelDownloadOneFile(id))
+      return FTP.logout();
     })
 }
 
@@ -238,17 +240,16 @@ export const cancelUploadingFile = (fileId) => ({
 })
 
 export const uploadFile = (connectedHome = false, filePath, file, remoteDir) => async (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
-  .then(() => FTP.makedir(remoteDir)
-    .then(() => FTP.uploadFile(filePath, remoteDir)
-      .then(() => {
-        //MSSQL update
-        if (connectedHome) {
-          return MSSQL_Home.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}', PreparedBy='${file.PreparedBy}', Revisable='${file.Revisable}' WHERE ID='${file.ID}'`)
-            .then(() => dispatch(removeFromEdit(file.ID)))
-        }
-        return MSSQL_Out.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}', PreparedBy='${file.PreparedBy}', Revisable='${file.Revisable}' WHERE ID='${file.ID}'`)
+  .then(() => FTP.uploadFile(filePath, remoteDir)
+    .then(() => {
+      //MSSQL update
+      if (connectedHome) {
+        return MSSQL_Home.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}', PreparedBy='${file.PreparedBy}', Revisable='${file.Revisable}' WHERE ID='${file.ID}'`)
           .then(() => dispatch(removeFromEdit(file.ID)))
-      })))
+      }
+      return MSSQL_Out.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}', PreparedBy='${file.PreparedBy}', Revisable='${file.Revisable}' WHERE ID='${file.ID}'`)
+        .then(() => dispatch(removeFromEdit(file.ID)))
+    }))
   .catch((e) => {
     Sentry.captureException(e, { func: 'uploadFile', doc: 'userActions' })
     console.error({ e, func: 'uploadFile', doc: 'userActions' })
@@ -261,29 +262,28 @@ export const removeFromEdit = (id) => ({
 })
 
 export const createFile = (connectedHome = false, filePath, file, remoteDir) => (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
-  .then(() => FTP.makedir(remoteDir)
-    .then(() => FTP.uploadFile(filePath, remoteDir)
-      .then(() => {
-        //MSSQL update
-        if (connectedHome) {
-          return MSSQL_Home.executeUpdate(`INSERT INTO ${Tables.t_docs} 
-          (LocalPath, Prepared, PreparedOn, PageNumber, ReviewedOn, PreparedBy, Revisable, Size, CreatedBy, Dossier2, UpLoadedOn, FileName, CreatedOn, Dossier1, ID, UpdatedOn, UpdatedBy, Commentaire, Dossier3, ServerPath, ReviewedBy, Extension, Reviewed, Locked, UpLoadedBy) 
-          VALUES ('${file.LocalPath}', '${file.Prepared}', '${file.PreparedOn}', '${file.PageNumber}', '${file.ReviewedOn}', '${file.PreparedBy}', '${file.Revisable}', '${file.Size}', '${file.CreatedBy}', '${file.Dossier2}', '${file.UpLoadedOn}', '${file.FileName}', '${file.CreatedOn}', '${file.Dossier1}', '${file.ID}', '${file.UpdatedOn}', '${file.UpdatedBy}', '${file.Commentaire}', '${file.Dossier3}', '${file.ServerPath}', '${file.ReviewedBy}', '${file.Extension}', '${file.Reviewed}', '${file.Locked}', '${file.UpLoadedBy}');`)
-            .then(() => {
-              dispatch(removeNewDoc(file.ID))
-              dispatch(addDoc(file))
-              dispatch(removeFromEdit(file.ID))
-            })
-        }
-        return MSSQL_Out.executeUpdate(`INSERT INTO ${Tables.t_docs} 
-          (LocalPath, Prepared, PreparedOn, PageNumber, ReviewedOn, PreparedBy, Revisable, Size, CreatedBy, Dossier2, UpLoadedOn, FileName, CreatedOn, Dossier1, ID, UpdatedOn, UpdatedBy, Commentaire, Dossier3, ServerPath, ReviewedBy, Extension, Reviewed, Locked, UpLoadedBy) 
-          VALUES ('${file.LocalPath}', '${file.Prepared}', '${file.PreparedOn}', '${file.PageNumber}', '${file.ReviewedOn}', '${file.PreparedBy}', '${file.Revisable}', '${file.Size}', '${file.CreatedBy}', '${file.Dossier2}', '${file.UpLoadedOn}', '${file.FileName}', '${file.CreatedOn}', '${file.Dossier1}', '${file.ID}', '${file.UpdatedOn}', '${file.UpdatedBy}', '${file.Commentaire}', '${file.Dossier3}', '${file.ServerPath}', '${file.ReviewedBy}', '${file.Extension}', '${file.Reviewed}', '${file.Locked}', '${file.UpLoadedBy}');`)
+  .then(() => FTP.uploadFile(filePath, remoteDir)
+    .then(() => {
+      //MSSQL update
+      if (connectedHome) {
+        return MSSQL_Home.executeUpdate(`INSERT INTO ${Tables.t_docs} 
+        (LocalPath, Prepared, PreparedOn, PageNumber, ReviewedOn, PreparedBy, Revisable, Size, CreatedBy, Dossier2, UpLoadedOn, FileName, CreatedOn, Dossier1, ID, UpdatedOn, UpdatedBy, Commentaire, Dossier3, ServerPath, ReviewedBy, Extension, Reviewed, Locked, UpLoadedBy) 
+        VALUES ('${file.LocalPath}', '${file.Prepared}', '${file.PreparedOn}', '${file.PageNumber}', '${file.ReviewedOn}', '${file.PreparedBy}', '${file.Revisable}', '${file.Size}', '${file.CreatedBy}', '${file.Dossier2}', '${file.UpLoadedOn}', '${file.FileName}', '${file.CreatedOn}', '${file.Dossier1}', '${file.ID}', '${file.UpdatedOn}', '${file.UpdatedBy}', '${file.Commentaire}', '${file.Dossier3}', '${file.ServerPath}', '${file.ReviewedBy}', '${file.Extension}', '${file.Reviewed}', '${file.Locked}', '${file.UpLoadedBy}');`)
           .then(() => {
             dispatch(removeNewDoc(file.ID))
             dispatch(addDoc(file))
             dispatch(removeFromEdit(file.ID))
           })
-      })))
+      }
+      return MSSQL_Out.executeUpdate(`INSERT INTO ${Tables.t_docs} 
+        (LocalPath, Prepared, PreparedOn, PageNumber, ReviewedOn, PreparedBy, Revisable, Size, CreatedBy, Dossier2, UpLoadedOn, FileName, CreatedOn, Dossier1, ID, UpdatedOn, UpdatedBy, Commentaire, Dossier3, ServerPath, ReviewedBy, Extension, Reviewed, Locked, UpLoadedBy) 
+        VALUES ('${file.LocalPath}', '${file.Prepared}', '${file.PreparedOn}', '${file.PageNumber}', '${file.ReviewedOn}', '${file.PreparedBy}', '${file.Revisable}', '${file.Size}', '${file.CreatedBy}', '${file.Dossier2}', '${file.UpLoadedOn}', '${file.FileName}', '${file.CreatedOn}', '${file.Dossier1}', '${file.ID}', '${file.UpdatedOn}', '${file.UpdatedBy}', '${file.Commentaire}', '${file.Dossier3}', '${file.ServerPath}', '${file.ReviewedBy}', '${file.Extension}', '${file.Reviewed}', '${file.Locked}', '${file.UpLoadedBy}');`)
+        .then(() => {
+          dispatch(removeNewDoc(file.ID))
+          dispatch(addDoc(file))
+          dispatch(removeFromEdit(file.ID))
+        })
+    }))
   .catch((e) => {
     Sentry.captureException(e, { func: 'createFile', doc: 'userActions' })
     console.error({ e, func: 'createFile', doc: 'userActions' })
@@ -300,7 +300,6 @@ export const uploadMultipleFiles = (connectedHome = false, files) => (dispatch) 
   .then(async () => {
     for (let i = 0; i < files.length; i++) {
       try {
-        await FTP.makedir(files[i].remoteDir);
         await FTP.uploadFile(files[i].filePath, files[i].remoteDir);
         if (files[i].isNew) {
           if (connectedHome) {

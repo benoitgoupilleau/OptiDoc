@@ -22,6 +22,7 @@ import { editFile, downloadModels } from '../redux/actions/user'
 import { addNewDoc } from '../redux/actions/business'
 
 import rootDir from '../services/rootDir';
+import { getDateFormat } from '../services/dateFormat';
 
 const Wrapper = styled(View)`
   padding: 20px;
@@ -117,9 +118,7 @@ class AddFileScreen extends React.Component {
 
   handleSelectModele = (ModeleID, FileName, filePath) => {
     const now = new Date();
-    const day = now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }).toString()
-    const month = (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }).toString();
-    const year = now.getFullYear()
+    const { day, month, year } = getDateFormat(now);
     const date = `${day}.${month}.${year}`;
     this.setState({ ModeleID, FileName, FileNameFinal: `${FileName} ${date}`, filePath })
   }
@@ -133,12 +132,7 @@ class AddFileScreen extends React.Component {
       const now = new Date();
       const affaire = this.props.affaires.filter(a => a.ID === businessId)[0]
       const clientName = affaire ? `${affaire.Client} - ${affaire.Designation}` : businessId;
-      const day = now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 }).toString()
-      const month = (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }).toString();
-      const year = now.getFullYear();
-      const hours = now.getHours().toLocaleString('fr-FR', { minimumIntegerDigits: 2 });
-      const minutes = now.getMinutes().toLocaleString('fr-FR', { minimumIntegerDigits: 2 });
-      const secondes = now.getMilliseconds().toLocaleString('fr-FR', { minimumIntegerDigits: 3 })
+      const { day, month, year, hours, minutes, secondes } = getDateFormat(now);
       const CreatedOn = `${year}-${month}-${day}`;
       const date = `${year}${month}${day}${hours}${minutes}${secondes}`;
       const fileID= 'DOC_' + date;
