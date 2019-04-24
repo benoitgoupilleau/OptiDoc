@@ -13,7 +13,8 @@ import {
   ADD_DOC,
   SET_AFFAIRES,
   SET_ARBO,
-  SET_DOCS_TO_DOWNLOAD
+  SET_DOCS_TO_DOWNLOAD,
+  UPDATE_DOC
 } from './types';
 
 import FilesToExclude from '../../constants/FilesToExclude';
@@ -86,6 +87,12 @@ const setDocsToDownload = (fileToDownload) => ({
 export const addDoc = (doc) => ({
   type: ADD_DOC,
   doc
+})
+
+export const updateDocName = (FileName, id) => ({
+  type: UPDATE_DOC,
+  FileName,
+  id
 })
 
 export const getModeles = (connectHome = false) => dispatch => {

@@ -7,7 +7,8 @@ import {
   ADD_NEW_DOC,
   REMOVED_NEW_DOC,
   SET_AFFAIRES,
-  SET_ARBO
+  SET_ARBO,
+  UPDATE_DOC,
 } from '../actions/types';
 
 const defaultState = {
@@ -82,6 +83,14 @@ export default (state = defaultState, action) => {
       return {
         ...state,
         newDocs: [...currentNewDoc.slice(0, indexToRemove), ...currentNewDoc.slice(indexToRemove + 1)]
+      }
+    }
+    case UPDATE_DOC: {
+      const indexToUpdate = state.newDocs.findIndex(d => d.ID === action.id)
+      const docToUpdate = { ...state.newDocs[indexToUpdate], FileName: action.FileName };
+      return {
+        ...state,
+        newDocs: [ ...state.newDocs.slice(0, indexToUpdate), docToUpdate, ...state.newDocs.slice(indexToUpdate + 1)]
       }
     }
     case UPDATE_PREPARE: {

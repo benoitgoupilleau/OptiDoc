@@ -2,14 +2,14 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { TouchableOpacity, Text, View, ActivityIndicator, Dimensions, Alert, ToastAndroid } from 'react-native';
+import { TouchableOpacity, Text, View, ActivityIndicator, Dimensions, Alert, ToastAndroid, TextInput } from 'react-native';
 import pick from 'lodash.pick';
 import RNFS from 'react-native-fs';
 import { EXTERNAL_PATH } from 'react-native-dotenv';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { withNavigation } from 'react-navigation';
 import { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, editPrepare, removePrepare, createFile } from '../../redux/actions/user'
-import { updatePrepared, removeNewDoc } from '../../redux/actions/business';
+import { updatePrepared, removeNewDoc, updateDocName } from '../../redux/actions/business';
 import { openFile } from '../../services/openfile'
 import Sentry from '../../services/sentry';
 
@@ -38,6 +38,14 @@ const Title = styled(Text)`
   max-width: ${width/2}px;
 `;
 
+const StyledInput = styled(TextInput)`
+  ${({ editable }) => editable && 'border-bottom-color: gray; border-bottom-width: 1px;'}
+  padding: 0;
+  color: gray;
+  font-size: ${Layout.font.medium};
+  max-width: ${width / 2}px;
+`;
+
 const IconsWrapper = styled(View)`
   flex-direction: row;
   align-items: center;
@@ -53,12 +61,12 @@ const Icons = styled(Ionicons)`
 `;
 
 class Document extends React.Component {
-  state = {
-    isDownloaded: false,
-  }
-
-  componentDidMount() {
-    this.checkIfDownloaded();
+  constructor(props) {
+    super(props);
+    this.state = {
+      isDownloaded: true,
+      localFileName: props.FileName
+    }
   }
 
   onEdit = async () => {
@@ -197,7 +205,7 @@ class Document extends React.Component {
   }
 
   onOpenFile = async () => {
-    const { FileName, type, navigation, ID, Dossier3, Extension, Dossier1, Dossier2, userId, ServerPath, loadingBusiness, editedDocs, Prepared, Reviewed, Locked} = this.props;
+    const { FileName, type, navigation, ID, Dossier3, Extension, Dossier1, Dossier2, userId, loadingBusiness, editedDocs, Prepared, Reviewed, Locked} = this.props;
     const isEdited = editedDocs.filter(e => e.ID === ID && !!e.editPath).length > 0;
     const isPrepared = editedDocs.filter(e => e.ID === ID && e.prepared).length > 0;
     const isDownloaded = await RNFS.exists(`${rootDir}/${userId}/${Dossier1}/${Dossier2}/${ID}.${Extension}`)
@@ -252,7 +260,7 @@ class Document extends React.Component {
     const { ID, Extension, Dossier1, Dossier2, userId } = this.props;
     const filepath = `${rootDir}/${userId}/${Dossier1}/${Dossier2}/${ID}.${Extension}`
     const isDownloaded = await RNFS.exists(filepath)
-    this.setState({ isDownloaded })
+    if (isDownloaded !== this.state.isDownloaded) this.setState({ isDownloaded })
   }
 
   displayLeftIcon = () => {
@@ -275,7 +283,8 @@ class Document extends React.Component {
   }
 
   render() {
-    const { FileName, type, ID, editedDocs, uploadingDocs, Reviewed, Prepared, Locked } = this.props;
+    this.checkIfDownloaded();
+    const { FileName, type, ID, editedDocs, uploadingDocs, Reviewed, Prepared, Locked, isNew } = this.props;
     const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
     return (
       <DocumentWrapper
@@ -283,7 +292,16 @@ class Document extends React.Component {
       > 
         <File>
           {this.displayLeftIcon()}
-          <Title>{FileName}</Title>
+          {isNew ?
+            <StyledInput
+              allowFontScaling
+              onChangeText={(localFileName) => this.setState({ localFileName })}
+              placeholder="Nom du fichier"
+              value={this.state.localFileName}
+              editable={Prepared === 'N'}
+              onEndEditing={() => this.props.updateDocName(this.state.localFileName, ID)}
+            /> :
+            <Title>{FileName}</Title>}
         </File>
         {type === Folder.rea ? 
           <IconsWrapper>
@@ -378,7 +396,8 @@ Document.propTypes = {
   removePrepare: PropTypes.func.isRequired,
   createFile: PropTypes.func.isRequired,
   connectedHome: PropTypes.bool.isRequired,
-}
+  updateDocName: PropTypes.func.isRequired,
+};
 
 Document.defaultProps = {
   type: Folder.prep,
@@ -401,4 +420,4 @@ const mapStateToProps = state => ({
   connectedHome: state.network.connectedHome,
 })
 
-export default withNavigation(connect(mapStateToProps, { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, updatePrepared, editPrepare, removePrepare, removeNewDoc, createFile })(Document));
+export default withNavigation(connect(mapStateToProps, { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, updatePrepared, editPrepare, removePrepare, removeNewDoc, createFile, updateDocName })(Document));
