@@ -18,7 +18,7 @@ import Colors from '../constants/Colors'
 import Folder from '../constants/Folder'
 import Sentry from '../services/sentry'
 
-import { editFile, downloadModels } from '../redux/actions/user'
+import { editFile, downloadModels, forceDownloadModels } from '../redux/actions/user'
 import { addNewDoc } from '../redux/actions/business'
 
 import rootDir from '../services/rootDir';
@@ -218,6 +218,12 @@ class AddFileScreen extends React.Component {
     }
   }
 
+  forceDownload = () => {
+    if (this.props.modeleDownloaded !== 'in progress' && this.props.mssqlConnected) {
+      this.props.forceDownloadModels(this.props.modeleDocs);
+    }
+  }
+
   render() {
     const title = this.props.navigation.getParam('affaire', '')
     const affaire = this.props.affaires.filter(a => a.ID === title)[0]
@@ -228,6 +234,9 @@ class AddFileScreen extends React.Component {
         <Wrapper>
           <Title>{clientName}</Title>
           <Section>Sélectionner un modèle</Section>
+          <StyledButton onPress={this.forceDownload}>
+            <StyledText>Retélécharger les modèles</StyledText>
+          </StyledButton>
           <Selector>
             <Option
               isSelected={this.state.TypeModele === 'PV'}
@@ -250,7 +259,13 @@ class AddFileScreen extends React.Component {
           </Selector>
           <ModeleList>
             {this.props.modeles.filter(m => m.TypeModele === this.state.TypeModele).map(m => (
-              <Modele key={m.ID} FileName={m.Designation} handleSelect={() => this.handleSelectModele(m.ID_Document, m.Designation, `${rootDir}/${Folder.modeleDocs}/${m.ID_Document}.pdf`)} selected={this.state.FileName === m.Designation}/>))
+              <Modele 
+                key={m.ID}
+                FileName={m.Designation}
+                handleSelect={() => this.handleSelectModele(m.ID_Document, m.Designation, `${rootDir}/${Folder.modeleDocs}/${m.ID_Document}.pdf`)}
+                selected={this.state.FileName === m.Designation}
+                openFile={() => this.props.navigation.navigate('Pdf', { title: m.Designation, ID: m.ID_Document, isModel: true, })}
+              />))
             }
           </ModeleList>
           <ButtonWrapper>
@@ -275,6 +290,7 @@ AddFileScreen.propTypes = {
   user: PropTypes.object.isRequired,
   editFile: PropTypes.func.isRequired,
   addNewDoc: PropTypes.func.isRequired,
+  forceDownloadModels: PropTypes.func.isRequired,
   downloadModels: PropTypes.func.isRequired,
   modeles: PropTypes.array.isRequired,
   modeleDownloaded: PropTypes.string.isRequired,
@@ -291,4 +307,4 @@ const mapStateToProps = state => ({
   modeleDownloaded: state.user.modeleDownloaded
 })
 
-export default connect(mapStateToProps, { editFile, addNewDoc, downloadModels })(AddFileScreen);
+export default connect(mapStateToProps, { editFile, addNewDoc, downloadModels, forceDownloadModels })(AddFileScreen);

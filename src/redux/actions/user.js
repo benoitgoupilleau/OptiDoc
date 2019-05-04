@@ -178,6 +178,40 @@ export const editFile = (file, filePath) => {
   })
 }
 
+export const forceDownloadModels = (modeleDocs) => dispatch => {
+  if (isDownloadingFiles) {
+    return dispatch(cancelDownloadModel())
+  }
+  isDownloadingModeles = true;
+  return RNFS.mkdir(`${rootDir}/${Folder.modeleDocs}`)
+    .then(() => FTP.login(FTP_USERNAME, FTP_PASSWORD).then(async () => {
+      if (modeleDocs.length > 0) {
+        const total = modeleDocs.length;
+        for (let i = 0; i < modeleDocs.length; i += 1) {
+            try {
+              dispatch(downloadModele(i + 1, total))
+              await FTP.downloadFile(`./${modeleDocs[i].ServerPath}`, `${rootDir}/${Folder.modeleDocs}`)
+            } catch (error) {
+              await RNFS.unlink(`${rootDir}/${Folder.modeleDocs}/${modeleDocs[i].ID}.${modeleDocs[i].Extension}`)
+              Sentry.captureException(error, { modeleDoc: modeleDocs[i], func: "FTP.downloadFile", doc: 'userActions' })
+              console.error({ error, modeleDoc: modeleDocs[i], func: "FTP.downloadFile", doc: 'userActions' })
+              return;
+          }
+        }
+      }
+      isDownloadingModeles = false;
+      await FTP.logout()
+      return dispatch(modeleDownloaded())
+    })
+    ).catch(async (e) => {
+      dispatch(cancelDownloadModel())
+      isDownloadingModeles = false;
+      Sentry.captureException(e, { func: 'downloadModels', doc: 'userActions' })
+      console.log({ e, func: 'downloadModels', doc: 'userActions' })
+      return await FTP.logout()
+    })
+}
+
 export const downloadModels = (modeleDocs) => dispatch => {
   if (isDownloadingFiles) {
     return dispatch(cancelDownloadModel())

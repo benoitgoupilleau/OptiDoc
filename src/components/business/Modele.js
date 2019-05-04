@@ -26,9 +26,10 @@ const Icons = styled(Ionicons)`
   padding: 0 10px;
 `;
 
-const Modele = ({ FileName, handleSelect, selected }) => (
+const Modele = ({ FileName, handleSelect, selected, openFile }) => (
   <ModeleWrapper
     onPress={handleSelect}
+    onLongPress={openFile}
   > 
     <Title selected={selected} >{FileName}</Title>
     {selected && 
@@ -44,6 +45,7 @@ const Modele = ({ FileName, handleSelect, selected }) => (
 Modele.propTypes = {
   FileName: PropTypes.string.isRequired,
   handleSelect: PropTypes.func.isRequired,
+  openFile: PropTypes.func.isRequired,
   selected: PropTypes.bool.isRequired
 }
 
