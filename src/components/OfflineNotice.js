@@ -2,7 +2,8 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { View, Text, NetInfo, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, Dimensions, TouchableOpacity } from 'react-native';
+import NetInfo from "@react-native-community/netinfo";
 
 import { connectivityChange, connectDbOut, connectDbHome } from '../redux/actions/network';
 
@@ -32,15 +33,15 @@ class OfflineNotice extends PureComponent {
       const isConnected = connectionInfo.type === 'wifi' || connectionInfo.type === 'cellular';
       this.props.connectivityChange(isConnected);
     });
-    NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
+    NetInfo.addEventListener(this.handleConnectivityChange);
   }
 
   componentWillUnmount() {
-    NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
+    NetInfo.removeEventListener(this.handleConnectivityChange);
   }
 
-  handleConnectivityChange = isConnected => {
-    this.props.connectivityChange(isConnected);
+  handleConnectivityChange = state => {
+    this.props.connectivityChange(state.isInternetReachable);
   }
 
   testDb = () => {

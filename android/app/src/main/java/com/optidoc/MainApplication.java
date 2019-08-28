@@ -22,6 +22,8 @@ import com.stonem.mssql.MSSQLPackage;
 import com.rnfs.RNFSPackage;
 import com.zaguini.rnjwt.RNJwtPackage;
 import com.github.yamill.orientation.OrientationPackage;
+import com.reactnativecommunity.netinfo.NetInfoPackage;
+
 
 import java.util.Arrays;
 import java.util.List;
@@ -52,7 +54,8 @@ public class MainApplication extends Application implements ReactApplication {
         new RNGestureHandlerPackage(),
         new MSSQLPackage(),
         new RNImageToPdfPackage(),
-        new OrientationPackage()
+        new OrientationPackage(),
+        new NetInfoPackage()
       );
     }
 
