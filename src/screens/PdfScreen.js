@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import Pdf from 'react-native-pdf';
 import Orientation from 'react-native-orientation';
 import PropTypes from 'prop-types';
 import { EXTERNAL_PATH } from 'react-native-dotenv';
-import { Dimensions, Text, ActivityIndicator, View, TouchableOpacity } from 'react-native';
+import { Dimensions, ActivityIndicator, View } from 'react-native';
 
 import Logout from '../components/Logout';
 import HeaderTitle from '../components/HeaderTitle'
@@ -19,13 +19,13 @@ import Colors from '../constants/Colors';
 
 import rootDir from '../services/rootDir';
 
-const Edit = styled(TouchableOpacity)`
+const Edit = styled.TouchableOpacity`
   align-items: center;
   background-color: ${Colors.mainColor};
   height: 30px;
 `
 
-const EditText = styled(Text)`
+const EditText = styled.Text`
   color: white;
 `;
 

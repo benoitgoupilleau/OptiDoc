@@ -1,11 +1,11 @@
+/* eslint-disable no-console */
 import React from 'react';
 import RNFS from 'react-native-fs';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Orientation from 'react-native-orientation';
-import { Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Alert } from 'react-native';
 import { PDFDocument, PDFPage } from 'react-native-pdf-lib';
-import styled from 'styled-components'
 import { EXTERNAL_PATH } from 'react-native-dotenv';
 
 import Logout from '../components/Logout';
@@ -13,8 +13,6 @@ import OfflineNotice from '../components/OfflineNotice';
 import HeaderTitle from '../components/HeaderTitle'
 import Modele from '../components/business/Modele';
 
-import Layout from '../constants/Layout'
-import Colors from '../constants/Colors'
 import Folder from '../constants/Folder'
 import Sentry from '../services/sentry'
 
@@ -24,70 +22,7 @@ import { addNewDoc } from '../redux/actions/business'
 import rootDir from '../services/rootDir';
 import { getDateFormat } from '../services/dateFormat';
 
-const Wrapper = styled(View)`
-  padding: 20px;
-`;
-
-const Title = styled(Text)`
-  color: ${Colors.secondColor};
-  font-size: ${Layout.font.large};
-  font-weight: bold;
-  text-align: center;
-`;
-
-const Section = styled(Text)`
-  font-size: ${Layout.font.medium};
-  font-weight: bold;
-`
-const Selector = styled(View)`
-  flex-direction: row;
-  align-items: center;
-  width:100%;
-`;
-
-const Option = styled(TouchableOpacity)`
-  width: 33%;
-  align-items: center;
-  ${props => props.isSelected && `background-color: ${Colors.thirdColor};`}
-  border-bottom-color: ${Colors.thirdColor};
-  border-bottom-width: 1px;
-  margin: 10px 0;
-`;
-
-const OptionText = styled(Text)`
-  ${props => props.isSelected && `color: white;`}
-  padding: 5px 0;
-`;
-
-const ModeleList = styled(Selector)`
-  margin: 10px 0;
-  flex-flow: row wrap;
-`;
-
-const ButtonWrapper = styled(View)`
-  align-items: center;
-`;
-
-const StyledButton = styled(TouchableOpacity)`
-  align-items: center;
-  background-color: ${props => props.disabled ? Colors.thirdColor : Colors.mainColor};
-  height: 30px;
-  margin: 10px 0;
-  padding: ${Layout.space.small};
-  text-align: center;
-  width: 200px;
-`;
-
-const StyledText = styled(Text)`
-  color: white;
-  font-size: ${Layout.font.small};
-`;
-
-const FileNameInput = styled(TextInput)`
-  width: 100%;
-  border-color: ${Colors.thirdColor};
-  border-width: 1px;
-`;
+import { Wrapper, Title, Section, Selector, Option, OptionText, ModeleList, ButtonWrapper, StyledButton, StyledText, FileNameInput } from './AddFileScreen.styled';
 
 class AddFileScreen extends React.Component {
   constructor(props) {

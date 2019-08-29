@@ -1,27 +1,11 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { View, Text, Image } from 'react-native';
+import { Image } from 'react-native';
 
 import logo from '../assets/images/logo.png';
-import Colors from '../constants/Colors'
-import Layout from '../constants/Layout'
 
-const Wrapper = styled(View)`
-  align-items: center;
-  display: flex;
-  flex-direction: row;
-  margin: 0 ${Layout.space.small};
-`;
-
-const Title = styled(Text)`
-  color: ${Colors.mainColor};
-  font-size: ${Layout.font.medium};
-  padding-left: 5px;
-  max-width: 400px;
-`
-
+import { Wrapper, Title } from './HeaderTitle.styled';
 
 const HeaderTitle = ({ title, noLogo }) => {
   const displayTitle = title.length > 25 ? title.substring(0, 25) + '(...)' : title

@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
 import RNFS from 'react-native-fs';
 import PropTypes from 'prop-types';
 import pick from 'lodash.pick';
@@ -20,55 +19,7 @@ import Tables from '../../constants/Tables';
 
 import rootDir from '../../services/rootDir';
 
-const BusinessWrapper = styled(View)`
-  background: ${Colors.antiBackground};
-  border-radius: 5px;
-  margin: ${Layout.space.large};
-  padding: ${Layout.space.medium};
-  text-align: left;
-`;
-
-const MainSection = styled(View)`
-  align-items: center;
-  flex-direction: row;
-  justify-content: space-between;
-  margin: ${Layout.space.medium};
-`
-
-const Title = styled(Text)`
-  color: ${Colors.secondColor};
-  font-size: ${Layout.font.large};
-  flex-grow: 1;
-  max-width: 500px;
-  font-weight: bold;
-`;
-
-const SectionWrapper = styled(View)`
-  align-items: center;
-  border-bottom-color: ${Colors.mainColor};
-  border-bottom-width: 1px;
-  flex-direction: row;
-  margin-bottom: ${Layout.space.medium};
-  padding: ${Layout.space.medium};
-`
-
-const Section = styled(Text)`
-  color: ${Colors.mainColor};
-  font-size: ${Layout.font.medium};
-  flex-grow: 1;
-`;
-
-const IconView = styled(View)`
-  flex-direction: row;
-`;
-
-const Icons = styled(Ionicons)`
-  padding: 0 ${Layout.space.medium};
-`;
-
-const AddIcons = styled(Icons)`
-  padding: 0 ${Layout.space.large};
-`;
+import { BusinessWrapper, MainSection, Title, SectionWrapper, Section, IconView, Icons, AddIcons } from './BusinessWithDocs.styled';
 
 const checkIfNew = (docs, id) => {
   const doc = docs.filter(d => d.ID === id)

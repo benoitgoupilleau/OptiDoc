@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React from 'react';
 import RNFS from 'react-native-fs';
 import ImagePicker from 'react-native-image-picker';
@@ -5,9 +6,7 @@ import PropTypes from 'prop-types';
 import RNImageToPdf from 'react-native-image-to-pdf';
 import { connect } from 'react-redux';
 import Orientation from 'react-native-orientation';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { Text, View, TextInput, ScrollView, Dimensions, PermissionsAndroid, TouchableOpacity, Alert, Image } from 'react-native';
-import styled from 'styled-components'
+import { Text, View, Dimensions, Alert } from 'react-native';
 import { EXTERNAL_PATH } from 'react-native-dotenv';
 
 import Logout from '../components/Logout';
@@ -15,7 +14,6 @@ import HeaderTitle from '../components/HeaderTitle';
 import OfflineNotice from '../components/OfflineNotice';
 
 import Layout from '../constants/Layout'
-import Colors from '../constants/Colors'
 import Folder from '../constants/Folder'
 
 import { editFile } from '../redux/actions/user'
@@ -24,115 +22,11 @@ import Sentry from '../services/sentry'
 
 import rootDir from '../services/rootDir';
 import { getDateFormat } from '../services/dateFormat';
+import { checkAccessCamera } from '../utils/permissionsAndroid';
+
+import { Wrapper, Title, Section, ButtonWrapper, StyledButton, StyledText, FileNameInput, Comment, StyledScroll, PictureWrapper, ImageFrame, Icons } from './AddPictureScreen.styled';
 
 const { width, height } = Dimensions.get('window');
-
-const Wrapper = styled(View)`
-  padding: 40px;
-`;
-
-const Title = styled(Text)`
-  color: ${Colors.secondColor};
-  font-size: ${Layout.font.large};
-  font-weight: bold;
-  text-align: center;
-`;
-
-const Section = styled(Text)`
-  font-size: ${Layout.font.large};
-  font-weight: bold;
-`
-
-const ButtonWrapper = styled(View)`
-  align-items: center;
-`;
-
-const StyledButton = styled(TouchableOpacity)`
-  align-items: center;
-  background-color: ${props => props.disabled ? Colors.thirdColor : Colors.mainColor};
-  height: 40px;
-  margin: 10px 0;
-  padding: ${Layout.space.small};
-  text-align: center;
-  width: 200px;
-`;
-
-const StyledText = styled(Text)`
-  color: white;
-  font-size: ${Layout.font.small};
-`;
-
-
-const FileNameInput = styled(TextInput)`
-  width: 100%;
-  border-color: ${Colors.thirdColor};
-  margin: 10px 0;
-  border-width: 1px;
-`;
-
-const Comment = styled(TextInput)`
-  width: 100%;
-  border-color: ${Colors.thirdColor};
-  border-width: 1px;
-`;
-
-const StyledScroll = styled(ScrollView)`
-  width: ${width};
-  padding-bottom: ${Layout.space.large};
-  height: ${height - 500}px;
-`;
-
-const PictureWrapper = styled(View)`
-  flex-direction: row;
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  position: relative;
-`;
-
-const ImageFrame = styled(Image)`
-  width: ${width - 80}px;
-  height: ${props => ((width - 80) * props.height) / props.width}px;
-`;
-
-const Icons = styled(Ionicons)`
-  position: absolute;
-  right: 10px;
-  top: 10px;
-`;
-
-const checkAccess = async () => {
-  const isAuthorised = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.CAMERA);
-  if (isAuthorised) {
-    return true;
-  } else {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.CAMERA,
-        {
-          title: "Optidoc demande l'acccès à vos photos",
-          message:
-            "Optidoc a besoin d'accéder à vos photos " +
-            "pour que vous puissiez les ajouter",
-          buttonPositive: 'Autoriser',
-        },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        return true;
-      } else {
-        Alert.alert(
-          "L'application doit pouvoir accéder aux photos",
-          "Impossible d'ajouter une photo sans accès à vos photos",
-          [
-            { text: 'Ok', onPress: () => checkAccess() },
-          ],
-        )
-      }
-    } catch (err) {
-      Sentry.captureMessage(err, { func: 'checkAccessCAMERA', doc: 'AddPictureScreen.js' });
-    }
-  }
-}
 
 class AddPictureScreen extends React.Component {
   constructor(props) {
@@ -154,7 +48,7 @@ class AddPictureScreen extends React.Component {
 
   componentDidMount() {
     Orientation.lockToPortrait();
-    checkAccess();
+    checkAccessCamera();
   }
 
   getPhotos = () => {
@@ -178,7 +72,7 @@ class AddPictureScreen extends React.Component {
   };
 
   handleButtonPress = async () => {
-    const isAuthorised = await checkAccess();
+    const isAuthorised = await checkAccessCamera();
     if (isAuthorised) {
       this.getPhotos();
     } else { 
@@ -283,11 +177,12 @@ class AddPictureScreen extends React.Component {
                 <StyledText>{this.state.creatingFile ? 'Création en cours' : 'Créer le fichier'}</StyledText>
               </StyledButton>
             </ButtonWrapper>
-            <StyledScroll>
+            <StyledScroll width={width} height={height}>
               {this.state.uri ? (
                 <PictureWrapper>
                   <ImageFrame
                     source={{ uri: this.state.uri }}
+                    screenWidth={width}
                     width={this.state.width}
                     height={this.state.height}
                   />

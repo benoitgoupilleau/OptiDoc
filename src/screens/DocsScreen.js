@@ -1,10 +1,8 @@
 import React from 'react';
-import { Text, ScrollView, Dimensions, View } from 'react-native';
+import { Text, Dimensions } from 'react-native';
 import { connect } from 'react-redux';
 import Orientation from 'react-native-orientation';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 
 import Logout from '../components/Logout';
 import HeaderTitle from '../components/HeaderTitle'
@@ -16,36 +14,9 @@ import BusinessWithDocs from '../components/business/BusinessWithDocs'
 import Layout from '../constants/Layout'
 import Colors from '../constants/Colors';
 
+import { StyledScroll, Legend, LegendWrapper, LegendItem, Icons } from './DocsScreen.styled';
+
 const { width } = Dimensions.get('window');
-
-const StyledScroll = styled(ScrollView)`
-  background-color: #ededed;
-  padding-bottom: ${Layout.space.large};
-  width: ${width};
-`;
-
-const Legend = styled(View)`
-  align-items: center;
-  flex-direction: row;
-  padding: 5px 0;
-  font-size: 10px;
-`;
-
-const LegendWrapper = styled(View)`
-  flex-flow: row wrap;
-  flex-grow: 1;
-  width: ${width-40}px;
-`
-
-const LegendItem = styled(View)`
-  flex-direction: row;
-  padding: 0 5px;
-  align-items: center;
-`;
-
-const Icons = styled(Ionicons)`
-  padding: 0 3px;
-`;
 
 class DocsScreen extends React.Component {
   static navigationOptions = {
@@ -67,10 +38,10 @@ class DocsScreen extends React.Component {
     if (affaire !== '' && !!this.props.docs[affaire]) {
       return (
         <Main>
-          <StyledScroll>
+          <StyledScroll width={width}>
             <Legend>
               <Text style={{paddingLeft: 5, paddingRight: 3, fontSize: 10, flexGrow: 1}}>Légende : </Text>
-              <LegendWrapper>
+              <LegendWrapper width={width}>
                 <LegendItem>
                   <Icons
                     name="md-create"

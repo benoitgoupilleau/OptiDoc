@@ -1,37 +1,20 @@
 import React from 'react';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { TouchableOpacity, Text, Dimensions } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import { Dimensions } from 'react-native';
 
 import Layout from '../../constants/Layout';
 
+import { ModeleWrapper, Title, Icons } from './Modele.styled';
+
 const { width } = Dimensions.get('window');
-
-const ModeleWrapper = styled(TouchableOpacity)`
-  margin: ${Layout.space.small};
-  flex-direction: row;
-  justify-content: space-between;
-  width: ${Math.round(width/2)-40}px;
-`;
-
-const Title = styled(Text)`
-  font-size: ${Layout.font.small};
-  max-width: ${Math.round(width/2)-75}px;
-  ${props => props.selected && 'color: black;'}
-`;
-
-const Icons = styled(Ionicons)`
-  padding: 0 10px;
-`;
 
 const Modele = ({ FileName, handleSelect, selected, openFile }) => (
   <ModeleWrapper
+    width={width}
     onPress={handleSelect}
     onLongPress={openFile}
   > 
-    <Title selected={selected} >{FileName}</Title>
+    <Title width={width} selected={selected} >{FileName}</Title>
     {selected && 
       <Icons
         color="green"

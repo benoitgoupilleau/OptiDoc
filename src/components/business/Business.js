@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { View, Text, ActivityIndicator, Alert } from 'react-native';
@@ -11,32 +10,7 @@ import { downloadBusiness } from '../../redux/actions/user'
 import Colors from '../../constants/Colors';
 import Layout from '../../constants/Layout'
 
-const BusinessWrapper = styled(View)`
-  background: ${Colors.antiBackground};
-  border-radius: 5px;
-  margin: ${Layout.space.large};
-  padding: ${Layout.space.medium};
-  text-align: left;
-`;
-
-const MainSection = styled(View)`
-  align-items: center;
-  flex-direction: row;
-  justify-content: space-between;
-  margin: ${Layout.space.medium};
-`
-
-const Title = styled(Text)`
-  color: ${Colors.secondColor};
-  font-size: ${Layout.font.large};
-  flex-grow: 1;
-  max-width: 450px;
-  font-weight: bold;
-`;
-
-const IconView = styled(View)`
-  flex-direction: row;
-`;
+import { BusinessWrapper, MainSection, Title, IconView } from './Business.styled'
 
 class Business extends React.Component {
   state = {

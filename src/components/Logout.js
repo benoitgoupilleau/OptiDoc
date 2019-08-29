@@ -1,12 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import styled from 'styled-components';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { View, TouchableOpacity, Text, Alert, ToastAndroid, ActivityIndicator } from 'react-native';
+import { Alert, ToastAndroid, ActivityIndicator } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
-import Colors from '../constants/Colors';
 import Layout from '../constants/Layout'
 
 import { logout } from '../redux/actions/user';
@@ -14,28 +11,7 @@ import { getNews } from '../redux/actions/news'
 import { getDocs, getModeles, getBusiness, getAffaires, getArbo } from '../redux/actions/business'
 import { getUser } from '../redux/actions/team'
 
-const Wrapper = styled(View)`
-  margin: ${Layout.space.large};
-  flex-direction: row;
-  align-items: center;
-`;
-
-const Icons = styled(Ionicons)`
-  padding: 0 20px;
-`;
-
-const StyledButton = styled(TouchableOpacity)`
-  align-items: center;
-  background-color: ${Colors.mainColor};
-  height: 32px;
-  text-align: center;
-`
-
-const StyledText = styled(Text)`
-  color: white;
-  padding: 5px;
-  font-size: ${Layout.font.small};
-`;
+import { Wrapper, Icons, StyledButton, StyledText } from './Logout.styled';
 
 class Logout extends React.Component {
   state = {

@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import Orientation from 'react-native-orientation';
-import { ScrollView, Text, RefreshControl, ActivityIndicator, Dimensions } from 'react-native';
+import { Text, RefreshControl, ActivityIndicator, Dimensions } from 'react-native';
 
 import Logout from '../components/Logout';
 import HeaderTitle from '../components/HeaderTitle'
@@ -20,7 +20,7 @@ import Layout from '../constants/Layout';
 
 const { width } = Dimensions.get('window');
 
-const StyledScroll = styled(ScrollView)`
+const StyledScroll = styled.ScrollView`
   background-color: #ededed;
   padding-bottom: ${Layout.space.large};
   width: ${width};

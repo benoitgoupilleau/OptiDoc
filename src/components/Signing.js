@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import styled from 'styled-components'
 import { JWT_SECRET, JWT_EXPIRE } from 'react-native-dotenv';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SwitchSelector from "react-native-switch-selector";
 import jwt from 'react-native-pure-jwt'
-import { View, Text, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
+import { View, Alert, Image } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import logo from '../assets/images/logo.png';
 
@@ -19,46 +18,7 @@ import { login } from '../redux/actions/user'
 import { getUser } from '../redux/actions/team'
 import { switchDb } from '../redux/actions/network'
 
-
-const Wrapper = styled(View)`
-  max-width: 400px;
-  width: 80%;
-  min-width: 200px;
-`;
-
-const Title = styled(Text)`
-  color: ${Colors.mainColor};
-  font-size: ${Layout.font.xlarge};
-  margin-bottom: ${Layout.space.xlarge};
-  text-align: center;
-`;
-
-const StyledInput = styled(TextInput)`
-  border-color: gray;
-  border-width: 1px;
-  font-size: ${Layout.font.medium};
-  height: 50px;
-  margin-bottom: ${Layout.space.large};
-`;
-
-const StyledButton = styled(TouchableOpacity)`
-  align-items: center;
-  background-color: ${Colors.mainColor};
-  height: 50px;
-  text-align: center;
-  padding: ${Layout.space.medium};
-`;
-
-const Message = styled(Text)`
-  text-align: center;
-  font-style: italic;
-  padding-bottom: ${Layout.space.small};
-`;
-
-const StyledText = styled(Text)`
-  color: white;
-  font-size: ${Layout.font.medium};
-`;
+import { Wrapper, Title, StyledInput, StyledButton, Message, StyledText } from './Signing.styled'
 
 const encoded = (str) => {
   const encodedChar = []

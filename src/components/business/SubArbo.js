@@ -1,54 +1,33 @@
-import React from 'react';
-import styled from 'styled-components';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { View, Text } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { View } from 'react-native';
 
 import Colors from '../../constants/Colors';
 import Layout from '../../constants/Layout'
 
-const SubArboWrapper = styled(View)`
-  align-items: center;
-  flex-direction: row;
-  margin-bottom: ${Layout.space.small};
-  padding: ${Layout.space.small};
-`
+import { SubArboWrapper, SubArboEl, Icons } from './SubArbo.styled'
 
-const SubArboEl = styled(Text)`
-  color: ${Colors.secondColor};
-  font-size: ${Layout.font.small};
-  flex-grow: 1;
-`;
+const SubArbo = ({ title, children }) => {
+  const [display, setDisplay] = useState(false);
 
-const Icons = styled(Ionicons)`
-  padding: 0 ${Layout.space.medium};
-`;
-
-class SubArbo extends React.Component {
-  state = {
-    display: false
+  const toggleArbo = () => {
+    setDisplay(!display);
   }
 
-  toggleArbo = () => {
-    this.setState({display: !this.state.display})
-  }
-
-  render() {
-    return (
-      <View>
+  return (
+    <View>
       <SubArboWrapper>
-          <Icons
-            name={this.state.display ? "md-arrow-dropdown" : "md-arrow-dropright"}
-            size={Layout.icon.default}
-            color={Colors.secondColor}
-            onPress={this.toggleArbo}
-          />
-          <SubArboEl onPress={this.toggleArbo} >{this.props.title}</SubArboEl>
-        </SubArboWrapper>
-        {this.state.display && this.props.children}
-      </View>
-    )
-  }
+        <Icons
+          name={display ? "md-arrow-dropdown" : "md-arrow-dropright"}
+          size={Layout.icon.default}
+          color={Colors.secondColor}
+          onPress={this.toggleArbo}
+        />
+        <SubArboEl onPress={toggleArbo} >{title}</SubArboEl>
+      </SubArboWrapper>
+      {display && children}
+    </View>
+  )
 }
 
 SubArbo.propTypes = {

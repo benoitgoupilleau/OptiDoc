@@ -1,47 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { ActivityIndicator, PermissionsAndroid, Alert } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import Main from '../components/Main';
 
 import { connectDbOut, connectDbHome } from '../redux/actions/network';
 import { getUser } from '../redux/actions/team'
 import { getDocs } from '../redux/actions/business'
 import { downloadModels } from '../redux/actions/user'
-import Sentry from '../services/sentry'
 
-const checkAccess = async () => {
-  const isAuthorised = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
-  if (isAuthorised) {
-    return true;
-  } else {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-        {
-          title: "Optidoc demande l'acccès aux documents",
-          message:
-            "Optidoc a besoin d'accéder à vos documents " +
-            "pour que vous puissiez les modifier",
-          buttonPositive: 'Autoriser',
-        },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        return true;
-      } else {
-        Alert.alert(
-          "L'application doit pouvoir accéder aux documents",
-          "L'application est inutilisable sans accès aux documents. Merci de valider l'accès",
-          [
-            { text: 'Ok', onPress: () => checkAccess() },
-          ],
-        )
-      }
-    } catch (err) {
-      Sentry.captureMessage(err, { func: 'checkAccessWRITE_EXTERNAL_STORAGE', doc: 'AuthLoadingScreen.js' });
-    }
-  }
-}
+import { checkAccessStorage } from '../utils/permissionsAndroid'
 
 const  AuthLoadingScreen = ({token,
   mssqlConnected,
@@ -57,7 +25,7 @@ const  AuthLoadingScreen = ({token,
   editedDocs,
   docs,
   downloadedBusiness}) => {
-  checkAccess();
+  checkAccessStorage();
   if (!mssqlConnected && !mssqlConnectionFailed) {
     connectedHome ? connectDbHome() : connectDbOut();
     if (usersLoaded) {

@@ -1,9 +1,9 @@
 import React from 'react';
-import { Text, ScrollView, Dimensions, View } from 'react-native';
+import { Text, Dimensions, View } from 'react-native';
 import Orientation from 'react-native-orientation';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 
 import Logout from '../components/Logout';
 import HeaderTitle from '../components/HeaderTitle'
@@ -18,7 +18,7 @@ import { downloadModels } from '../redux/actions/user'
 
 const { width } = Dimensions.get('window');
 
-const StyledScroll = styled(ScrollView)`
+const StyledScroll = styled.ScrollView`
   background-color: #ededed;
   padding-bottom: ${Layout.space.large};
   width: ${width};

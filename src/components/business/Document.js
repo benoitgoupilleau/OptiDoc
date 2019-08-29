@@ -1,12 +1,11 @@
+/* eslint-disable no-console */
 import React from 'react';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { TouchableOpacity, Text, View, ActivityIndicator, Dimensions, Alert, ToastAndroid, TextInput } from 'react-native';
+import { ActivityIndicator, Dimensions, Alert, ToastAndroid } from 'react-native';
 import pick from 'lodash.pick';
 import RNFS from 'react-native-fs';
 import { EXTERNAL_PATH } from 'react-native-dotenv';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { withNavigation } from 'react-navigation';
 import { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, editPrepare, removePrepare, createFile } from '../../redux/actions/user'
 import { updatePrepared, removeNewDoc, updateDocName } from '../../redux/actions/business';
@@ -22,43 +21,7 @@ import rootDir from '../../services/rootDir';
 
 const { width } = Dimensions.get('window');
 
-const DocumentWrapper = styled(TouchableOpacity)`
-  margin: ${Layout.space.medium};
-  flex-direction: row;
-  justify-content: space-between;
-`;
-
-const File = styled(View)`
-  flex-direction: row;
-  align-items: center;
-`;
-
-const Title = styled(Text)`
-  font-size: ${Layout.font.medium};
-  max-width: ${width/2}px;
-`;
-
-const StyledInput = styled(TextInput)`
-  ${({ editable }) => editable && 'border-bottom-color: gray; border-bottom-width: 1px;'}
-  padding: 0;
-  color: gray;
-  font-size: ${Layout.font.medium};
-  max-width: ${width / 2}px;
-`;
-
-const IconsWrapper = styled(View)`
-  flex-direction: row;
-  align-items: center;
-`;
-
-const EditIcons = styled(View)`
-  flex-direction: row;
-  align-items: center;
-`;
-
-const Icons = styled(Ionicons)`
-  padding: 0 10px 0 5px;
-`;
+import { DocumentWrapper, File, Title, StyledInput, IconsWrapper, EditIcons, Icons } from './Document.styled'
 
 class Document extends React.Component {
   constructor(props) {
@@ -294,6 +257,7 @@ class Document extends React.Component {
           {this.displayLeftIcon()}
           {isNew ?
             <StyledInput
+              width={width}
               allowFontScaling
               onChangeText={(localFileName) => this.setState({ localFileName })}
               placeholder="Nom du fichier"
@@ -301,7 +265,7 @@ class Document extends React.Component {
               editable={Prepared === 'N'}
               onEndEditing={() => this.props.updateDocName(this.state.localFileName, ID)}
             /> :
-            <Title>{FileName}</Title>}
+            <Title width={width}>{FileName}</Title>}
         </File>
         {type === Folder.rea ? 
           <IconsWrapper>

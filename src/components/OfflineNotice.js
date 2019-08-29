@@ -1,31 +1,14 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { View, Text, Dimensions, TouchableOpacity } from 'react-native';
+import { Dimensions, TouchableOpacity } from 'react-native';
 import NetInfo from "@react-native-community/netinfo";
 
 import { connectivityChange, connectDbOut, connectDbHome } from '../redux/actions/network';
 
-import Colors from '../constants/Colors';
-import Layout from '../constants/Layout'
+import { Wrapper, Message } from './OfflineNotice.styled';
 
 const { width } = Dimensions.get('window');
-
-const Wrapper = styled(View)`
-  background-color: ${props => props.type === 'error' ? Colors.errorBackground : (props.type === 'warning' ? Colors.warningBackground : Colors.mainColor)};
-  height: 30px;
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
-  width: ${width};
-`;
-
-const Message = styled(Text)`
-  color: ${props => props.type === 'error' ? Colors.errorText : (props.type === 'warning' ? Colors.warningText : Colors.warningText)};
-  font-size: ${Layout.font.small};
-  padding: 0 3px;
-`;
 
 class OfflineNotice extends PureComponent {
   componentDidMount() {
@@ -52,13 +35,13 @@ class OfflineNotice extends PureComponent {
   render() {
     if (!this.props.isConnected) {
       return (
-        <Wrapper type="error">
+        <Wrapper type="error" width={width}>
             <Message type="error">Mode hors ligne</Message>
         </Wrapper>
       );
     } else if (this.props.isConnected && !this.props.mssqlConnected) {
       return (
-        <Wrapper type="warning">
+        <Wrapper type="warning" width={width}>
           {this.props.connecting ? 
             <Message type="warning" >Connexion en cours ...</Message> :
           <TouchableOpacity onPress={this.testDb} style={{ height: 30 }}>
@@ -68,7 +51,7 @@ class OfflineNotice extends PureComponent {
       );
     } else if (this.props.modeleDownloaded === 'in progress') {
       return (
-        <Wrapper>
+        <Wrapper width={width}>
             <Message>Fichiers modèles en cours de téléchargement {this.props.nbDownloaded}/{this.props.totalModeles}</Message>
         </Wrapper>
       );
