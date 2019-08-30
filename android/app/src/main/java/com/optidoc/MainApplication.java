@@ -20,7 +20,6 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.stonem.mssql.MSSQLPackage;
 import com.rnfs.RNFSPackage;
-import com.zaguini.rnjwt.RNJwtPackage;
 import com.github.yamill.orientation.OrientationPackage;
 import com.reactnativecommunity.netinfo.NetInfoPackage;
 
@@ -49,7 +48,6 @@ public class MainApplication extends Application implements ReactApplication {
         new RNFSPackage(),
         new VectorIconsPackage(),
         new RCTPdfView(),
-        new RNJwtPackage(),
         new RNFtpPackage(),
         new RNGestureHandlerPackage(),
         new MSSQLPackage(),
