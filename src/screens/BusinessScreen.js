@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Text, Dimensions, View } from 'react-native';
 import Orientation from 'react-native-orientation';
 import { connect } from 'react-redux';
@@ -24,40 +24,37 @@ const StyledScroll = styled.ScrollView`
   width: ${width};
 `;
 
-class BusinessScreen extends React.Component {
-  static navigationOptions = {
-    headerTitle: <HeaderTitle/>,
-    headerRight: <Logout />,
-    headerStyle: {
-      height: 70
-    }
-  }
-
-  componentDidMount() {
+const BusinessScreen = React.memo(({ businesses, docs, newDocs, modeleDownloaded, mssqlConnected, downloadModels, modeleDocs }) => {
+  useEffect(() => {
     Orientation.lockToPortrait();
-    if (this.props.modeleDownloaded !== 'in progress' && this.props.mssqlConnected) {
-      this.props.downloadModels(this.props.modeleDocs);
+    if (modeleDownloaded !== 'in progress' && mssqlConnected) {
+      downloadModels(modeleDocs);
     }
-  }
+  }, [])
 
-  
-  render() {
-    if (this.props.businesses.length > 0) {
-      return (
-        <Main>
-          <View>
-            <StyledScroll>
-              {this.props.businesses.map(b => <Business key={b} title={b} prep={this.props.docs[b].prep} rea={this.props.docs[b].rea} newDocs={this.props.newDocs[b]} />)}
-            </StyledScroll>
-          </View>
-        </Main>
-      );
-    }
+  if (businesses.length > 0) {
     return (
       <Main>
-        <Text>Aucune affaire disponible</Text>
+        <View>
+          <StyledScroll>
+            {businesses.map(b => <Business key={b} title={b} prep={docs[b].prep} rea={docs[b].rea} newDocs={newDocs[b]} />)}
+          </StyledScroll>
+        </View>
       </Main>
     );
+  }
+  return (
+    <Main>
+      <Text>Aucune affaire disponible</Text>
+    </Main>
+  );
+})
+
+BusinessScreen.navigationOptions = {
+  headerTitle: <HeaderTitle />,
+  headerRight: <Logout />,
+  headerStyle: {
+    height: 70
   }
 }
 

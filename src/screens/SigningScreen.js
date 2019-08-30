@@ -1,23 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Orientation from 'react-native-orientation'
 
 import Main from '../components/Main';
 import Signin from '../components/Signing';
 
-class SignInScreen extends React.Component {
-
-  componentDidMount() {
+const SignInScreen = () => {
+  useEffect(() => {
     Orientation.lockToPortrait()
-  }
+  }, [])
 
-  render() {
     return (
       <Main>
         <Signin />
       </Main>
     );
-  }
 }
 
 SignInScreen.propTypes = {
