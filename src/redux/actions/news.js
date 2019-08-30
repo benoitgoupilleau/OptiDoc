@@ -1,7 +1,7 @@
-import MSSQL_Out from '../../services/mssqlOut';
-import MSSQL_Home from '../../services/mssqlHome';
-import Tables from '../../constants/Tables';
 import Sentry from '../../services/sentry'
+import api from '../../services/api';
+
+import { store } from '../store/store'
 
 import {
   SET_NEWS,
@@ -9,21 +9,12 @@ import {
 } from './types';
 
 
-export const getNews = (connectHome = false) => dispatch => {
-  if (connectHome) {
-    return MSSQL_Home.executeQuery(`SELECT * FROM ${Tables.t_news}`)
-      .then((res) => dispatch(setNews(res)))
-      .catch(e => {
-        Sentry.captureException(e, { func: 'getNews', doc: 'newsActions' })
-        console.error({ e, func: 'getNews', doc: 'newsActions' })
-        return;
-      })
-  }
-  return MSSQL_Out.executeQuery(`SELECT * FROM ${Tables.t_news}`)
-    .then((res) => dispatch(setNews(res)))
+export const getNews = () => dispatch => {
+  const { user } = store.getState();
+  return api.get('/api/news', { headers: { Authorization: `Bearer ${user.bearerToken}`}})
+    .then((res) => dispatch(setNews(res.data)))
     .catch(e => {
       Sentry.captureException(e, { func: 'getNews', doc: 'newsActions' })
-      console.error({ e, func: 'getNews', doc: 'newsActions' })
       return;
     })
 }

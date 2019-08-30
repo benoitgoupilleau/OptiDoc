@@ -45,7 +45,7 @@ class HomeScreen extends React.Component {
   componentDidMount() {
     Orientation.lockToPortrait();
     if (this.props.mssqlConnected) {
-      this.props.getNews(this.props.connectedHome);
+      this.props.getNews();
       this.props.getDocs(this.props.connectedHome, this.props.docs, this.props.downloadedBusiness, this.props.editedDocs);
       this.props.getBusiness(this.props.connectedHome)
       this.props.getModeles(this.props.connectedHome)
@@ -67,13 +67,13 @@ class HomeScreen extends React.Component {
     if (this.props.mssqlConnected) {
       this.setState({ refreshing: true });
       this.props.refreshNews();
-      this.props.getNews(this.props.connectedHome)
+      this.props.getNews()
     }
   }
 
   render() {
     if (this.props.mssqlConnected && !this.state.hasFetchedData){
-      this.props.getNews(this.props.connectedHome);
+      this.props.getNews();
       this.props.getDocs(this.props.connectedHome, this.props.docs, this.props.downloadedBusiness, this.props.editedDocs);
       this.props.getBusiness(this.props.connectedHome)
       this.props.getModeles(this.props.connectedHome)
@@ -101,7 +101,7 @@ class HomeScreen extends React.Component {
             }
           >
             {this.props.newsList.map(news => (
-              <News key={news.ID} title={news.Titre} content={news.Contenu} />
+              <News key={news.id} title={news.titre} content={news.contenu} />
             ))}
           </StyledScroll>
         </Main>
