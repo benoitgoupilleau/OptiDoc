@@ -26,7 +26,7 @@ export const StyledInput = styled.TextInput`
 
 export const StyledButton = styled.TouchableOpacity`
   align-items: center;
-  background-color: ${Colors.mainColor};
+  background-color: ${({ disabled }) => disabled ? Colors.thirdColor : Colors.mainColor};
   height: 50px;
   text-align: center;
   padding: ${Layout.space.medium};
