@@ -6,6 +6,7 @@ import FileViewer from 'react-native-file-viewer';
 import MSSQL_Out from '../../services/mssqlOut';
 import MSSQL_Home from '../../services/mssqlHome';
 import Sentry from '../../services/sentry'
+import api from '../../services/api';
 
 import {
   LOGIN,
@@ -37,14 +38,23 @@ import rootDir from '../../services/rootDir';
 let isDownloadingFiles = false;
 let isDownloadingModeles = false;
 
-export const login = (userName, user, bearerToken) => ({
+export const loginApi = (userName, MdP, successCallback, errorCallback) => dispatch => api.post('/api/login', { login: userName, MdP })
+  .then((res) => {
+    const { username, id_user, token } = res.data;
+    successCallback();
+    return dispatch(setUser(userName, id_user, token, username));
+  })
+  .catch(() => {
+    return errorCallback()
+  })
+
+const setUser = (userName, userId, bearerToken, name) => ({
   type: LOGIN,
   userName,
   bearerToken,
-  id: user.ID,
-  id_employe: user.ID_Employe,
-  name: user.Nom
-}) 
+  id: userId,
+  name
+})
 
 export const logout = () => ({
   type: LOGOUT

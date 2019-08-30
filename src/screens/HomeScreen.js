@@ -12,7 +12,6 @@ import Main from '../components/Main';
 
 import { getNews, refreshNews } from '../redux/actions/news'
 import { getDocs, getModeles, getBusiness, getAffaires, getArbo } from '../redux/actions/business'
-import { getUser } from '../redux/actions/team'
 import { downloadModels } from '../redux/actions/user'
 import { filterNews } from '../redux/selector/news'
 
@@ -50,7 +49,6 @@ class HomeScreen extends React.Component {
       this.props.getDocs(this.props.connectedHome, this.props.docs, this.props.downloadedBusiness, this.props.editedDocs);
       this.props.getBusiness(this.props.connectedHome)
       this.props.getModeles(this.props.connectedHome)
-      this.props.getUser(this.props.connectedHome)
       this.props.getAffaires(this.props.connectedHome)
       this.props.getArbo(this.props.connectedHome)
     }
@@ -79,7 +77,6 @@ class HomeScreen extends React.Component {
       this.props.getDocs(this.props.connectedHome, this.props.docs, this.props.downloadedBusiness, this.props.editedDocs);
       this.props.getBusiness(this.props.connectedHome)
       this.props.getModeles(this.props.connectedHome)
-      this.props.getUser(this.props.connectedHome)
       this.props.getAffaires(this.props.connectedHome)
       this.props.getArbo(this.props.connectedHome)
       if(this.props.modeleDownloaded !== 'in progress') this.props.downloadModels(this.props.modeleDocs)
@@ -129,7 +126,6 @@ HomeScreen.propTypes = {
   mssqlConnected: PropTypes.bool.isRequired,
   getBusiness: PropTypes.func.isRequired,
   getModeles: PropTypes.func.isRequired,
-  getUser: PropTypes.func.isRequired,
   getAffaires: PropTypes.func.isRequired,
   getArbo: PropTypes.func.isRequired,
   downloadModels: PropTypes.func.isRequired,
@@ -147,7 +143,6 @@ const mapStateToProps = (state) => ({
   loaded: state.news.loaded,
   refreshing: state.news.refreshing,
   mssqlConnected: state.network.mssqlConnected,
-  usersLoaded: state.teams.usersLoaded,
   userId: state.user.id,
   editedDocs: state.user.editedDocs,
   downloadedBusiness: state.user.downloadedBusiness,
@@ -157,4 +152,4 @@ const mapStateToProps = (state) => ({
   connectedHome: state.network.connectedHome
 })
 
-export default connect(mapStateToProps, { getNews, refreshNews, getDocs, getModeles, getBusiness, getUser, downloadModels, getAffaires, getArbo })(HomeScreen);
+export default connect(mapStateToProps, { getNews, refreshNews, getDocs, getModeles, getBusiness, downloadModels, getAffaires, getArbo })(HomeScreen);

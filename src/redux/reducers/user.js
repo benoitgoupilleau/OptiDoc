@@ -1,7 +1,5 @@
 import omit from 'lodash.omit';
 import { REHYDRATE } from 'redux-persist';
-import { JWT_SECRET } from 'react-native-dotenv';
-import jwt from 'react-native-pure-jwt';
 import {
   LOGIN,
   LOGOUT,
@@ -44,39 +42,14 @@ const defaultState = {
   totalModeles: 0
 }
 
-const checkToken = async (token) => {
-  if (token !== '') {
-    try {
-      const verify = await jwt.verify(token, JWT_SECRET, { alg: 'hs256' })
-      const now = new Date().getTime();
-      const isStillValid = verify.exp && verify.exp > now;
-      return isStillValid;
-    } catch (e) {
-      return false;
-    }
-  }
-  return false;
-}
-
 export default (state = defaultState, action) => {
   switch (action.type) {
     case REHYDRATE: {
-      let unValidToken = false;
-      let omitToken = {}
       let omitLoading = {}
       if (action.payload && action.payload.user) {
-        unValidToken = !checkToken(action.payload.user.bearerToken);
-        omitToken = { ...omit(action.payload.user, ['bearerToken', 'modeleDownloaded']) }
         omitLoading = { ...omit(action.payload.user, ['loadingBusiness', 'modeleDownloaded']) }
       }
       const modeleDownloaded = action.payload && action.payload.user && (action.payload.user.modeleDownloaded === 'yes' || action.payload.user.modeleDownloaded === 'no') ? action.payload.user.modeleDownloaded : 'no';
-      if (unValidToken) {
-        return {
-          ...state,
-          ...omitToken,
-          modeleDownloaded
-        }
-      }
       return {
         ...state,
         ...omitLoading,
@@ -89,7 +62,6 @@ export default (state = defaultState, action) => {
         userName: action.userName,
         bearerToken: action.bearerToken,
         id: action.id,
-        id_employe: action.id_employe,
         name: action.name,
       }
     case LOGOUT:

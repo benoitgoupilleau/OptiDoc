@@ -30,10 +30,6 @@ export const MSSQL_FAILED = 'MSSQL_FAILED';
 export const UPD_CONNECTED_HOME = 'UPD_CONNECTED_HOME';
 export const CONNECTING = 'CONNECTING';
 
-// Team actions
-export const SET_USER = 'SET_USER';
-
-
 // Business actions
 export const SET_DOCS = 'SET_DOCS';
 export const ADD_DOC = 'ADD_DOC';

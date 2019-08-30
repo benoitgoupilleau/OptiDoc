@@ -8,7 +8,6 @@ import createEncryptor from 'redux-persist-transform-encrypt';
 
 import newsReducer from '../reducers/news';
 import networkReducer from '../reducers/network'
-import teamReducer from '../reducers/team';
 import userReducer from '../reducers/user';
 import businessReducer from '../reducers/business';
 import Sentry from '../../services/sentry'
@@ -35,7 +34,6 @@ const persistConfig = {
 const rootReducer = combineReducers({
   news: newsReducer,
   network: networkReducer,
-  teams: teamReducer,
   user: userReducer,
   business: businessReducer
 });

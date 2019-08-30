@@ -9,7 +9,6 @@ import Layout from '../constants/Layout'
 import { logout } from '../redux/actions/user';
 import { getNews } from '../redux/actions/news'
 import { getDocs, getModeles, getBusiness, getAffaires, getArbo } from '../redux/actions/business'
-import { getUser } from '../redux/actions/team'
 
 import { Wrapper, Icons, StyledButton, StyledText } from './Logout.styled';
 
@@ -45,7 +44,6 @@ class Logout extends React.Component {
     this.props.getArbo(this.props.connectedHome)
     this.props.getBusiness(this.props.connectedHome);
     this.props.getModeles(this.props.connectedHome)
-    this.props.getUser(this.props.connectedHome)
     setTimeout(() => {
       this.setState({ refreshing: false})
       ToastAndroid.showWithGravity(
@@ -84,7 +82,6 @@ Logout.propTypes = {
   getDocs: PropTypes.func.isRequired,
   getBusiness: PropTypes.func.isRequired,
   getModeles: PropTypes.func.isRequired,
-  getUser: PropTypes.func.isRequired,
   getAffaires: PropTypes.func.isRequired,
   getArbo: PropTypes.func.isRequired,
   editedDocs: PropTypes.array.isRequired,
@@ -118,5 +115,4 @@ export default withNavigation(connect(mapStateToProps, {
   getArbo,
   getBusiness,
   getModeles,
-  getUser
 })(Logout));
