@@ -28,9 +28,9 @@ class AddFileScreen extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      TypeModele: 'PV',
+      typeModele: 'PV',
       ModeleID: '',
-      FileName: '',
+      fileName: '',
       filePath: '',
       FileNameFinal: '',
       creatingFile: false
@@ -51,11 +51,11 @@ class AddFileScreen extends React.Component {
     }
   }
 
-  handleSelectModele = (ModeleID, FileName, filePath) => {
+  handleSelectModele = (ModeleID, fileName, filePath) => {
     const now = new Date();
     const { day, month, year } = getDateFormat(now);
     const date = `${day}.${month}.${year}`;
-    this.setState({ ModeleID, FileName, FileNameFinal: `${FileName} ${date}`, filePath })
+    this.setState({ ModeleID, fileName, FileNameFinal: `${fileName} ${date}`, filePath })
   }
 
   onCreateFile = () => {
@@ -89,7 +89,7 @@ class AddFileScreen extends React.Component {
               CreatedBy: this.props.user.name,
               Dossier2: 'Realisation',
               UpLoadedOn: '1900-01-01',
-              FileName: this.state.FileNameFinal,
+              fileName: this.state.FileNameFinal,
               CreatedOn,
               Dossier1: businessId,
               ID: fileID,
@@ -174,32 +174,32 @@ class AddFileScreen extends React.Component {
           </StyledButton>
           <Selector>
             <Option
-              isSelected={this.state.TypeModele === 'PV'}
-              onPress={() => this.setState({ TypeModele: 'PV', FileName: '', FileNameFinal: '' })}
+              isSelected={this.state.typeModele === 'PV'}
+              onPress={() => this.setState({ typeModele: 'PV', fileName: '', FileNameFinal: '' })}
             >
-              <OptionText isSelected={this.state.TypeModele === 'PV'}>PV</OptionText>
+              <OptionText isSelected={this.state.typeModele === 'PV'}>PV</OptionText>
             </Option>
             <Option
-              isSelected={this.state.TypeModele === 'DMOS'}
-              onPress={() => this.setState({ TypeModele: 'DMOS', FileName: '', FileNameFinal: '' })}
+              isSelected={this.state.typeModele === 'DMOS'}
+              onPress={() => this.setState({ typeModele: 'DMOS', fileName: '', FileNameFinal: '' })}
             >
-              <OptionText isSelected={this.state.TypeModele === 'DMOS'}>DMOS</OptionText>
+              <OptionText isSelected={this.state.typeModele === 'DMOS'}>DMOS</OptionText>
             </Option>
             <Option
-              isSelected={this.state.TypeModele === 'CR'}
-              onPress={() => this.setState({ TypeModele: 'CR', FileName: '', FileNameFinal: '' })}
+              isSelected={this.state.typeModele === 'CR'}
+              onPress={() => this.setState({ typeModele: 'CR', fileName: '', FileNameFinal: '' })}
             >
-              <OptionText isSelected={this.state.TypeModele === 'CR'}>CR</OptionText>
+              <OptionText isSelected={this.state.typeModele === 'CR'}>CR</OptionText>
             </Option>
           </Selector>
           <ModeleList>
-            {this.props.modeles.filter(m => m.TypeModele === this.state.TypeModele).map(m => (
+            {this.props.modeles.filter(m => m.typeModele === this.state.typeModele).map(m => (
               <Modele 
-                key={m.ID}
-                FileName={m.Designation}
-                handleSelect={() => this.handleSelectModele(m.ID_Document, m.Designation, `${rootDir}/${Folder.modeleDocs}/${m.ID_Document}.pdf`)}
-                selected={this.state.FileName === m.Designation}
-                openFile={() => this.props.navigation.navigate('Pdf', { title: m.Designation, ID: m.ID_Document, isModel: true, })}
+                key={m.id}
+                fileName={m.designation}
+                handleSelect={() => this.handleSelectModele(m.iD_Document, m.designation, `${rootDir}/${Folder.modeleDocs}/${m.iD_Document}.pdf`)}
+                selected={this.state.fileName === m.designation}
+                openFile={() => this.props.navigation.navigate('Pdf', { title: m.designation, ID: m.iD_Document, isModel: true, })}
               />))
             }
           </ModeleList>
@@ -209,7 +209,7 @@ class AddFileScreen extends React.Component {
               onChangeText={(FileNameFinal) => this.setState({ FileNameFinal })}
               value={this.state.FileNameFinal}
             />
-            <StyledButton disabled={this.state.FileName === '' || this.state.creatingFile} onPress={this.onCreateFile}>
+            <StyledButton disabled={this.state.fileName === '' || this.state.creatingFile} onPress={this.onCreateFile}>
               <StyledText>{this.state.creatingFile ? 'Création en cours' : 'Créer le fichier'}</StyledText>
             </StyledButton>
           </ButtonWrapper>

@@ -98,21 +98,12 @@ export const updateDocName = (FileName, id) => ({
   id
 })
 
-export const getModeles = (connectHome = false) => dispatch => {
-  if (connectHome) {
-    return MSSQL_Home.executeQuery(`SELECT * FROM ${Tables.t_modeles}`)
-      .then((res) => dispatch(setModeles(res)))
-      .catch(e => {
-        Sentry.captureException(e, { func: 'getModeles', doc: 'businessActions' })
-        console.error({ e, func: 'getModeles', doc: 'businessActions' })
-        return;
-      })
-  }
-  return MSSQL_Out.executeQuery(`SELECT * FROM ${Tables.t_modeles}`)
-    .then((res) => dispatch(setModeles(res)))
+export const getModeles = () => dispatch => {
+  const { user } = store.getState();
+  return api.get('/api/modeles', { headers: { Authorization: `Bearer ${user.bearerToken}` } })
+    .then((res) => dispatch(setModeles(res.data)))
     .catch(e => {
       Sentry.captureException(e, { func: 'getModeles', doc: 'businessActions' })
-      console.error({ e, func: 'getModeles', doc: 'businessActions' })
       return;
     })
 }

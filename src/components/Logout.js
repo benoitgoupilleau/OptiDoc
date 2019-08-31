@@ -43,7 +43,7 @@ class Logout extends React.Component {
     this.props.getAffaires(this.props.connectedHome)
     this.props.getArbo(this.props.connectedHome)
     this.props.getBusiness();
-    this.props.getModeles(this.props.connectedHome)
+    this.props.getModeles()
     setTimeout(() => {
       this.setState({ refreshing: false})
       ToastAndroid.showWithGravity(

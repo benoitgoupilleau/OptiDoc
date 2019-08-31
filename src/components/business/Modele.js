@@ -8,13 +8,13 @@ import { ModeleWrapper, Title, Icons } from './Modele.styled';
 
 const { width } = Dimensions.get('window');
 
-const Modele = ({ FileName, handleSelect, selected, openFile }) => (
+const Modele = ({ fileName, handleSelect, selected, openFile }) => (
   <ModeleWrapper
     width={width}
     onPress={handleSelect}
     onLongPress={openFile}
   > 
-    <Title width={width} selected={selected} >{FileName}</Title>
+    <Title width={width} selected={selected} >{fileName}</Title>
     {selected && 
       <Icons
         color="green"
@@ -26,7 +26,7 @@ const Modele = ({ FileName, handleSelect, selected, openFile }) => (
 );
 
 Modele.propTypes = {
-  FileName: PropTypes.string.isRequired,
+  fileName: PropTypes.string.isRequired,
   handleSelect: PropTypes.func.isRequired,
   openFile: PropTypes.func.isRequired,
   selected: PropTypes.bool.isRequired

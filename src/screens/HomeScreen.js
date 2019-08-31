@@ -32,9 +32,9 @@ const HomeScreen = React.memo(({ refreshing, loaded, newsList, getNews, refreshN
     Orientation.lockToPortrait();
     getNews();
     getBusiness();
+    getModeles()
     if (mssqlConnected) {
       getDocs(connectedHome, docs, downloadedBusiness, editedDocs);
-      getModeles(connectedHome)
       getAffaires(connectedHome)
       getArbo(connectedHome)
     }
