@@ -19,7 +19,7 @@ const encoded = (str) => {
   return encodedChar.join('');
 }
 
-const Signin = ({ userName, navigation, loginApi, locked }) => {
+const Signin = ({ userName, navigation, loginApi, locked, sessionExpired }) => {
   const [localUserName, setUserName] = useState(userName)
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -57,6 +57,7 @@ const Signin = ({ userName, navigation, loginApi, locked }) => {
         />
       </View>
       <Title>OptiDoc</Title>
+      {sessionExpired && <Message type="error">Votre session a expiré. Merci de vous reconnecter</Message>}
       <StyledInput
         allowFontScaling
         onChangeText={(userName) => setUserName(userName)}
@@ -87,11 +88,13 @@ Signin.propTypes = {
   loginApi: PropTypes.func.isRequired,
   locked: PropTypes.bool.isRequired,
   userName: PropTypes.string.isRequired,
+  sessionExpired: PropTypes.bool.isRequired
 }
 
 const mapStateToProps = state => ({
   userName: state.user.userName,
   locked: state.user.locked,
+  sessionExpired: state.user.sessionExpired
 })
 
 export default withNavigation(connect(mapStateToProps, { loginApi })(Signin));

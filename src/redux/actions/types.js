@@ -1,6 +1,7 @@
 // User action
 export const LOGIN = 'LOGIN';
 export const LOGOUT = 'LOGOUT';
+export const SESSION_EXPIRED = 'SESSION_EXPIRED'
 export const BUSINESS_DOWNLOADED = 'BUSINESS_DOWNLOADED'
 export const DOWNLOADING_BUSINESS = 'DOWNLOADING_BUSINESS'
 export const CANCEL_DOWNLOAD = 'CANCEL_DOWNLOAD'

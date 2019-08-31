@@ -33,9 +33,10 @@ export const StyledButton = styled.TouchableOpacity`
 `;
 
 export const Message = styled.Text`
-  text-align: center;
   font-style: italic;
   padding-bottom: ${Layout.space.small};
+  text-align: center;
+  ${({ type }) => type === 'error' && `color: ${Colors.errorBackground}`}
 `;
 
 export const StyledText = styled.Text`

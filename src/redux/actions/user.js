@@ -11,6 +11,7 @@ import api from '../../services/api';
 import {
   LOGIN,
   LOGOUT,
+  SESSION_EXPIRED,
   BUSINESS_DOWNLOADED,
   DOWNLOADING_BUSINESS,
   CANCEL_DOWNLOAD,
@@ -58,6 +59,10 @@ const setUser = (userName, userId, bearerToken, name) => ({
 
 export const logout = () => ({
   type: LOGOUT
+});
+
+export const sessionExpired = () => ({
+  type: SESSION_EXPIRED
 });
 
 export const downLoadOneFile = (id, serverPath, localPath) => dispatch => {

@@ -4,6 +4,7 @@ import { ENV } from 'react-native-dotenv';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/lib/integration/react';
 import AppNavigator from './src/navigation/AppNavigator'
+import NavigationService from './src/services/navigationService';
 
 import { store, persistor } from './src/redux/store/store';
 
@@ -17,7 +18,11 @@ setRootDir();
 const App = () => (
   <Provider store={store} >
     <PersistGate loading={<ActivityIndicator />} persistor={persistor}>
-      <AppNavigator />
+      <AppNavigator 
+        ref={navigatorRef => {
+          NavigationService.setTopLevelNavigator(navigatorRef);
+        }}
+      />
     </PersistGate>
   </Provider>
 );

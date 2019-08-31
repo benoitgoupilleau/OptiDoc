@@ -25,14 +25,19 @@ const StyledScroll = styled.ScrollView`
   width: ${width};
 `;
 
-const HomeScreen = React.memo(({ refreshing, loaded, newsList, getNews, refreshNews, getBusiness, mssqlConnected, connectedHome, getDocs, docs, downloadedBusiness, editedDocs, getModeles, getAffaires, getArbo, modeleDownloaded, modeleDocs }) => {
+const HomeScreen = React.memo(({ token, refreshing, loaded, newsList, getNews, refreshNews, getBusiness, mssqlConnected, connectedHome, getDocs, docs, downloadedBusiness, editedDocs, getModeles, getAffaires, getArbo, modeleDownloaded, modeleDocs }) => {
   const [updatingNews, setUpdatingNews] = useState(refreshing);
+  
+  useEffect(() => {
+    if (token !== '') {
+      getNews();
+      getBusiness();
+      getModeles()
+    }
+  }, [token])
 
   useEffect(() => {
     Orientation.lockToPortrait();
-    getNews();
-    getBusiness();
-    getModeles()
     if (mssqlConnected) {
       getDocs(connectedHome, docs, downloadedBusiness, editedDocs);
       getAffaires(connectedHome)
@@ -114,11 +119,13 @@ HomeScreen.propTypes = {
   downloadedBusiness: PropTypes.array.isRequired,
   docs: PropTypes.array.isRequired,
   modeleDownloaded: PropTypes.string.isRequired,
-  connectedHome: PropTypes.bool.isRequired
+  connectedHome: PropTypes.bool.isRequired,
+  token: PropTypes.string.isRequired
 }
 
 
 const mapStateToProps = (state) => ({
+  token: state.user.bearerToken,
   newsList: filterNews([...state.news.newsList]),
   loaded: state.news.loaded,
   refreshing: state.news.refreshing,

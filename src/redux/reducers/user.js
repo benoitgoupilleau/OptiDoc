@@ -3,6 +3,7 @@ import { REHYDRATE } from 'redux-persist';
 import {
   LOGIN,
   LOGOUT,
+  SESSION_EXPIRED,
   BUSINESS_DOWNLOADED,
   DOWNLOADING_BUSINESS,
   CANCEL_DOWNLOAD,
@@ -39,7 +40,8 @@ const defaultState = {
   locked: false,
   modeleDownloaded: 'no',
   nbDownloaded: 0,
-  totalModeles: 0
+  totalModeles: 0,
+  sessionExpired: false
 }
 
 export default (state = defaultState, action) => {
@@ -63,11 +65,18 @@ export default (state = defaultState, action) => {
         bearerToken: action.bearerToken,
         id: action.id,
         name: action.name,
+        sessionExpired: false
       }
     case LOGOUT:
       return {
         ...state,
         ...omit(defaultState, ['userName', 'downloadedBusiness', 'editedDocs'])
+      }
+    case SESSION_EXPIRED:
+      return {
+        ...state,
+        ...omit(defaultState, ['userName', 'downloadedBusiness', 'editedDocs']),
+        sessionExpired: true
       }
     case DOWNLOADING_BUSINESS: {
       const currentBusiness = state.loadingBusiness.includes(action.id) ? [...state.loadingBusiness] : [...state.loadingBusiness, action.id];
