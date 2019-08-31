@@ -172,7 +172,7 @@ export default (state = defaultState, action) => {
       const currentFiles = [...state.editedDocs];
       const indexToUpdate = currentFiles.findIndex(c => c.ID === action.id)
       const fileEdit = currentFiles[indexToUpdate];
-      if (!!fileEdit.editPath) {
+      if (fileEdit.editPath) {
         delete fileEdit.prepared;
         return {
           ...state,

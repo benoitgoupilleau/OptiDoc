@@ -147,9 +147,9 @@ class AddPictureScreen extends React.Component {
   }
 
   render() {
-    const title = this.props.navigation.getParam('affaire', '')
-    const affaire = this.props.affaires.filter(a => a.ID === title)[0]
-    const clientName = affaire ? `${affaire.Client} - ${affaire.Designation}` : title;
+    const id_affaire = this.props.navigation.getParam('affaire', '')
+    const business = this.props.userBusiness.find((b) => b.id === id_affaire)
+    const clientName = business ? `${business.client} - ${business.designation}` : id_affaire;
     return (
       <View>
         <OfflineNotice />
@@ -203,14 +203,14 @@ class AddPictureScreen extends React.Component {
 
 AddPictureScreen.propTypes = {
   navigation: PropTypes.object.isRequired,
-  affaires: PropTypes.array.isRequired,
+  userBusiness: PropTypes.array.isRequired,
   user: PropTypes.object.isRequired,
   editFile: PropTypes.func.isRequired,
   addNewDoc: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => ({
-  affaires: state.business.affaires,
+  userBusiness: state.business.business,
   user: state.user,
   modeleDownloaded: state.user.modeleDownloaded
 })

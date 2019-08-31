@@ -47,7 +47,7 @@ class AddFileScreen extends React.Component {
   componentDidMount() {
     Orientation.lockToPortrait();
     if (this.props.modeleDownloaded !== 'in progress' && this.props.mssqlConnected) {
-      this.props.downloadModels(this.props.modeleDocs);
+      this.props.downloadModels(this.props.modeles);
     }
   }
 
@@ -65,8 +65,8 @@ class AddFileScreen extends React.Component {
       this.setState({creatingFile: true})
       const businessId = this.props.navigation.getParam('affaire', '')
       const now = new Date();
-      const affaire = this.props.affaires.filter(a => a.ID === businessId)[0]
-      const clientName = affaire ? `${affaire.Client} - ${affaire.Designation}` : businessId;
+      const affaire = this.props.userBusiness.find((b) => b.id === businessId)
+      const clientName = affaire ? `${affaire.client} - ${affaire.designation}` : businessId;
       const { day, month, year, hours, minutes, secondes } = getDateFormat(now);
       const CreatedOn = `${year}-${month}-${day}`;
       const date = `${year}${month}${day}${hours}${minutes}${secondes}`;
@@ -155,14 +155,14 @@ class AddFileScreen extends React.Component {
 
   forceDownload = () => {
     if (this.props.modeleDownloaded !== 'in progress' && this.props.mssqlConnected) {
-      this.props.forceDownloadModels(this.props.modeleDocs);
+      this.props.forceDownloadModels(this.props.modeles);
     }
   }
 
   render() {
-    const title = this.props.navigation.getParam('affaire', '')
-    const affaire = this.props.affaires.filter(a => a.ID === title)[0]
-    const clientName = affaire ? `${affaire.Client} - ${affaire.Designation}` : title;
+    const id_affaire = this.props.navigation.getParam('affaire', '')
+    const business = this.props.userBusiness.find((b) => b.id === id_affaire)
+    const clientName = business ? `${business.client} - ${business.designation}` : id_affaire;
     return (
       <View>
         <OfflineNotice />
@@ -221,7 +221,7 @@ class AddFileScreen extends React.Component {
 
 AddFileScreen.propTypes = {
   navigation: PropTypes.object.isRequired,
-  affaires: PropTypes.array.isRequired,
+  userBusiness: PropTypes.array.isRequired,
   user: PropTypes.object.isRequired,
   editFile: PropTypes.func.isRequired,
   addNewDoc: PropTypes.func.isRequired,
@@ -229,16 +229,14 @@ AddFileScreen.propTypes = {
   downloadModels: PropTypes.func.isRequired,
   modeles: PropTypes.array.isRequired,
   modeleDownloaded: PropTypes.string.isRequired,
-  modeleDocs: PropTypes.array.isRequired,
   mssqlConnected: PropTypes.bool.isRequired
 }
 
 const mapStateToProps = state => ({
-  modeleDocs: state.business.docs.filter(d => (d.Dossier1 && d.Dossier1 === 'Modele')),
   modeles: state.business.modeles,
   mssqlConnected: state.network.mssqlConnected,
   user: state.user,
-  affaires: state.business.affaires,
+  userBusiness: state.business.business,
   modeleDownloaded: state.user.modeleDownloaded
 })
 

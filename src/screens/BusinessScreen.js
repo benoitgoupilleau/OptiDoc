@@ -78,7 +78,7 @@ const mapStateToProps = ({ user, business, network }) => {
     newDocs,
     modeleDownloaded: user.modeleDownloaded,
     mssqlConnected: network.mssqlConnected,
-    modeleDocs: business.docs.filter(d => (d.Dossier1 && d.Dossier1 === 'Modele')),
+    modeleDocs: business.modeles,
   })
 }
 

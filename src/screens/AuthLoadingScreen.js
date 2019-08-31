@@ -18,16 +18,13 @@ const  AuthLoadingScreen = ({token,
   connectedHome,
   navigation,
   downloadModels,
-  modeleDocs,
-  editedDocs,
-  docs,
-  downloadedBusiness}) => {
+  modeleDocs
+  }) => {
   checkAccessStorage();
   if (!mssqlConnected && !mssqlConnectionFailed) {
     connectedHome ? connectDbHome() : connectDbOut();
     navigation.navigate(token !== '' ? 'App' : 'Auth');
   } else {
-    getDocs(connectedHome, docs, downloadedBusiness, editedDocs)
     downloadModels(modeleDocs)
     navigation.navigate(token !== '' ? 'App' : 'Auth');
   }
@@ -59,7 +56,7 @@ const mapStateToProps = state => ({
   downloadedBusiness: state.user.downloadedBusiness,
   mssqlConnected: state.network.mssqlConnected,
   mssqlConnectionFailed: state.network.mssqlConnectionFailed,
-  modeleDocs: state.business.docs.filter(d => (d.Dossier1 && d.Dossier1 === 'Modele')),
+  modeleDocs: state.business.modeles,
   docs: state.business.docs,
   connectedHome: state.network.connectedHome
 })

@@ -11,7 +11,7 @@ import News from '../components/news/News';
 import Main from '../components/Main';
 
 import { getNews, refreshNews } from '../redux/actions/news'
-import { getDocs, getModeles, getBusiness, getAffaires, getArbo } from '../redux/actions/business'
+import { getDocs, getModeles, getBusiness, getArbo } from '../redux/actions/business'
 import { downloadModels } from '../redux/actions/user'
 import { filterNews } from '../redux/selector/news'
 
@@ -25,7 +25,7 @@ const StyledScroll = styled.ScrollView`
   width: ${width};
 `;
 
-const HomeScreen = React.memo(({ token, refreshing, loaded, newsList, getNews, refreshNews, getBusiness, mssqlConnected, connectedHome, getDocs, docs, downloadedBusiness, editedDocs, getModeles, getAffaires, getArbo, modeleDownloaded, modeleDocs }) => {
+const HomeScreen = React.memo(({ token, refreshing, loaded, newsList, getNews, refreshNews, getBusiness, mssqlConnected, getDocs, docs, downloadedBusiness, editedDocs, getModeles, getArbo, modeleDownloaded, modeleDocs }) => {
   const [updatingNews, setUpdatingNews] = useState(refreshing);
   
   useEffect(() => {
@@ -33,16 +33,13 @@ const HomeScreen = React.memo(({ token, refreshing, loaded, newsList, getNews, r
       getNews();
       getBusiness();
       getModeles()
+      getDocs(docs, downloadedBusiness, editedDocs);
+      getArbo()
     }
   }, [token])
 
   useEffect(() => {
     Orientation.lockToPortrait();
-    if (mssqlConnected) {
-      getDocs(connectedHome, docs, downloadedBusiness, editedDocs);
-      getAffaires(connectedHome)
-      getArbo(connectedHome)
-    }
     if (modeleDownloaded !== 'in progress' && mssqlConnected) {
       downloadModels(modeleDocs);
     }
@@ -111,7 +108,6 @@ HomeScreen.propTypes = {
   mssqlConnected: PropTypes.bool.isRequired,
   getBusiness: PropTypes.func.isRequired,
   getModeles: PropTypes.func.isRequired,
-  getAffaires: PropTypes.func.isRequired,
   getArbo: PropTypes.func.isRequired,
   downloadModels: PropTypes.func.isRequired,
   modeleDocs: PropTypes.array.isRequired,
@@ -119,7 +115,6 @@ HomeScreen.propTypes = {
   downloadedBusiness: PropTypes.array.isRequired,
   docs: PropTypes.array.isRequired,
   modeleDownloaded: PropTypes.string.isRequired,
-  connectedHome: PropTypes.bool.isRequired,
   token: PropTypes.string.isRequired
 }
 
@@ -134,9 +129,8 @@ const mapStateToProps = (state) => ({
   editedDocs: state.user.editedDocs,
   downloadedBusiness: state.user.downloadedBusiness,
   docs: state.business.docs,
-  modeleDocs: state.business.docs.filter(d => (d.Dossier1 && d.Dossier1 === 'Modele')),
+  modeleDocs: state.business.modeles,
   modeleDownloaded: state.user.modeleDownloaded,
-  connectedHome: state.network.connectedHome
 })
 
-export default connect(mapStateToProps, { getNews, refreshNews, getDocs, getModeles, getBusiness, downloadModels, getAffaires, getArbo })(HomeScreen);
+export default connect(mapStateToProps, { getNews, refreshNews, getDocs, getModeles, getBusiness, downloadModels, getArbo })(HomeScreen);

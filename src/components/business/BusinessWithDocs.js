@@ -39,7 +39,7 @@ class BusinessWithDocs extends React.Component {
   }
 
   displayIcon = () => {
-    const editedBusiness = this.props.editedDocs.filter(e => e.affaire === this.props.title)
+    const editedBusiness = this.props.editedDocs.filter(e => e.affaire === this.props.id)
     if (this.state.upLoading) {
       return (
         <View>
@@ -65,7 +65,7 @@ class BusinessWithDocs extends React.Component {
   }
 
   confirmedOnUpload = async () => {
-    const editedBusiness = this.props.editedDocs.filter(e => e.affaire === this.props.title)
+    const editedBusiness = this.props.editedDocs.filter(e => e.affaire === this.props.id)
     this.setState({ upLoading: true });
     const filesToUpload = [];
     const multiUpload = [];
@@ -77,17 +77,17 @@ class BusinessWithDocs extends React.Component {
         await RNFS.unlink(`${EXTERNAL_PATH}${editedBusiness[i].ID}(0).${editedBusiness[i].Extension}`)
       }
       const filePath = `${EXTERNAL_PATH}${editedBusiness[i].ID}.${editedBusiness[i].Extension}`;
-      const destPath = `${rootDir}/${this.props.userId}/${this.props.title}/${Folder.rea}/${editedBusiness[i].ID}.${editedBusiness[i].Extension}`;
+      const destPath = `${rootDir}/${this.props.userId}/${this.props.id}/${Folder.rea}/${editedBusiness[i].ID}.${editedBusiness[i].Extension}`;
       let file = {}
       if (editedBusiness[i].isNew) {
         file = { ...this.props.newDocs.filter(n => n.ID === editedBusiness[i].ID)[0] }
       } else {
         file = { ...this.props.docs.filter(n => n.ID === editedBusiness[i].ID)[0] }
       }
-      multiUpload.push({ affaire: this.props.title, fileId: editedBusiness[i].ID });
+      multiUpload.push({ affaire: this.props.id, fileId: editedBusiness[i].ID });
       pick(this.props, Tables.docField);
       await RNFS.copyFile(filePath, destPath);
-      const remoteDir = `./${this.props.title}/Realisation/${editedBusiness[i].Dossier3}`
+      const remoteDir = `./${this.props.id}/Realisation/${editedBusiness[i].Dossier3}`
       const userName = this.props.name;
       const now = new Date();
       const date = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
@@ -115,7 +115,7 @@ class BusinessWithDocs extends React.Component {
       if (this.props.uploadingDocs.length > 0) {
         Alert.alert('Envoi en cours', "Vous pourrez envoyer vos fichiers une fois l'envoi terminé", [{ text: 'Ok' }]);
       } else {
-        const editedBusiness = this.props.editedDocs.filter(e => e.affaire === this.props.title)
+        const editedBusiness = this.props.editedDocs.filter(e => e.affaire === this.props.id)
         const unPreparedDocs = editedBusiness.filter(d => !(d.prepared && d.prepared === true))
         if (unPreparedDocs.length > 0) {
           Alert.alert('Envoi impossible', "Les fichiers ne sont pas tous cochés comme 'Préparé'", [{ text: 'Ok' }]);
@@ -135,15 +135,15 @@ class BusinessWithDocs extends React.Component {
   }
 
   onDownload = () => {
-    const { title, prep, rea, modeleDownloaded, downloadBusiness, userId, loadingBusiness, isConnected } = this.props;
+    const { id, prep, rea, modeleDownloaded, downloadBusiness, userId, loadingBusiness, isConnected } = this.props;
     if (isConnected) {
       if (modeleDownloaded === 'in progress') {
         Alert.alert('Modèle en cours de téléchargement', 'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants', [{ text: 'Ok' }]);
       } else {
-        if (loadingBusiness.includes(title)) {
+        if (loadingBusiness.includes(id)) {
           Alert.alert('Un téléchargement est en cours', "Merci d'attendre la fin du téléchargement", [{ text: 'Ok' }]);
         } else {
-          downloadBusiness(userId, title, prep, rea)
+          downloadBusiness(userId, id, prep, rea)
         }
       }
     } else {
@@ -163,16 +163,16 @@ class BusinessWithDocs extends React.Component {
     const { prep, rea, subFolder } = this.props;
     const listArbo = [];
     for (let i = 0; i < prep.length; i++) {
-      const indexArbo = listArbo.findIndex(a => (a.NomDossier === prep[i].Dossier3 && a.Etape === 'Preparation'))
+      const indexArbo = listArbo.findIndex(a => (a.nomDossier === prep[i].dossier3 && a.etape === 'Preparation'))
       if (indexArbo === -1) {
-        const newArbo = subFolder.filter(s => (s.NomDossier === prep[i].Dossier3 && s.Etape === 'Preparation'))[0]
+        const newArbo = subFolder.filter(s => (s.nomDossier === prep[i].dossier3 && s.etape === 'Preparation'))[0]
         listArbo.push(newArbo)
       }
     }
     if (listArbo.length > 0) {
-      listArbo.sort((a, b) => (a.NomDossier > b.NomDossier ? 1 : -1));
-      return listArbo.map(arbo => <SubArbo key={'Prep' + arbo.NomDossier} title={arbo.Designation}>{prep.filter(p => p.Dossier3 === arbo.NomDossier)
-        .sort((a, b) => (a.FileName > b.FileName ? 1 : -1))
+      listArbo.sort((a, b) => (a.nomDossier > b.nomDossier ? 1 : -1));
+      return listArbo.map(arbo => <SubArbo key={'Prep' + arbo.nomDossier} title={arbo.designation}>{prep.filter(p => p.dossier3 === arbo.nomDossier)
+        .sort((a, b) => (a.fileName > b.fileName ? 1 : -1))
         .map(p => <Document key={p.ID} {...p} type={Folder.prep} prep={prep} rea={rea} />)}
         </SubArbo>)
     }
@@ -183,26 +183,25 @@ class BusinessWithDocs extends React.Component {
     const { prep, rea, editedDocs, subFolder } = this.props;
     const listArbo = [];
     for (let i = 0; i < rea.length; i++) {
-      const indexArbo = listArbo.findIndex(a => (a.NomDossier === rea[i].Dossier3 && a.Etape === 'Realisation'))
+      const indexArbo = listArbo.findIndex(a => (a.nomDossier === rea[i].dossier3 && a.etape === 'Realisation'))
       if (indexArbo === -1) {
-        const newArbo = subFolder.filter(s => (s.NomDossier === rea[i].Dossier3 && s.Etape === 'Realisation'))[0]
+        const newArbo = subFolder.filter(s => (s.nomDossier === rea[i].dossier3 && s.etape === 'Realisation'))[0]
         listArbo.push(newArbo)
       }
     }
     if (listArbo.length > 0) {
-      listArbo.sort((a, b) => (a.NomDossier > b.NomDossier ? 1 : -1));
-      return listArbo.map(arbo => <SubArbo key={'Rea' + arbo.NomDossier} title={arbo.Designation}>{rea.filter(r => r.Dossier3 === arbo.NomDossier)
-        .sort((a, b) => (a.FileName > b.FileName ? 1 : -1))
-        .map(r => <Document key={r.ID} isNew={checkIfNew(editedDocs, r.ID)} {...r} type={Folder.rea} prep={prep} rea={rea} />)}
+      listArbo.sort((a, b) => (a.nomDossier > b.nomDossier ? 1 : -1));
+      return listArbo.map(arbo => <SubArbo key={'Rea' + arbo.nomDossier} title={arbo.designation}>{rea.filter(r => r.dossier3 === arbo.nomDossier)
+        .sort((a, b) => (a.fileName > b.fileName ? 1 : -1))
+        .map(r => <Document key={r.id} isNew={checkIfNew(editedDocs, r.id)} {...r} type={Folder.rea} prep={prep} rea={rea} />)}
       </SubArbo>)
     }
     return <React.Fragment></React.Fragment>
   }
 
   render() {
-    const { title, navigation } = this.props;
-    const affaire = this.props.affaires.filter(a => a.ID === title)[0]
-    const clientName = affaire ? `${affaire.Client} - ${affaire.Designation}` : title;
+    const { id, client, designation, navigation } = this.props;
+    const clientName = `${client} - ${designation}`;
     return (
       <BusinessWrapper>
         <MainSection>
@@ -232,13 +231,13 @@ class BusinessWithDocs extends React.Component {
               name={"md-camera"}
               size={Layout.icon.large}
               color={Colors.mainColor}
-              onPress={() => navigation.navigate('AddPic', { affaire: title }) }
+              onPress={() => navigation.navigate('AddPic', { affaire: id }) }
             />
             <AddIcons
               name={"md-add"}
               size={Layout.icon.large}
               color={Colors.mainColor}
-              onPress={() => navigation.navigate('AddDoc', { affaire: title })}
+              onPress={() => navigation.navigate('AddDoc', { affaire: id })}
             />
           </IconView>
         </SectionWrapper>
@@ -249,7 +248,9 @@ class BusinessWithDocs extends React.Component {
 }
 
 BusinessWithDocs.propTypes = {
-  title: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
+  client: PropTypes.string.isRequired,
+  designation: PropTypes.string.isRequired,
   prep: PropTypes.array,
   rea: PropTypes.array,
   modeleDocs: PropTypes.array.isRequired,
@@ -258,7 +259,6 @@ BusinessWithDocs.propTypes = {
   userId: PropTypes.string.isRequired,
   navigation: PropTypes.object.isRequired,
   isConnected: PropTypes.bool.isRequired,
-  affaires: PropTypes.array.isRequired,
   modeleDownloaded: PropTypes.string.isRequired,
   editedDocs: PropTypes.array.isRequired,
   subFolder: PropTypes.array.isRequired,
@@ -294,12 +294,11 @@ const mapStateToProps = (state, props) => ({
   userId: state.user.id,
   name: state.user.name,
   editedDocs: state.user.editedDocs,
-  modeleDocs: state.business.docs.filter(d => (d.Dossier1 && d.Dossier1 === 'Modele')),
+  modeleDocs: state.business.modeles,
   multipleUploadDocs: state.user.multipleUploadDocs.filter(m => m.affaire === props.title),
   docs: state.business.docs,
   newDocs: state.business.newDocs,
   subFolder: state.business.subFolder,
-  affaires: state.business.affaires,
   modeleDownloaded: state.user.modeleDownloaded,
   connectedHome: state.network.connectedHome,
 })

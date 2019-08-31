@@ -33,9 +33,10 @@ class DocsScreen extends React.Component {
 
   
   render() {
-    const affaire =  this.props.navigation.getParam('affaire', '');
+    const id_affaire =  this.props.navigation.getParam('affaire', '');
 
-    if (affaire !== '' && !!this.props.docs[affaire]) {
+    if (id_affaire !== '' && !!this.props.docs[id_affaire]) {
+      const business = this.props.userBusiness.find((b) => b.id === id_affaire)
       return (
         <Main>
           <StyledScroll width={width}>
@@ -82,7 +83,7 @@ class DocsScreen extends React.Component {
                 </LegendItem>
               </LegendWrapper>
             </Legend>
-            <BusinessWithDocs key={affaire} title={affaire} prep={this.props.docs[affaire].prep} rea={this.props.docs[affaire].rea} newDocs={this.props.newDocs[affaire]} />
+            <BusinessWithDocs key={id_affaire} {...business} prep={this.props.docs[id_affaire].prep} rea={this.props.docs[id_affaire].rea} newDocs={this.props.newDocs[id_affaire]} />
           </StyledScroll>
         </Main>
       );
@@ -96,6 +97,7 @@ class DocsScreen extends React.Component {
 }
 
 DocsScreen.propTypes = {
+  userBusiness: PropTypes.array.isRequired,
   docs: PropTypes.object.isRequired,
   newDocs: PropTypes.object.isRequired,
   navigation: PropTypes.object.isRequired
@@ -108,6 +110,7 @@ const mapStateToProps = ({ business }) => {
   return ({
     docs,
     newDocs,
+    userBusiness
   })
 }
 

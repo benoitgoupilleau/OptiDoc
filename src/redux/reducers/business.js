@@ -6,7 +6,6 @@ import {
   ADD_DOC,
   ADD_NEW_DOC,
   REMOVED_NEW_DOC,
-  SET_AFFAIRES,
   SET_ARBO,
   UPDATE_DOC,
 } from '../actions/types';
@@ -16,7 +15,6 @@ const defaultState = {
   modeles: [],
   newDocs: [],
   business: [],
-  affaires: [],
   subFolder: []
 }
 
@@ -59,11 +57,6 @@ export default (state = defaultState, action) => {
       return {
         ...state,
         business: action.business,
-      }
-    case SET_AFFAIRES:
-      return {
-        ...state,
-        affaires: action.affaires,
       }
     case SET_ARBO:
       return {

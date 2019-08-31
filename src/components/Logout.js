@@ -8,7 +8,7 @@ import Layout from '../constants/Layout'
 
 import { logout } from '../redux/actions/user';
 import { getNews } from '../redux/actions/news'
-import { getDocs, getModeles, getBusiness, getAffaires, getArbo } from '../redux/actions/business'
+import { getDocs, getModeles, getBusiness, getArbo } from '../redux/actions/business'
 
 import { Wrapper, Icons, StyledButton, StyledText } from './Logout.styled';
 
@@ -39,9 +39,8 @@ class Logout extends React.Component {
   refreshData = () => {
     this.setState({ refreshing: true})
     this.props.getNews()
-    this.props.getDocs(this.props.connectedHome, this.props.docs, this.props.downloadedBusiness, this.props.editedDocs)
-    this.props.getAffaires(this.props.connectedHome)
-    this.props.getArbo(this.props.connectedHome)
+    this.props.getDocs(this.props.docs, this.props.downloadedBusiness, this.props.editedDocs)
+    this.props.getArbo()
     this.props.getBusiness();
     this.props.getModeles()
     setTimeout(() => {
@@ -82,7 +81,6 @@ Logout.propTypes = {
   getDocs: PropTypes.func.isRequired,
   getBusiness: PropTypes.func.isRequired,
   getModeles: PropTypes.func.isRequired,
-  getAffaires: PropTypes.func.isRequired,
   getArbo: PropTypes.func.isRequired,
   editedDocs: PropTypes.array.isRequired,
   loadingBusiness: PropTypes.array.isRequired,
@@ -111,7 +109,6 @@ export default withNavigation(connect(mapStateToProps, {
   logout,
   getNews,
   getDocs,
-  getAffaires,
   getArbo,
   getBusiness,
   getModeles,

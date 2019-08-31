@@ -39,7 +39,6 @@ export const SET_MODELES = 'SET_MODELES';
 export const SET_BUSINESS = 'SET_BUSINESS';
 export const ADD_NEW_DOC = 'ADD_NEW_DOC';
 export const REMOVED_NEW_DOC = 'REMOVED_NEW_DOC'
-export const SET_AFFAIRES = 'SET_AFFAIRES';
 export const SET_ARBO = 'SET_ARBO';
 export const SET_DOCS_TO_DOWNLOAD = 'SET_DOCS_TO_DOWNLOAD'
 

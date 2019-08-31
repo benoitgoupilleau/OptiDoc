@@ -1,6 +1,3 @@
-import MSSQL_Out from '../../services/mssqlOut';
-import MSSQL_Home from '../../services/mssqlHome';
-import Tables from '../../constants/Tables';
 import Sentry from '../../services/sentry';
 import api from '../../services/api';
 
@@ -14,7 +11,6 @@ import {
   ADD_NEW_DOC,
   REMOVED_NEW_DOC,
   ADD_DOC,
-  SET_AFFAIRES,
   SET_ARBO,
   SET_DOCS_TO_DOWNLOAD,
   UPDATE_DOC
@@ -25,44 +21,29 @@ import FilesToExclude from '../../constants/FilesToExclude';
 const identifyNewFiles = (downloadedAffaire, currentDocs, files) => {
   const fileToDownload = [];
   for (let i = 0; i < downloadedAffaire.length; i++) {
-    const currentBusinessFile = currentDocs.filter(c => c.Dossier1 === downloadedAffaire[i]);
-    const newBusinessFile = files.filter(c => c.Dossier1 === downloadedAffaire[i]);
+    const currentBusinessFile = currentDocs.filter(c => c.dossier1 === downloadedAffaire[i]);
+    const newBusinessFile = files.filter(c => c.dossier1 === downloadedAffaire[i]);
     for (let j = 0; j < newBusinessFile.length; j++) {
       if (currentBusinessFile.length > 0) {
-        const indexDoc = currentBusinessFile.findIndex(d => d.ID === newBusinessFile[j].ID)
+        const indexDoc = currentBusinessFile.findIndex(d => d.id === newBusinessFile[j].id)
         if (indexDoc > -1) {
-          if (currentBusinessFile[indexDoc].UpLoadedOn < newBusinessFile[j].UpLoadedOn) {
-            fileToDownload.push(newBusinessFile[j].ID)
+          if (currentBusinessFile[indexDoc].upLoadedOn < newBusinessFile[j].upLoadedOn) {
+            fileToDownload.push(newBusinessFile[j].id)
           }
         }
       } else {
-        fileToDownload.push(newBusinessFile[j].ID)
+        fileToDownload.push(newBusinessFile[j].id)
       }
     }
   }
   return fileToDownload;
 }
 
-export const getDocs = (connectHome = false, currentDocs = [], downloadedAffaire = [], editedDocs = []) => dispatch => {
-  if (connectHome) {
-    return MSSQL_Home.executeQuery(`SELECT * FROM ${Tables.t_docs}`)
-      .then((res) => {
-        const files = res.filter(d => !FilesToExclude.includes(d.Dossier3))
-        const fileToDownload = identifyNewFiles(downloadedAffaire, currentDocs, files);
-        if (fileToDownload.length > 0) {
-          dispatch(setDocsToDownload(fileToDownload))
-        }
-        return dispatch(setDocs(editedDocs, files))
-      })
-      .catch(e => {
-        Sentry.captureException(e, { func: 'getDocs', doc: 'businessActions' })
-        console.error({ e, func: 'getDocs', doc: 'businessActions' })
-        return;
-      })
-  }
-  return MSSQL_Out.executeQuery(`SELECT * FROM ${Tables.t_docs}`)
+export const getDocs = (currentDocs = [], downloadedAffaire = [], editedDocs = []) => dispatch => {
+  const { user } = store.getState();
+  return api.get(`/api/documents/fromuser/${user.id}`, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
     .then((res) => {
-      const files = res.filter(d => !FilesToExclude.includes(d.Dossier3))
+      const files = res.data.filter(d => !FilesToExclude.includes(d.dossier3))
       const fileToDownload = identifyNewFiles(downloadedAffaire, currentDocs, files);
       if (fileToDownload.length > 0) {
         dispatch(setDocsToDownload(fileToDownload))
@@ -71,7 +52,6 @@ export const getDocs = (connectHome = false, currentDocs = [], downloadedAffaire
     })
     .catch(e => {
       Sentry.captureException(e, { func: 'getDocs', doc: 'businessActions' })
-      console.error({ e, func: 'getDocs', doc: 'businessActions' })
       return;
     })
 }
@@ -149,45 +129,12 @@ export const removeNewDoc = id => ({
   id
 })
 
-export const getAffaires = (connectHome = false) => dispatch => {
-  if (connectHome) {
-    return MSSQL_Home.executeQuery(`SELECT * FROM ${Tables.t_affaires}`)
-      .then((res) => dispatch(setAffaires(res)))
-      .catch(e => {
-        Sentry.captureException(e, { func: 'getAffaires', doc: 'businessActions' })
-        console.error({ e, func: 'getAffaires', doc: 'businessActions' })
-        return;
-      })
-  }
-  return MSSQL_Out.executeQuery(`SELECT * FROM ${Tables.t_affaires}`)
-    .then((res) => dispatch(setAffaires(res)))
-    .catch(e => {
-      Sentry.captureException(e, { func: 'getAffaires', doc: 'businessActions' })
-      console.error({ e, func: 'getAffaires', doc: 'businessActions' })
-      return;
-    })
-}
-
-const setAffaires = (affaires) => ({
-  type: SET_AFFAIRES,
-  affaires
-})
-
-export const getArbo = (connectHome = false) => dispatch => {
-  if (connectHome) {
-    return MSSQL_Home.executeQuery(`SELECT * FROM ${Tables.t_arbo}`)
-      .then((res) => dispatch(setArbo(res)))
-      .catch(e => {
-        Sentry.captureException(e, { func: 'getArbo', doc: 'businessActions' })
-        console.error({ e, func: 'getArbo', doc: 'businessActions' })
-        return;
-      })
-  }
-  return MSSQL_Out.executeQuery(`SELECT * FROM ${Tables.t_arbo}`)
-    .then((res) => dispatch(setArbo(res)))
+export const getArbo = () => dispatch => {
+  const { user } = store.getState();
+  return api.get('/api/arbo', { headers: { Authorization: `Bearer ${user.bearerToken}` } })
+    .then((res) => dispatch(setArbo(res.data)))
     .catch(e => {
       Sentry.captureException(e, { func: 'getArbo', doc: 'businessActions' })
-      console.error({ e, func: 'getArbo', doc: 'businessActions' })
       return;
     })
 }
