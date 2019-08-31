@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import Logout from '../components/Logout';
 import HeaderTitle from '../components/HeaderTitle'
 import Main from '../components/Main';
-import { listAffaires, listDocs, listNewDocs } from '../redux/selector/business'
+import { listDocs, listNewDocs } from '../redux/selector/business'
 
 import BusinessWithDocs from '../components/business/BusinessWithDocs'
 
@@ -101,10 +101,10 @@ DocsScreen.propTypes = {
   navigation: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ user, business }) => {
-  const businesses = listAffaires(business.business, user.id)
-  const docs = listDocs(business.docs, business.newDocs, businesses)
-  const newDocs = listNewDocs(business.newDocs, businesses)
+const mapStateToProps = ({ business }) => {
+  const userBusiness = business.business
+  const docs = listDocs(business.docs, business.newDocs, userBusiness)
+  const newDocs = listNewDocs(business.newDocs, userBusiness)
   return ({
     docs,
     newDocs,

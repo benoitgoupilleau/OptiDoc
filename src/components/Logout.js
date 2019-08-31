@@ -42,7 +42,7 @@ class Logout extends React.Component {
     this.props.getDocs(this.props.connectedHome, this.props.docs, this.props.downloadedBusiness, this.props.editedDocs)
     this.props.getAffaires(this.props.connectedHome)
     this.props.getArbo(this.props.connectedHome)
-    this.props.getBusiness(this.props.connectedHome);
+    this.props.getBusiness();
     this.props.getModeles(this.props.connectedHome)
     setTimeout(() => {
       this.setState({ refreshing: false})

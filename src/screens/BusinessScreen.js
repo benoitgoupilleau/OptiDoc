@@ -13,7 +13,7 @@ import Business from '../components/business/Business'
 
 import Layout from '../constants/Layout'
 
-import { listAffaires, listDocs, listNewDocs } from '../redux/selector/business'
+import { listDocs, listNewDocs } from '../redux/selector/business'
 import { downloadModels } from '../redux/actions/user'
 
 const { width } = Dimensions.get('window');
@@ -24,20 +24,19 @@ const StyledScroll = styled.ScrollView`
   width: ${width};
 `;
 
-const BusinessScreen = React.memo(({ businesses, docs, newDocs, modeleDownloaded, mssqlConnected, downloadModels, modeleDocs }) => {
+const BusinessScreen = React.memo(({ userBusiness, docs, newDocs, modeleDownloaded, mssqlConnected, downloadModels, modeleDocs }) => {
   useEffect(() => {
     Orientation.lockToPortrait();
     if (modeleDownloaded !== 'in progress' && mssqlConnected) {
       downloadModels(modeleDocs);
     }
   }, [])
-
-  if (businesses.length > 0) {
+  if (userBusiness.length > 0) {
     return (
       <Main>
         <View>
           <StyledScroll>
-            {businesses.map(b => <Business key={b} title={b} prep={docs[b].prep} rea={docs[b].rea} newDocs={newDocs[b]} />)}
+            {userBusiness.map(b => <Business key={b.id} {...b} prep={docs[b.id].prep} rea={docs[b.id].rea} newDocs={newDocs[b.id]} />)}
           </StyledScroll>
         </View>
       </Main>
@@ -59,7 +58,7 @@ BusinessScreen.navigationOptions = {
 }
 
 BusinessScreen.propTypes = {
-  businesses: PropTypes.array.isRequired,
+  userBusiness: PropTypes.array.isRequired,
   docs: PropTypes.object.isRequired,
   newDocs: PropTypes.object.isRequired,
   mssqlConnected: PropTypes.bool.isRequired,
@@ -70,11 +69,11 @@ BusinessScreen.propTypes = {
 
 
 const mapStateToProps = ({ user, business, network }) => {
-  const businesses = listAffaires(business.business, user.id)
-  const docs = listDocs(business.docs, business.newDocs, businesses)
-  const newDocs = listNewDocs(business.newDocs, businesses)
+  const userBusiness = business.business
+  const docs = listDocs(business.docs, business.newDocs, userBusiness)
+  const newDocs = listNewDocs(business.newDocs, userBusiness)
   return ({
-    businesses,
+    userBusiness,
     docs,
     newDocs,
     modeleDownloaded: user.modeleDownloaded,

@@ -19,14 +19,14 @@ class Business extends React.Component {
   }
 
   displayIcon = () => {
-    const { title, downloadedBusiness, loadingBusiness, nbDocBusiness, totalDocBusiness } = this.props;
-    if (loadingBusiness.includes(title)) {
+    const { id, downloadedBusiness, loadingBusiness, nbDocBusiness, totalDocBusiness } = this.props;
+    if (loadingBusiness.includes(id)) {
       return (
         <View>
           {totalDocBusiness > 0 && <Text>{nbDocBusiness}/{totalDocBusiness}</Text>}
           <ActivityIndicator />
         </View>)
-    } else if (downloadedBusiness.includes(title)) {
+    } else if (downloadedBusiness.includes(id)) {
       return (
         <IconView>
             <Ionicons
@@ -55,12 +55,12 @@ class Business extends React.Component {
   }
 
   goToDocs = () => {
-    const { title } = this.props
-    this.props.navigation.navigate('Docs', { affaire: title })
+    const { id } = this.props
+    this.props.navigation.navigate('Docs', { affaire: id })
   }
 
   onDownload = () => {
-    const { title, prep, rea, modeleDownloaded, downloadBusiness, userId, loadingBusiness, isConnected } = this.props;
+    const { id, prep, rea, modeleDownloaded, downloadBusiness, userId, loadingBusiness, isConnected } = this.props;
     if (isConnected) {
       if (modeleDownloaded === 'in progress') {
         Alert.alert('Modèle en cours de téléchargement', 'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants', [{ text: 'Ok' }]);
@@ -73,7 +73,7 @@ class Business extends React.Component {
             style: 'cancel',
           }, { 
             text: 'Oui',
-            onPress: () => downloadBusiness(userId, title, prep, rea)
+            onPress: () => downloadBusiness(userId, id, prep, rea)
           }]);
           
         }
@@ -84,16 +84,15 @@ class Business extends React.Component {
   }
 
   render() {
-    const { title } = this.props;
-    const affaire = this.props.affaires.filter(a => a.ID === title)[0]
-    const clientName = affaire ? `${affaire.Client} - ${affaire.Designation}` : title;
+    const { id, client, designation } = this.props;
+    const clientName = `${client} - ${designation}`;
     return (
       <BusinessWrapper>
         <MainSection>
           <Title onPress={() => { 
-            if (this.props.downloadedBusiness.includes(title)) {
+            if (this.props.downloadedBusiness.includes(id)) {
               return this.goToDocs();
-            } else if (!this.props.loadingBusiness.includes(title)) {
+            } else if (!this.props.loadingBusiness.includes(id)) {
               return this.onDownload();
             }
             return;
@@ -106,7 +105,9 @@ class Business extends React.Component {
 }
 
 Business.propTypes = {
-  title: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
+  client: PropTypes.string.isRequired,
+  designation: PropTypes.string.isRequired,
   prep: PropTypes.array,
   rea: PropTypes.array,
   modeleDocs: PropTypes.array.isRequired,

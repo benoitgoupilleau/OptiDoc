@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
@@ -25,93 +25,73 @@ const StyledScroll = styled.ScrollView`
   width: ${width};
 `;
 
-class HomeScreen extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      refreshing: props.refreshing,
-      hasFetchedData: false
-    }
-  }
+const HomeScreen = React.memo(({ refreshing, loaded, newsList, getNews, refreshNews, getBusiness, mssqlConnected, connectedHome, getDocs, docs, downloadedBusiness, editedDocs, getModeles, getAffaires, getArbo, modeleDownloaded, modeleDocs }) => {
+  const [updatingNews, setUpdatingNews] = useState(refreshing);
 
-  static navigationOptions = {
-    headerTitle: <HeaderTitle />,
-    headerRight: <Logout />,
-    headerStyle: {
-      height: 70
-    }
-  }
-
-  componentDidMount() {
+  useEffect(() => {
     Orientation.lockToPortrait();
-    if (this.props.mssqlConnected) {
-      this.props.getNews();
-      this.props.getDocs(this.props.connectedHome, this.props.docs, this.props.downloadedBusiness, this.props.editedDocs);
-      this.props.getBusiness(this.props.connectedHome)
-      this.props.getModeles(this.props.connectedHome)
-      this.props.getAffaires(this.props.connectedHome)
-      this.props.getArbo(this.props.connectedHome)
+    getNews();
+    getBusiness();
+    if (mssqlConnected) {
+      getDocs(connectedHome, docs, downloadedBusiness, editedDocs);
+      getModeles(connectedHome)
+      getAffaires(connectedHome)
+      getArbo(connectedHome)
     }
-    if (this.props.modeleDownloaded !== 'in progress' && this.props.mssqlConnected) {
-      this.props.downloadModels(this.props.modeleDocs);
+    if (modeleDownloaded !== 'in progress' && mssqlConnected) {
+      downloadModels(modeleDocs);
+    }
+  }, [])
+
+  useEffect(() => {
+    setUpdatingNews(refreshing)
+  }, [refreshing])
+
+  const onRefresh = () => {
+    if (mssqlConnected) {
+      setUpdatingNews(true)
+      refreshNews();
+      getNews()
     }
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.refreshing !== this.props.refreshing) {
-      this.setState({ refreshing: this.props.refreshing })
-    }
-  }
-
-  onRefresh = () => {
-    if (this.props.mssqlConnected) {
-      this.setState({ refreshing: true });
-      this.props.refreshNews();
-      this.props.getNews()
-    }
-  }
-
-  render() {
-    if (this.props.mssqlConnected && !this.state.hasFetchedData){
-      this.props.getNews();
-      this.props.getDocs(this.props.connectedHome, this.props.docs, this.props.downloadedBusiness, this.props.editedDocs);
-      this.props.getBusiness(this.props.connectedHome)
-      this.props.getModeles(this.props.connectedHome)
-      this.props.getAffaires(this.props.connectedHome)
-      this.props.getArbo(this.props.connectedHome)
-      if(this.props.modeleDownloaded !== 'in progress') this.props.downloadModels(this.props.modeleDocs)
-      this.setState({hasFetchedData: true})
-    } 
-    if (!this.props.loaded) {
-      return(
-        <Main>
-          <ActivityIndicator/>
-        </Main>
-      )
-    }
-    if (this.props.newsList.length > 0) {
-      return (
-        <Main>
-          <StyledScroll
-            refreshControl={
-              <RefreshControl
-                refreshing={this.state.refreshing}
-                onRefresh={this.onRefresh}
-              />
-            }
-          >
-            {this.props.newsList.map(news => (
-              <News key={news.id} title={news.titre} content={news.contenu} />
-            ))}
-          </StyledScroll>
-        </Main>
-      )
-    }
+  if (!loaded) {
     return (
       <Main>
-        <Text>Aucune actualité à afficher</Text>
+        <ActivityIndicator />
       </Main>
-    );
+    )
+  }
+  if (newsList.length > 0) {
+    return (
+      <Main>
+        <StyledScroll
+          refreshControl={
+            <RefreshControl
+              refreshing={updatingNews}
+              onRefresh={onRefresh}
+            />
+          }
+        >
+          {newsList.map(news => (
+            <News key={news.id} title={news.titre} content={news.contenu} />
+          ))}
+        </StyledScroll>
+      </Main>
+    )
+  }
+  return (
+    <Main>
+      <Text>Aucune actualité à afficher</Text>
+    </Main>
+  );
+})
+
+HomeScreen.navigationOptions = {
+  headerTitle: <HeaderTitle />,
+  headerRight: <Logout />,
+  headerStyle: {
+    height: 70
   }
 }
 

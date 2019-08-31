@@ -1,7 +1,10 @@
 import MSSQL_Out from '../../services/mssqlOut';
 import MSSQL_Home from '../../services/mssqlHome';
 import Tables from '../../constants/Tables';
-import Sentry from '../../services/sentry'
+import Sentry from '../../services/sentry';
+import api from '../../services/api';
+
+import { store } from '../store/store'
 
 import {
   SET_DOCS,
@@ -128,21 +131,14 @@ export const updatePrepared = (fileId, Prepared, PreparedOn, PreparedBy, Revisab
   Revisable
 })
 
-export const getBusiness = (connectHome = false) => dispatch => {
-  if (connectHome) {
-    return MSSQL_Home.executeQuery(`SELECT * FROM ${Tables.t_business}`)
-      .then((res) => dispatch(setBusiness(res)))
-      .catch(e => {
-        Sentry.captureException(e, { func: 'getBusiness', doc: 'businessActions' })
-        console.error({ e, func: 'getBusiness', doc: 'businessActions' })
-        return;
-      })
-  }
-  return MSSQL_Out.executeQuery(`SELECT * FROM ${Tables.t_business}`)
-    .then((res) => dispatch(setBusiness(res)))
+export const getBusiness = () => dispatch => {
+  const { user } = store.getState();
+  return api.get(`/api/affaires/fromuser/${user.id}`, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
+    .then((res) => {
+      return dispatch(setBusiness(res.data))
+    })
     .catch(e => {
       Sentry.captureException(e, { func: 'getBusiness', doc: 'businessActions' })
-      console.error({ e, func: 'getBusiness', doc: 'businessActions' })
       return;
     })
 }
