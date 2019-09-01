@@ -3,6 +3,7 @@ package com.optidoc;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.imagepicker.ImagePickerPackage;
 import com.anyline.RNImageToPDF.RNImageToPdfPackage;
@@ -21,7 +22,6 @@ import com.facebook.soloader.SoLoader;
 import com.stonem.mssql.MSSQLPackage;
 import com.rnfs.RNFSPackage;
 import com.github.yamill.orientation.OrientationPackage;
-import com.reactnativecommunity.netinfo.NetInfoPackage;
 
 
 import java.util.Arrays;
