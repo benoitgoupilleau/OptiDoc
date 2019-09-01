@@ -24,10 +24,10 @@ const StyledScroll = styled.ScrollView`
   width: ${width};
 `;
 
-const BusinessScreen = React.memo(({ userBusiness, docs, newDocs, modeleDownloaded, mssqlConnected, downloadModels, modeleDocs }) => {
+const BusinessScreen = React.memo(({ userBusiness, docs, newDocs, modeleDownloaded, downloadModels, modeleDocs }) => {
   useEffect(() => {
     Orientation.lockToPortrait();
-    if (modeleDownloaded !== 'in progress' && mssqlConnected) {
+    if (modeleDownloaded !== 'in progress') {
       downloadModels(modeleDocs);
     }
   }, [])
@@ -61,14 +61,13 @@ BusinessScreen.propTypes = {
   userBusiness: PropTypes.array.isRequired,
   docs: PropTypes.object.isRequired,
   newDocs: PropTypes.object.isRequired,
-  mssqlConnected: PropTypes.bool.isRequired,
   modeleDownloaded: PropTypes.string.isRequired,
   modeleDocs: PropTypes.array.isRequired,
   downloadModels: PropTypes.func.isRequired
 }
 
 
-const mapStateToProps = ({ user, business, network }) => {
+const mapStateToProps = ({ user, business }) => {
   const userBusiness = business.business
   const docs = listDocs(business.docs, business.newDocs, userBusiness)
   const newDocs = listNewDocs(business.newDocs, userBusiness)
@@ -77,7 +76,6 @@ const mapStateToProps = ({ user, business, network }) => {
     docs,
     newDocs,
     modeleDownloaded: user.modeleDownloaded,
-    mssqlConnected: network.mssqlConnected,
     modeleDocs: business.modeles,
   })
 }

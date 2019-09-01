@@ -71,13 +71,13 @@ class PdfScreen extends React.Component {
       const isEdited = this.props.navigation.getParam('isEdited', false)
       const isModel = this.props.navigation.getParam('isModel', false)
       const isPrepared = this.props.navigation.getParam('isPrepared', false)
-      const ID = this.props.navigation.getParam('ID', '')
-      const Extension = this.props.navigation.getParam('Extension', '')
-      const Dossier1 = this.props.navigation.getParam('Dossier1', '')
-      const Dossier3 = this.props.navigation.getParam('Dossier3', '')
-      const Reviewed = this.props.navigation.getParam('Reviewed', '');
-      const Locked = this.props.navigation.getParam('Locked', '')
-      const Prepared = this.props.navigation.getParam('Prepared', '');
+      const ID = this.props.navigation.getParam('id', '')
+      const Extension = this.props.navigation.getParam('extension', '')
+      const Dossier1 = this.props.navigation.getParam('dossier1', '')
+      const Dossier3 = this.props.navigation.getParam('dossier3', '')
+      const Reviewed = this.props.navigation.getParam('reviewed', '');
+      const Locked = this.props.navigation.getParam('locked', '')
+      const Prepared = this.props.navigation.getParam('prepared', '');
       const type = this.props.navigation.getParam('type', Folder.prep)
       const filePath = isEdited ? `${EXTERNAL_PATH}${ID}.${Extension}` : 
         isModel ? `${rootDir}/${Folder.modeleDocs}/${ID}.pdf` : `${rootDir}/${this.props.userId}/${Dossier1}/${type}/${ID}.${Extension}`;

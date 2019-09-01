@@ -1,12 +1,15 @@
 import RNFS from 'react-native-fs';
 import omit from 'lodash.omit';
+import RNFetchBlob from 'rn-fetch-blob'
 import FTP from '../../services/ftp';
-import { FTP_USERNAME, FTP_PASSWORD } from 'react-native-dotenv';
+import { FTP_USERNAME, FTP_PASSWORD, API_URL } from 'react-native-dotenv';
 import FileViewer from 'react-native-file-viewer';
 import MSSQL_Out from '../../services/mssqlOut';
 import MSSQL_Home from '../../services/mssqlHome';
 import Sentry from '../../services/sentry'
 import api from '../../services/api';
+
+import { store } from '../store/store'
 
 import {
   LOGIN,
@@ -65,24 +68,28 @@ export const sessionExpired = () => ({
   type: SESSION_EXPIRED
 });
 
-export const downLoadOneFile = (id, serverPath, localPath) => dispatch => {
+export const downLoadOneFile = (id, extension, businessId) => async (dispatch) => {
   if (isDownloadingFiles) {
     return dispatch(cancelDownloadOneFile(id))
   }
-  return FTP.login(FTP_USERNAME, FTP_PASSWORD)
+  const { user } = store.getState();
+  const destinationFolder = `${rootDir}/${user.id}/${businessId}`;
+  dispatch(downloadingFile(id))
+  return RNFetchBlob
+    .config({
+      path: `${destinationFolder}/${Folder.prep}/${id}.${extension}`
+    })
+    .fetch('GET', `${API_URL}/api/pdffile/download/${id}`, {
+      Authorization: `Bearer ${user.bearerToken}`
+    })
     .then(() => {
-      dispatch(downloadingFile(id))
-      return FTP.downloadFile(serverPath, localPath).then(() => {
-        dispatch(fileDownloaded(id));
-        return FTP.logout();
-      })
+      dispatch(fileDownloaded(id));
     })
     .catch((e) => {
       Sentry.captureException(e, { func: 'downLoadOneFile', doc: 'userActions' })
-      console.error({ e, func: 'downLoadOneFile', doc: 'userActions' })
       isDownloadingFiles = false;
       dispatch(cancelDownloadOneFile(id))
-      return FTP.logout();
+      return;
     })
 }
 
@@ -106,54 +113,63 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
     return dispatch(cancelDownload(businessId))
   }
   isDownloadingFiles = true;
-  dispatch(downloading(businessId, 0, 0))
-  return RNFS.mkdir(`${rootDir}/${userId}/${businessId}`)
-    .then(() => FTP.login(FTP_USERNAME, FTP_PASSWORD).then(async () => {
-      const total = prep.length + rea.length;
+  dispatch(downloading(businessId, 0, 0));
+  const { user } = store.getState();
+  const total = prep.length + rea.length;
+  const destinationFolder = `${rootDir}/${userId}/${businessId}`
+  return RNFS.mkdir(destinationFolder)
+    .then(async () => {
       let nbDownloading = 0
       if (prep.length > 0) {
-        await RNFS.mkdir(`${rootDir}/${userId}/${businessId}/${Folder.prep}`);
+        await RNFS.mkdir(`${destinationFolder}/${Folder.prep}`);
         for (let i = 0; i < prep.length; i += 1) {
           try {
-            const fileExists = await RNFS.exists(`${rootDir}/${userId}/${businessId}/${Folder.prep}/${prep[i].ID}.${prep[i].Extension}`)
+            const fileExists = await RNFS.exists(`${destinationFolder}/${Folder.prep}/${prep[i].id}.${prep[i].extension}`)
             nbDownloading = nbDownloading + 1;
             dispatch(downloading(businessId, nbDownloading, total))
             if (!fileExists) {
-              await FTP.downloadFile(`./${prep[i].ServerPath}`, `${rootDir}/${userId}/${businessId}/${Folder.prep}`)
+              await RNFetchBlob
+                .config({
+                  path: `${destinationFolder}/${Folder.prep}/${prep[i].id}.${prep[i].extension}`
+                })
+                .fetch('GET', `${API_URL}/api/pdffile/download/${prep[i].id}`, {
+                  Authorization: `Bearer ${user.bearerToken}`
+                })
             }
           } catch (error) {
-            Sentry.captureException(error, { prepDoc: prep[i], func: "FTP.downloadFile", doc: 'userActions' })
-            console.error({ error, prepDoc: prep[i], func: "FTP.downloadFile", doc: 'userActions' })
+            Sentry.captureException(error, { prepDoc: prep[i], func: "downloadFile", doc: 'userActions' })
             return dispatch(cancelDownload(businessId))
           }
         }
       }
       if (rea.length > 0) {
-        await RNFS.mkdir(`${rootDir}/${userId}/${businessId}/${Folder.rea}`);
+        await RNFS.mkdir(`${destinationFolder}/${Folder.rea}`);
         for (let i = 0; i < rea.length; i += 1) {
           try {
-            const fileExists = await RNFS.exists(`${rootDir}/${userId}/${businessId}/${Folder.rea}/${rea[i].ID}.${rea[i].Extension}`)
+            const fileExists = await RNFS.exists(`${destinationFolder}/${Folder.rea}/${rea[i].id}.${rea[i].extension}`)
             nbDownloading = nbDownloading + 1;
             dispatch(downloading(businessId, nbDownloading, total))
             if (!fileExists) {
-              await FTP.downloadFile(`./${rea[i].ServerPath}`, `${rootDir}/${userId}/${businessId}/${Folder.rea}`)
+              await RNFetchBlob
+                .config({
+                  path: `${destinationFolder}/${Folder.rea}/${rea[i].id}.${rea[i].extension}`
+                })
+                .fetch('GET', `${API_URL}/api/pdffile/download/${rea[i].id}`, {
+                  Authorization: `Bearer ${user.bearerToken}`
+                })
             }
           } catch (error) {
-            Sentry.captureException(error, { reaDoc: rea[i], func: "FTP.downloadFile", doc: 'userActions' })
-            console.error({ error, reaDoc: rea[i], func: "FTP.downloadFile", doc: 'userActions' })
+            Sentry.captureException(error, { reaDoc: rea[i], func: "downloadFile", doc: 'userActions' })
             return dispatch(cancelDownload(businessId))
           }
         }
       }
       isDownloadingFiles = false;
-      await FTP.logout()
       return dispatch(businessDownloaded(businessId))
     })
-    ).catch(async (e) => {
+    .catch(async (e) => {
       Sentry.captureException(e, { func: 'downloadBusiness', doc: 'userActions' })
-      console.error({ e, func: 'downloadBusiness', doc: 'userActions' })
       isDownloadingFiles = false;
-      await FTP.logout()
       return dispatch(cancelDownload(businessId))
     })
 }
@@ -198,32 +214,29 @@ export const forceDownloadModels = (modeleDocs) => dispatch => {
     return dispatch(cancelDownloadModel())
   }
   isDownloadingModeles = true;
-  return RNFS.mkdir(`${rootDir}/${Folder.modeleDocs}`)
-    .then(() => FTP.login(FTP_USERNAME, FTP_PASSWORD).then(async () => {
-      if (modeleDocs.length > 0) {
-        const total = modeleDocs.length;
-        for (let i = 0; i < modeleDocs.length; i += 1) {
-            try {
-              dispatch(downloadModele(i + 1, total))
-              await FTP.downloadFile(`./${modeleDocs[i].ServerPath}`, `${rootDir}/${Folder.modeleDocs}`)
-            } catch (error) {
-              await RNFS.unlink(`${rootDir}/${Folder.modeleDocs}/${modeleDocs[i].ID}.${modeleDocs[i].Extension}`)
-              Sentry.captureException(error, { modeleDoc: modeleDocs[i], func: "FTP.downloadFile", doc: 'userActions' })
-              console.error({ error, modeleDoc: modeleDocs[i], func: "FTP.downloadFile", doc: 'userActions' })
-              return;
-          }
-        }
+  const { user } = store.getState();
+  const destinationFolder = `${rootDir}/${Folder.modeleDocs}`;
+  const total = modeleDocs.length;
+  return RNFS.mkdir(destinationFolder)
+    .then(async () => {
+      for (let i = 0; i < modeleDocs.length; i += 1) {
+        dispatch(downloadModele(i + 1, total))
+        await RNFetchBlob
+          .config({
+            path: `${destinationFolder}/${modeleDocs[i].iD_Document}.pdf`
+          })
+          .fetch('GET', `${API_URL}/api/pdffile/download/${modeleDocs[i].iD_Document}`, {
+            Authorization: `Bearer ${user.bearerToken}`
+          })
       }
       isDownloadingModeles = false;
-      await FTP.logout()
       return dispatch(modeleDownloaded())
     })
-    ).catch(async (e) => {
+    .catch((e) => {
       dispatch(cancelDownloadModel())
       isDownloadingModeles = false;
-      Sentry.captureException(e, { func: 'downloadModels', doc: 'userActions' })
-      console.log({ e, func: 'downloadModels', doc: 'userActions' })
-      return await FTP.logout()
+      Sentry.captureException(e, { func: 'forceDownloadModels', doc: 'userActions' })
+      return
     })
 }
 
@@ -232,36 +245,33 @@ export const downloadModels = (modeleDocs) => dispatch => {
     return dispatch(cancelDownloadModel())
   }
   isDownloadingModeles = true;
-  return RNFS.mkdir(`${rootDir}/${Folder.modeleDocs}`)
-    .then(() => FTP.login(FTP_USERNAME, FTP_PASSWORD).then(async () => {
-      if (modeleDocs.length > 0) {
-        const total = modeleDocs.length;
-        for (let i = 0; i < modeleDocs.length; i += 1) {
-          const fileExists = await RNFS.exists(`${rootDir}/${Folder.modeleDocs}/${modeleDocs[i].ID}.${modeleDocs[i].Extension}`)
-          if (!fileExists) {
-            try {
-              dispatch(downloadModele(i+1, total))
-              await FTP.downloadFile(`./${modeleDocs[i].ServerPath}`, `${rootDir}/${Folder.modeleDocs}`)
-            } catch (error) {
-              await RNFS.unlink(`${rootDir}/${Folder.modeleDocs}/${modeleDocs[i].ID}.${modeleDocs[i].Extension}`)
-              Sentry.captureException(error, { modeleDoc: modeleDocs[i], func: "FTP.downloadFile", doc: 'userActions' })
-              console.error({ error, modeleDoc: modeleDocs[i], func: "FTP.downloadFile", doc: 'userActions' })
-              return;
-            }
-          }
+  const { user } = store.getState();
+  const total = modeleDocs.length;
+  const destinationFolder = `${rootDir}/${Folder.modeleDocs}`;
+  return RNFS.mkdir(destinationFolder)
+    .then(async () => {
+      for (let i = 0; i < modeleDocs.length; i += 1) {
+        const fileExists = await RNFS.exists(`${destinationFolder}/${modeleDocs[i].iD_Document}.pdf`);
+        if (!fileExists) {
+          dispatch(downloadModele(i + 1, total))
+          await RNFetchBlob
+            .config({
+              path: `${destinationFolder}/${modeleDocs[i].iD_Document}.pdf`
+            })
+            .fetch('GET', `${API_URL}/api/pdffile/download/${modeleDocs[i].iD_Document}`, {
+              Authorization: `Bearer ${user.bearerToken}`
+            })
         }
       }
       isDownloadingModeles = false;
-      await FTP.logout()
       return dispatch(modeleDownloaded())
-      })
-    ).catch(async (e) => {
-      dispatch(cancelDownloadModel())
-      isDownloadingModeles = false;
-      Sentry.captureException(e, { func: 'downloadModels', doc: 'userActions' })
-      console.log({ e, func: 'downloadModels', doc: 'userActions' })
-      return await FTP.logout()
     })
+      .catch((e) => {
+        dispatch(cancelDownloadModel())
+        isDownloadingModeles = false;
+        Sentry.captureException(e, { func: 'downloadModels', doc: 'userActions' })
+        return;
+      })
 }
 
 const modeleDownloaded = () => ({

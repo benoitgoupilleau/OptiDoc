@@ -199,7 +199,7 @@ class AddFileScreen extends React.Component {
                 fileName={m.designation}
                 handleSelect={() => this.handleSelectModele(m.iD_Document, m.designation, `${rootDir}/${Folder.modeleDocs}/${m.iD_Document}.pdf`)}
                 selected={this.state.fileName === m.designation}
-                openFile={() => this.props.navigation.navigate('Pdf', { title: m.designation, ID: m.iD_Document, isModel: true, })}
+                openFile={() => this.props.navigation.navigate('Pdf', { title: m.designation, id: m.iD_Document, isModel: true, })}
               />))
             }
           </ModeleList>

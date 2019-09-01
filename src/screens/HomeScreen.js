@@ -35,14 +35,14 @@ const HomeScreen = React.memo(({ token, refreshing, loaded, newsList, getNews, r
       getModeles()
       getDocs(docs, downloadedBusiness, editedDocs);
       getArbo()
+      if (modeleDownloaded !== 'in progress') {
+        downloadModels(modeleDocs);
+      }
     }
   }, [token])
 
   useEffect(() => {
     Orientation.lockToPortrait();
-    if (modeleDownloaded !== 'in progress' && mssqlConnected) {
-      downloadModels(modeleDocs);
-    }
   }, [])
 
   useEffect(() => {

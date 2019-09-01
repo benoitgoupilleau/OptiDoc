@@ -206,9 +206,9 @@ class Document extends React.Component {
   }
 
   onDownloadFile = () => {
-    const { id, dossier1, dossier2, userId, serverPath } = this.props;
+    const { id, dossier1, extension } = this.props;
     if (this.props.isConnected) {
-      this.props.downLoadOneFile(id, serverPath, `${rootDir}/${userId}/${dossier1}/${dossier2}`)
+      this.props.downLoadOneFile(id, extension, dossier1)
       return ToastAndroid.showWithGravity(
         "Fichier en cours de téléchargement",
         ToastAndroid.SHORT,
