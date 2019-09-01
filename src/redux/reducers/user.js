@@ -75,8 +75,8 @@ export default (state = defaultState, action) => {
     case SESSION_EXPIRED:
       return {
         ...state,
-        ...omit(defaultState, ['userName', 'downloadedBusiness', 'editedDocs']),
-        sessionExpired: true
+        sessionExpired: true,
+        locked: state.editedDocs.length > 0
       }
     case DOWNLOADING_BUSINESS: {
       const currentBusiness = state.loadingBusiness.includes(action.id) ? [...state.loadingBusiness] : [...state.loadingBusiness, action.id];
