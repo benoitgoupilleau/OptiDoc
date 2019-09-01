@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Alert, ToastAndroid, ActivityIndicator } from 'react-native';
@@ -12,39 +12,38 @@ import { getDocs, getModeles, getBusiness, getArbo } from '../redux/actions/busi
 
 import { Wrapper, Icons, StyledButton, StyledText } from './Logout.styled';
 
-class Logout extends React.Component {
-  state = {
-    refreshing: false,
-  }
-  signOut = () => {
-    if (this.props.hasEditFiles) {
+const Logout = React.memo(({ hasEditFiles, navigation, logout, userId, getNews, getDocs, getArbo, getBusiness, getModeles, docs, downloadedBusiness, editedDocs, title }) => {
+  const [refreshing, setRefreshing] = useState(false);
+
+  const signOut = () => {
+    if (hasEditFiles) {
       Alert.alert(
         'Etes-vous sûr de vouloir vous déconnecter ?',
         "Vous avez encore des fichiers modifiés en local que vous n'avez pas envoyés",
         [
-          { text: 'Annuler', style: 'cancel'},
-          { text: 'Oui', onPress: this.signOutAsync },
+          { text: 'Annuler', style: 'cancel' },
+          { text: 'Oui', onPress: signOutAsync },
         ],
       )
     } else {
-      this.signOutAsync();
+      signOutAsync();
     }
   }
-
-  signOutAsync = () => {
-    this.props.navigation.navigate('Auth');
-    this.props.logout(this.props.userId);
+  
+  const signOutAsync = () => {
+    navigation.navigate('Auth');
+    logout(userId);
   };
 
-  refreshData = () => {
-    this.setState({ refreshing: true})
-    this.props.getNews()
-    this.props.getDocs(this.props.docs, this.props.downloadedBusiness, this.props.editedDocs)
-    this.props.getArbo()
-    this.props.getBusiness();
-    this.props.getModeles()
+  const refreshData = () => {
+    setRefreshing(true);
+    getNews()
+    getDocs(docs, downloadedBusiness, editedDocs)
+    getArbo()
+    getBusiness();
+    getModeles()
     setTimeout(() => {
-      this.setState({ refreshing: false})
+      setRefreshing(false);
       ToastAndroid.showWithGravity(
         "Données en cours d'actualisation",
         ToastAndroid.SHORT,
@@ -53,30 +52,28 @@ class Logout extends React.Component {
     }, 2000)
   }
 
-  render() {
-    return (
-      <Wrapper>
-        {this.state.refreshing ?
-        <ActivityIndicator style={{ paddingLeft: 20, paddingRight: 20 }}/> :
+  return (
+    <Wrapper>
+      {refreshing ?
+        <ActivityIndicator style={{ paddingLeft: 20, paddingRight: 20 }} /> :
         <Icons
           name="md-refresh"
           size={Layout.icon.default}
-          onPress={this.refreshData}
+          onPress={refreshData}
         />}
-        <StyledButton onPress={this.signOut}>
-          <StyledText>{this.props.title}</StyledText>
-        </StyledButton>
-      </Wrapper>
-    );
-  }
-}
+      <StyledButton onPress={signOut}>
+        <StyledText>{title}</StyledText>
+      </StyledButton>
+    </Wrapper>
+  );
+}) 
 
 Logout.propTypes = {
   title: PropTypes.string,
   navigation: PropTypes.object.isRequired,
   logout: PropTypes.func.isRequired,
   hasEditFiles: PropTypes.bool.isRequired,
-  userId: PropTypes.string.isRequired,
+  userId: PropTypes.string,
   getNews: PropTypes.func.isRequired,
   getDocs: PropTypes.func.isRequired,
   getBusiness: PropTypes.func.isRequired,
