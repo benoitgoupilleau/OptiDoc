@@ -21,11 +21,9 @@ export default (state = defaultState, action) => {
       }
     }
     case UPDATE_NET_STATUS: {
-      const mssqlConnected = action.isConnected ? state.mssqlConnected : false;
       return {
         ...state,
         isConnected: action.isConnected,
-        mssqlConnected
       }
     }
     default:

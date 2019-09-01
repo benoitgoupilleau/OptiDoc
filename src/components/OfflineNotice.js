@@ -12,7 +12,7 @@ const { width } = Dimensions.get('window');
 
 const OfflineNotice = React.memo(({ isConnected, modeleDownloaded, nbDownloaded, totalModeles, connectivityChange }) => {
   useEffect(() => {
-    NetInfo.getConnectionInfo().then((connectionInfo) => {
+    NetInfo.fetch().then((connectionInfo) => {
       const currentConnection = connectionInfo.type === 'wifi' || connectionInfo.type === 'cellular';
       if (isConnected !== currentConnection) connectivityChange(currentConnection);
     });
@@ -23,7 +23,7 @@ const OfflineNotice = React.memo(({ isConnected, modeleDownloaded, nbDownloaded,
   }, [])
 
   const handleConnectivityChange = state => {
-    const newConnection = state.isInternetReachable
+    const newConnection = state.isConnected;
     if (isConnected !== newConnection) connectivityChange(newConnection);
   }
 
