@@ -159,7 +159,6 @@ class Document extends React.Component {
         await RNFS.unlink(externalPath)
       } catch (error) {
         Sentry.captureException(error, { func: 'removeWoPFile', doc: 'Document.js' })
-        console.error({ error, func: 'removeWoPFile', doc: 'Document.js' })
         return;
       }
     }
@@ -181,7 +180,6 @@ class Document extends React.Component {
           )
           .catch((e) => {
             Sentry.captureException(e, { func: 'onOpenFile', doc: 'Document.js'})
-            console.error({ e, func: 'onOpenFile', doc: 'Document.js' })
             return;
           })
       } else {

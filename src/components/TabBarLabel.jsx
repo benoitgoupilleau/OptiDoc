@@ -12,15 +12,11 @@ const StyledText = styled.Text`
 `;
 
 
-class TabBarLabel extends React.Component {
-  render() {
-    return (
-      <StyledText focused={this.props.focused} >
-        {this.props.title}
-      </StyledText>
-    );
-  }
-}
+const TabBarLabel = ({ focused, title }) => (
+  <StyledText focused={focused} >
+    {title}
+  </StyledText>
+);
 
 TabBarLabel.propTypes = {
   title: PropTypes.string.isRequired,
