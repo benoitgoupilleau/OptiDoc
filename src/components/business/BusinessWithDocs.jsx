@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import RNFS from 'react-native-fs';
 import PropTypes from 'prop-types';
 import pick from 'lodash.pick';
@@ -10,7 +10,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Document from './Document'
 import SubArbo from './SubArbo';
-import { downloadBusiness, uploadFile, uploadingFile, createFile, uploadMultipleFiles, uploadingMulti } from '../../redux/actions/user'
+import { uploadingFile, uploadMultipleFiles, uploadingMulti } from '../../redux/actions/user'
 
 import Colors from '../../constants/Colors';
 import Layout from '../../constants/Layout'
@@ -29,68 +29,38 @@ const checkIfNew = (docs, id) => {
   return false;
 }
 
-class BusinessWithDocs extends React.Component {
-  state = {
-    showPrep: false,
-    showRea: false,
-    upLoading: false,
-    nbFiles: 0,
-    totalFiles: 0
-  }
+const BusinessWithDocs = React.memo((props) => {
+  const { userId, id, navigation, isConnected, client, designation, prep, rea, editedDocs, uploadingDocs, multipleUploadDocs, newDocs, docs, uploadingFile, subFolder, uploadMultipleFiles, uploadingMulti } = props;
+  const [showPrep, setshowPrep] = useState(false);
+  const [showRea, setshowRea] = useState(false);
+  const [upLoading, setupLoading] = useState(false);
 
-  displayIcon = () => {
-    const editedBusiness = this.props.editedDocs.filter(e => e.affaire === this.props.id)
-    if (this.state.upLoading) {
-      return (
-        <View>
-          <ActivityIndicator />
-        </View>)
-    } else if (this.props.multipleUploadDocs.length > 0) {
-      return (
-        <View style={{alignItems: 'center'}}>
-          <Text>{this.props.multipleUploadDocs.length}</Text>
-          <ActivityIndicator />
-        </View>)
-    } else if (editedBusiness.length > 0) {
-      return (
-        <Ionicons
-          name={"md-cloud-upload"}
-          size={Layout.icon.large}
-          color={Colors.secondColor}
-          onPress={this.onUpload}
-        />
-      )
-    }
-    return null;
-  }
-
-  confirmedOnUpload = async () => {
-    const editedBusiness = this.props.editedDocs.filter(e => e.affaire === this.props.id)
-    this.setState({ upLoading: true });
+  const confirmedOnUpload = async () => {
+    const editedBusiness = editedDocs.filter(e => e.affaire === id)
+    setupLoading(true);
     const filesToUpload = [];
     const multiUpload = [];
     for (let i = 0; i < editedBusiness.length; i++) {
-      this.setState({ nbFiles: i + 1 });
       const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${editedBusiness[i].id}(0).${editedBusiness[i].Extension}`);
       if (secondVersion) {
         await RNFS.copyFile(`${EXTERNAL_PATH}${editedBusiness[i].id}(0).${editedBusiness[i].Extension}`, `${EXTERNAL_PATH}${editedBusiness[i].id}.${editedBusiness[i].Extension}`);
         await RNFS.unlink(`${EXTERNAL_PATH}${editedBusiness[i].id}(0).${editedBusiness[i].Extension}`)
       }
       const filePath = `${EXTERNAL_PATH}${editedBusiness[i].id}.${editedBusiness[i].Extension}`;
-      const destPath = `${rootDir}/${this.props.userId}/${this.props.id}/${Folder.rea}/${editedBusiness[i].id}.${editedBusiness[i].Extension}`;
+      const destPath = `${rootDir}/${userId}/${id}/${Folder.rea}/${editedBusiness[i].id}.${editedBusiness[i].Extension}`;
       let file = {}
       if (editedBusiness[i].isNew) {
-        file = { ...this.props.newDocs.filter(n => n.id === editedBusiness[i].id)[0] }
+        file = { ...newDocs.filter(n => n.id === editedBusiness[i].id)[0] }
       } else {
-        file = { ...this.props.docs.filter(n => n.id === editedBusiness[i].id)[0] }
+        file = { ...docs.filter(n => n.id === editedBusiness[i].id)[0] }
       }
-      multiUpload.push({ affaire: this.props.id, fileId: editedBusiness[i].id });
-      pick(this.props, Tables.docField);
+      multiUpload.push({ affaire: id, fileId: editedBusiness[i].id });
+      pick(props, Tables.docField);
       await RNFS.copyFile(filePath, destPath);
-      const remoteDir = `./${this.props.id}/Realisation/${editedBusiness[i].Dossier3}`
-      const userName = this.props.name;
+      const remoteDir = `./${id}/Realisation/${editedBusiness[i].Dossier3}`
+      const userName = name;
       const now = new Date();
-      const date = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
+      const date = `${now.getFullYear()}-${(now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 })}-${now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })}`
       const fileToUpLoad = {
         ...file,
         upLoadedOn: date,
@@ -98,24 +68,24 @@ class BusinessWithDocs extends React.Component {
         updatedBy: userName,
         upLoadedBy: userName
       }
-      this.props.uploadingFile(editedBusiness[i].id);
+      uploadingFile(editedBusiness[i].id);
       if (editedBusiness[i].isNew) {
         filesToUpload.push({ ...fileToUpLoad, filePath, remoteDir, isNew: true })
       } else {
         filesToUpload.push({ ...fileToUpLoad, filePath, remoteDir, isNew: false })
       }
     }
-    this.props.uploadingMulti(multiUpload)
-    this.props.uploadMultipleFiles(filesToUpload);
-    this.setState({ upLoading: false });
+    uploadingMulti(multiUpload)
+    uploadMultipleFiles(filesToUpload);
+    setupLoading(false);
   }
 
-  onUpload = () => {
-    if (this.props.isConnected) {
-      if (this.props.uploadingDocs.length > 0) {
+  const onUpload = () => {
+    if (isConnected) {
+      if (uploadingDocs.length > 0) {
         Alert.alert('Envoi en cours', "Vous pourrez envoyer vos fichiers une fois l'envoi terminé", [{ text: 'Ok' }]);
       } else {
-        const editedBusiness = this.props.editedDocs.filter(e => e.affaire === this.props.id)
+        const editedBusiness = editedDocs.filter(e => e.affaire === id)
         const unPreparedDocs = editedBusiness.filter(d => !(d.prepared && d.prepared === true))
         if (unPreparedDocs.length > 0) {
           Alert.alert('Envoi impossible', "Les fichiers ne sont pas tous cochés comme 'Préparé'", [{ text: 'Ok' }]);
@@ -125,7 +95,7 @@ class BusinessWithDocs extends React.Component {
             style: 'cancel',
           }, {
             text: 'Oui',
-            onPress: () => this.confirmedOnUpload()
+            onPress: () => confirmedOnUpload()
           }]);
         }
       }
@@ -134,33 +104,43 @@ class BusinessWithDocs extends React.Component {
     }
   }
 
-  onDownload = () => {
-    const { id, prep, rea, modeleDownloaded, downloadBusiness, userId, loadingBusiness, isConnected } = this.props;
-    if (isConnected) {
-      if (modeleDownloaded === 'in progress') {
-        Alert.alert('Modèle en cours de téléchargement', 'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants', [{ text: 'Ok' }]);
-      } else {
-        if (loadingBusiness.includes(id)) {
-          Alert.alert('Un téléchargement est en cours', "Merci d'attendre la fin du téléchargement", [{ text: 'Ok' }]);
-        } else {
-          downloadBusiness(userId, id, prep, rea)
-        }
-      }
-    } else {
-      Alert.alert('Vous êtes en mode hors-ligne', 'Vous pourrez télécharger cette affaire une fois votre connexion rétablie', [{ text: 'Ok' }]);
+  const displayIcon = () => {
+    const editedBusiness = editedDocs.filter(e => e.affaire === id)
+    if (upLoading) {
+      return (
+        <View>
+          <ActivityIndicator />
+        </View>)
+    } else if (multipleUploadDocs.length > 0) {
+      return (
+        <View style={{ alignItems: 'center' }}>
+          <Text>{multipleUploadDocs.length}</Text>
+          <ActivityIndicator />
+        </View>)
+    } else if (editedBusiness.length > 0) {
+      return (
+        <Ionicons
+          name={"md-cloud-upload"}
+          size={Layout.icon.large}
+          color={Colors.secondColor}
+          onPress={onUpload}
+        />
+      )
     }
+    return null;
   }
 
-  toggleRea = () => {
-    this.setState({showRea: !this.state.showRea})
+  const toggleRea = () => {
+    const toggle = !showRea;
+    setshowRea(toggle)
   }
 
-  togglePrep = () => {
-    this.setState({showPrep: !this.state.showPrep})
+  const togglePrep = () => {
+    const toggle = !showPrep
+    setshowPrep(toggle);
   }
 
-  displayPrep = () => {
-    const { prep, rea, subFolder } = this.props;
+  const displayPrep = () => {
     const listArbo = [];
     for (let i = 0; i < prep.length; i++) {
       const indexArbo = listArbo.findIndex(a => (a.nomDossier === prep[i].dossier3 && a.etape === 'Preparation'))
@@ -174,13 +154,12 @@ class BusinessWithDocs extends React.Component {
       return listArbo.map(arbo => <SubArbo key={'Prep' + arbo.nomDossier} title={arbo.designation}>{prep.filter(p => p.dossier3 === arbo.nomDossier)
         .sort((a, b) => (a.fileName > b.fileName ? 1 : -1))
         .map(p => <Document key={p.id} {...p} type={Folder.prep} prep={prep} rea={rea} />)}
-        </SubArbo>)
+      </SubArbo>)
     }
     return <React.Fragment></React.Fragment>
   }
 
-  displayRea = () => {
-    const { prep, rea, editedDocs, subFolder } = this.props;
+  const displayRea = () => {
     const listArbo = [];
     for (let i = 0; i < rea.length; i++) {
       const indexArbo = listArbo.findIndex(a => (a.nomDossier === rea[i].dossier3 && a.etape === 'Realisation'))
@@ -199,53 +178,51 @@ class BusinessWithDocs extends React.Component {
     return <React.Fragment></React.Fragment>
   }
 
-  render() {
-    const { id, client, designation, navigation } = this.props;
-    const clientName = `${client} - ${designation}`;
-    return (
-      <BusinessWrapper>
-        <MainSection>
-          <Title>{clientName}</Title>
-          {this.displayIcon()}
-        </MainSection>
-        <SectionWrapper>
-          <Icons
-            name={this.state.showPrep ? "md-arrow-dropdown" : "md-arrow-dropright"}
-            size={Layout.icon.default}
+  const clientName = `${client} - ${designation}`;
+  return (
+    <BusinessWrapper>
+      <MainSection>
+        <Title>{clientName}</Title>
+        {displayIcon()}
+      </MainSection>
+      <SectionWrapper>
+        <Icons
+          name={showPrep ? "md-arrow-dropdown" : "md-arrow-dropright"}
+          size={Layout.icon.default}
+          color={Colors.mainColor}
+          onPress={togglePrep}
+        />
+        <Section onPress={togglePrep} >Préparation</Section>
+      </SectionWrapper>
+      {showPrep && displayPrep()}
+      <SectionWrapper>
+        <Icons
+          name={showRea ? "md-arrow-dropdown" : "md-arrow-dropright"}
+          size={Layout.icon.default}
+          color={Colors.mainColor}
+          onPress={toggleRea}
+        />
+        <Section onPress={toggleRea} >Réalisation</Section>
+        <IconView>
+          <AddIcons
+            name={"md-camera"}
+            size={Layout.icon.large}
             color={Colors.mainColor}
-            onPress={this.togglePrep}
+            onPress={() => navigation.navigate('AddPic', { affaire: id })}
           />
-          <Section onPress={this.togglePrep} >Préparation</Section>
-        </SectionWrapper>
-        {this.state.showPrep && this.displayPrep()}
-        <SectionWrapper>
-          <Icons
-            name={this.state.showRea ? "md-arrow-dropdown" : "md-arrow-dropright"}
-            size={Layout.icon.default}
+          <AddIcons
+            name={"md-add"}
+            size={Layout.icon.large}
             color={Colors.mainColor}
-            onPress={this.toggleRea}
+            onPress={() => navigation.navigate('AddDoc', { affaire: id })}
           />
-          <Section onPress={this.toggleRea} >Réalisation</Section>
-          <IconView>
-            <AddIcons
-              name={"md-camera"}
-              size={Layout.icon.large}
-              color={Colors.mainColor}
-              onPress={() => navigation.navigate('AddPic', { affaire: id }) }
-            />
-            <AddIcons
-              name={"md-add"}
-              size={Layout.icon.large}
-              color={Colors.mainColor}
-              onPress={() => navigation.navigate('AddDoc', { affaire: id })}
-            />
-          </IconView>
-        </SectionWrapper>
-        {this.state.showRea && this.displayRea()}
-      </BusinessWrapper>
-    );
-  }
-}
+        </IconView>
+      </SectionWrapper>
+      {showRea && displayRea()}
+    </BusinessWrapper>
+  );
+
+})
 
 BusinessWithDocs.propTypes = {
   id: PropTypes.string.isRequired,
@@ -254,18 +231,13 @@ BusinessWithDocs.propTypes = {
   prep: PropTypes.array,
   rea: PropTypes.array,
   modeleDocs: PropTypes.array.isRequired,
-  loadingBusiness: PropTypes.array.isRequired,
-  downloadBusiness: PropTypes.func.isRequired,
   userId: PropTypes.string.isRequired,
   navigation: PropTypes.object.isRequired,
   isConnected: PropTypes.bool.isRequired,
-  modeleDownloaded: PropTypes.string.isRequired,
   editedDocs: PropTypes.array.isRequired,
   subFolder: PropTypes.array.isRequired,
   uploadingFile: PropTypes.func.isRequired,
   uploadingDocs: PropTypes.array.isRequired,
-  createFile: PropTypes.func.isRequired,
-  uploadFile: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
   multipleUploadDocs: PropTypes.array,
   uploadingMulti: PropTypes.func.isRequired,
@@ -284,7 +256,6 @@ BusinessWithDocs.defaultProps = {
 
 const mapStateToProps = (state, props) => ({
   isConnected: state.network.isConnected,
-  loadingBusiness: state.user.loadingBusiness,
   nbDocBusiness: state.user.nbDocBusiness,
   uploadingDocs: state.user.uploadingDocs,
   totalDocBusiness: state.user.totalDocBusiness,
@@ -296,7 +267,6 @@ const mapStateToProps = (state, props) => ({
   docs: state.business.docs,
   newDocs: state.business.newDocs,
   subFolder: state.business.subFolder,
-  modeleDownloaded: state.user.modeleDownloaded,
 })
 
-export default withNavigation(connect(mapStateToProps, { downloadBusiness, uploadingFile, createFile, uploadFile, uploadMultipleFiles, uploadingMulti })(BusinessWithDocs));
+export default withNavigation(connect(mapStateToProps, { uploadingFile, uploadMultipleFiles, uploadingMulti })(BusinessWithDocs));
