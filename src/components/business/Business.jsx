@@ -12,7 +12,7 @@ import Layout from '../../constants/Layout'
 
 import { BusinessWrapper, MainSection, Title, IconView } from './Business.styled'
 
-const Business = React.memo(({ isConnected, userId, prep, rea, id, downloadedBusiness, loadingBusiness, nbDocBusiness, totalDocBusiness, navigation, client, designation }) => {
+const Business = React.memo(({ isConnected, userId, prep, rea, id, downloadBusiness, downloadedBusiness, loadingBusiness, nbDocBusiness, totalDocBusiness, navigation, client, designation }) => {
   const goToDocs = () => {
     navigation.navigate('Docs', { affaire: id })
   }

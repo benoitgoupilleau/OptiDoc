@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import RNFS from 'react-native-fs';
 import ImagePicker from 'react-native-image-picker';
 import PropTypes from 'prop-types';
@@ -27,30 +27,19 @@ import { Wrapper, Title, Section, ButtonWrapper, StyledButton, StyledText, FileN
 
 const { width, height } = Dimensions.get('window');
 
-class AddPictureScreen extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      comment: '',
-      pictureNameFinal: '',
-      creatingFile: false,
-      path: ''
-    }
-  } 
-  static navigationOptions = {
-    headerTitle: <HeaderTitle noLogo title="Ajouter une photo"/>,
-    headerRight: <Logout />,
-    headerStyle: {
-      height: 70
-    }
-  }
+const AddPictureScreen = React.memo(({ navigation, user, userBusiness, editFile, addNewDoc }) => {
+  const [comment, setComment] = useState('')
+  const [pictureNameFinal, setpictureNameFinal] = useState('')
+  const [creatingFile, setCreatingFile] = useState(false)
+  const [path, setPath] = useState('');
+  const [uri, setUri] = useState('')
 
-  componentDidMount() {
+  useEffect(() => {
     Orientation.lockToPortrait();
     checkAccessCamera();
-  }
+  }, [])
 
-  getPhotos = () => {
+  const getPhotos = () => {
     const options = {
       title: 'Selectionner une photo',
       takePhotoButtonTitle: 'Prendre une photo',
@@ -62,42 +51,34 @@ class AddPictureScreen extends React.Component {
         const now = new Date();
         const { day, month, year } = getDateFormat(now);
         const date = `${day}.${month}.${year}`;
-        this.setState({
-          ...response,
-          pictureNameFinal: 'Photo ' + date 
-        });
+        setPath(response.path)
+        setUri(response.uri)
+        setpictureNameFinal(`Photo ${date}`)
       }
     });
   };
 
-  handleButtonPress = async () => {
+  const handleButtonPress = async () => {
     const isAuthorised = await checkAccessCamera();
     if (isAuthorised) {
-      this.getPhotos();
-    } else { 
+      getPhotos();
+    } else {
       Alert.alert("L'application n'a pas accès à vos photos", "Merci de modifier les paramètres de l'application", [{ text: 'Ok' }])
     }
   }
 
-  handleSelectPicture = (pictureName) => {
-    const now = new Date();
-    const { day, month, year } = getDateFormat(now);
-    const date = `${day}.${month}.${year}`;
-    this.setState({ pictureName, pictureNameFinal: `Photo ${date}` })
-  }
-
-  onCreatePicture = () => {
-    this.setState({ creatingFile: true })
-    const businessId = this.props.navigation.getParam('affaire', '')
+  const onCreatePicture = () => {
+    setCreatingFile(true)
+    const businessId = navigation.getParam('affaire', '')
     const now = new Date();
     const { day, month, year, hours, minutes, secondes } = getDateFormat(now);
     const createdOn = `${year}-${month}-${day}`;
     const date = `${year}${month}${day}${hours}${minutes}${secondes}`;
     const fileID = 'DOC_' + date;
     const dossier3 = 'DOSS_5';
-    const destPath = `${rootDir}/${this.props.user.id}/${businessId}/${Folder.rea}/${fileID}.pdf`;
-    RNImageToPdf.createPDFbyImages({ imagePaths: [this.state.path], name: 'fileID' })
-      .then((file) => RNFS.mkdir(`${rootDir}/${this.props.user.id}/${businessId}/${Folder.rea}`)
+    const destPath = `${rootDir}/${user.id}/${businessId}/${Folder.rea}/${fileID}.pdf`;
+    RNImageToPdf.createPDFbyImages({ imagePaths: [path], name: 'fileID' })
+      .then((file) => RNFS.mkdir(`${rootDir}/${user.id}/${businessId}/${Folder.rea}`)
         .then(() => RNFS.copyFile(file.filePath, destPath)
           .then(() => {
             const newDoc = {
@@ -109,16 +90,16 @@ class AddPictureScreen extends React.Component {
               preparedBy: '',
               revisable: 'N',
               size: 0,
-              createdBy: this.props.user.name,
+              createdBy: user.name,
               dossier2: 'Realisation',
               upLoadedOn: '1900-01-01',
-              fileName: this.state.pictureNameFinal,
+              fileName: pictureNameFinal,
               createdOn,
               dossier1: businessId,
               id: fileID,
               updatedOn: createdOn,
-              updatedBy: this.props.user.name,
-              commentaire: this.state.comment,
+              updatedBy: user.name,
+              commentaire: comment,
               dossier3,
               serverPath: `${businessId}/Realisation/${dossier3}/${fileID}.pdf`,
               reviewedBy: '',
@@ -127,74 +108,81 @@ class AddPictureScreen extends React.Component {
               locked: 'N',
               upLoadedBy: ''
             }
-            this.props.navigation.goBack();
-            this.props.editFile({ id: fileID, editPath: `${EXTERNAL_PATH}${fileID}.pdf`, isNew: true, affaire: businessId, extension: 'pdf', dossier3 }, destPath)
-            return this.props.addNewDoc(newDoc)
+            navigation.goBack();
+            editFile({ id: fileID, editPath: `${EXTERNAL_PATH}${fileID}.pdf`, isNew: true, affaire: businessId, extension: 'pdf', dossier3 }, destPath)
+            return addNewDoc(newDoc)
           })
           .catch(e => {
             Sentry.captureException(e, { func: 'copyFile', doc: 'AddPictureScreen.js' })
-            this.setState({ creatingFile: false })
+            setCreatingFile(false);
             return;
           })))
       .catch((e) => {
         Sentry.captureException(e, { func: 'onCreatePicture', doc: 'AddPictureScreen.js' })
-        this.setState({ creatingFile: false })
+        setCreatingFile(false);
         return;
       })
   }
 
-  render() {
-    const id_affaire = this.props.navigation.getParam('affaire', '')
-    const business = this.props.userBusiness.find((b) => b.id === id_affaire)
-    const clientName = business ? `${business.client} - ${business.designation}` : id_affaire;
-    return (
-      <View>
-        <OfflineNotice />
-        <Wrapper>
-          <Title>{clientName}</Title>
-          <Section>Ajouter une photo</Section>
-          <View>
-            <FileNameInput
-              placeholder="Nom du fichier"
-              onChangeText={(pictureNameFinal) => this.setState({ pictureNameFinal })}
-              value={this.state.pictureNameFinal}
-            />
-            <Text>Commentaire obligatoire pour la photo :</Text>
-            <Comment 
-              multiline={true}
-              onChangeText={(comment) => this.setState({ comment })}
-              value={this.state.comment}
-              returnKeyType="done"
-            />
-            <StyledButton onPress={this.handleButtonPress}>
-              <StyledText>Sélectionner une photo</StyledText>
+  const id_affaire = navigation.getParam('affaire', '')
+  const business = userBusiness.find((b) => b.id === id_affaire)
+  const clientName = business ? `${business.client} - ${business.designation}` : id_affaire;
+  return (
+    <View>
+      <OfflineNotice />
+      <Wrapper>
+        <Title>{clientName}</Title>
+        <Section>Ajouter une photo</Section>
+        <View>
+          <FileNameInput
+            placeholder="Nom du fichier"
+            onChangeText={(pictureNameFinal) => setpictureNameFinal(pictureNameFinal)}
+            value={pictureNameFinal}
+          />
+          <Text>Commentaire obligatoire pour la photo :</Text>
+          <Comment
+            multiline={true}
+            onChangeText={(comment) => setComment(comment)}
+            value={comment}
+            returnKeyType="done"
+          />
+          <StyledButton onPress={handleButtonPress}>
+            <StyledText>Sélectionner une photo</StyledText>
+          </StyledButton>
+          <ButtonWrapper>
+            <StyledButton disabled={path === '' || comment === '' || creatingFile} onPress={onCreatePicture}>
+              <StyledText>{creatingFile ? 'Création en cours' : 'Créer le fichier'}</StyledText>
             </StyledButton>
-            <ButtonWrapper>
-              <StyledButton disabled={this.state.path === '' || this.state.comment === '' || this.state.creatingFile} onPress={this.onCreatePicture}>
-                <StyledText>{this.state.creatingFile ? 'Création en cours' : 'Créer le fichier'}</StyledText>
-              </StyledButton>
-            </ButtonWrapper>
-            <StyledScroll width={width} height={height}>
-              {this.state.uri ? (
-                <PictureWrapper>
-                  <ImageFrame
-                    source={{ uri: this.state.uri }}
-                    screenWidth={width}
-                    width={this.state.width}
-                    height={this.state.height}
-                  />
-                  <Icons
-                    color="green"
-                    name="md-checkmark-circle"
-                    size={Layout.icon.default}
-                  />
-                </PictureWrapper>
-              ) : <Text>Aucune photo sélectionnée</Text> }
-            </StyledScroll>
-          </View>
-        </Wrapper>
-      </View>
-    );
+          </ButtonWrapper>
+          <StyledScroll width={width} height={height}>
+            {uri ? (
+              <PictureWrapper>
+                <ImageFrame
+                  source={{ uri: uri }}
+                  screenWidth={width}
+                  width={width}
+                  height={height}
+                />
+                <Icons
+                  color="green"
+                  name="md-checkmark-circle"
+                  size={Layout.icon.default}
+                />
+              </PictureWrapper>
+            ) : <Text>Aucune photo sélectionnée</Text>}
+          </StyledScroll>
+        </View>
+      </Wrapper>
+    </View>
+  );
+
+})
+
+AddPictureScreen.navigationOptions = {
+  headerTitle: <HeaderTitle noLogo title="Ajouter une photo" />,
+  headerRight: <Logout />,
+  headerStyle: {
+    height: 70
   }
 }
 

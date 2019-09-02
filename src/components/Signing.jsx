@@ -19,7 +19,7 @@ const encoded = (str) => {
   return encodedChar.join('');
 }
 
-const Signin = ({ userName, navigation, loginApi, locked, sessionExpired }) => {
+const Signing = React.memo(({ userName, navigation, loginApi, locked, sessionExpired }) => {
   const [localUserName, setUserName] = useState(userName)
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -81,9 +81,9 @@ const Signin = ({ userName, navigation, loginApi, locked, sessionExpired }) => {
       {locked && <Logout title="Forcer la déconnexion" />}
     </Wrapper>
   )
-}
+})
 
-Signin.propTypes = {
+Signing.propTypes = {
   navigation: PropTypes.object.isRequired,
   loginApi: PropTypes.func.isRequired,
   locked: PropTypes.bool.isRequired,
@@ -97,4 +97,4 @@ const mapStateToProps = state => ({
   sessionExpired: state.user.sessionExpired
 })
 
-export default withNavigation(connect(mapStateToProps, { loginApi })(Signin));
+export default withNavigation(connect(mapStateToProps, { loginApi })(Signing));

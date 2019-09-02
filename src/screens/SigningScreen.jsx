@@ -9,12 +9,12 @@ const SignInScreen = () => {
   useEffect(() => {
     Orientation.lockToPortrait()
   }, [])
-
-    return (
-      <Main>
-        <Signin />
-      </Main>
-    );
+  
+  return (
+    <Main>
+      <Signin />
+    </Main>
+  );
 }
 
 SignInScreen.propTypes = {

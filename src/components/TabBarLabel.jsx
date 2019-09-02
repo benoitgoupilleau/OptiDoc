@@ -12,11 +12,11 @@ const StyledText = styled.Text`
 `;
 
 
-const TabBarLabel = ({ focused, title }) => (
+const TabBarLabel = React.memo(({ focused, title }) => (
   <StyledText focused={focused} >
     {title}
   </StyledText>
-);
+));
 
 TabBarLabel.propTypes = {
   title: PropTypes.string.isRequired,

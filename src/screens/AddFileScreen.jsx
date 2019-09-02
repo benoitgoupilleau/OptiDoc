@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import RNFS from 'react-native-fs';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -23,58 +23,49 @@ import { getDateFormat } from '../services/dateFormat';
 
 import { Wrapper, Title, Section, Selector, Option, OptionText, ModeleList, ButtonWrapper, StyledButton, StyledText, FileNameInput } from './AddFileScreen.styled';
 
-class AddFileScreen extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      typeModele: 'PV',
-      ModeleID: '',
-      fileName: '',
-      filePath: '',
-      FileNameFinal: '',
-      creatingFile: false
-    }
-  } 
-  static navigationOptions = {
-    headerTitle: <HeaderTitle noLogo title="Ajouter un document"/>,
-    headerRight: <Logout />,
-    headerStyle: {
-      height: 70
-    }
-  }
+const AddFileScreen = React.memo(({ navigation, user, userBusiness, modeleDownloaded, modeles, editFile, addNewDoc, downloadModels, forceDownloadModels }) => {
+  const [typeModele, setTypeModele] = useState('PV');
+  const [ModeleID, setModeleID] = useState('');
+  const [fileName, setFileName] = useState('');
+  const [filePath, setFilePath] = useState('');
+  const [FileNameFinal, setFileNameFinal] = useState('');
+  const [creatingFile, setCreatingFile] = useState(false);
 
-  componentDidMount() {
+  useEffect(() => {
     Orientation.lockToPortrait();
-    if (this.props.modeleDownloaded !== 'in progress') {
-      this.props.downloadModels(this.props.modeles);
+    if (modeleDownloaded !== 'in progress') {
+      downloadModels(modeles);
     }
-  }
+  }, [])
 
-  handleSelectModele = (ModeleID, fileName, filePath) => {
+  const handleSelectModele = (ModeleID, fileName, filePath) => {
     const now = new Date();
     const { day, month, year } = getDateFormat(now);
     const date = `${day}.${month}.${year}`;
-    this.setState({ ModeleID, fileName, FileNameFinal: `${fileName} ${date}`, filePath })
+    setModeleID(ModeleID);
+    setFileName(fileName);
+    setFileNameFinal(`${fileName} ${date}`);
+    setFilePath(filePath);
   }
 
-  onCreateFile = () => {
-    if (this.props.modeleDownloaded === 'in progress') {
+  const onCreateFile = () => {
+    if (modeleDownloaded === 'in progress') {
       return Alert.alert('Modèle en cours de téléchargement', 'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants', [{ text: 'Ok' }]);
     } else {
-      this.setState({creatingFile: true})
-      const businessId = this.props.navigation.getParam('affaire', '')
+      setCreatingFile(true)
+      const businessId = navigation.getParam('affaire', '')
       const now = new Date();
-      const affaire = this.props.userBusiness.find((b) => b.id === businessId)
+      const affaire = userBusiness.find((b) => b.id === businessId)
       const clientName = affaire ? `${affaire.client} - ${affaire.designation}` : businessId;
       const { day, month, year, hours, minutes, secondes } = getDateFormat(now);
       const createdOn = `${year}-${month}-${day}`;
       const date = `${year}${month}${day}${hours}${minutes}${secondes}`;
-      const fileID= 'DOC_' + date;
-      const modeleSelected = this.props.modeles.filter(m => m.iD_Document === this.state.ModeleID)[0]
+      const fileID = 'DOC_' + date;
+      const modeleSelected = modeles.filter(m => m.iD_Document === ModeleID)[0]
       const dossier3 = modeleSelected.dossierDestination;
-      const destPath= `${rootDir}/${this.props.user.id}/${businessId}/${Folder.rea}/${fileID}.pdf`;
-      RNFS.mkdir(`${rootDir}/${this.props.user.id}/${businessId}/${Folder.rea}`)
-        .then(() => RNFS.copyFile(this.state.filePath, destPath)
+      const destPath = `${rootDir}/${user.id}/${businessId}/${Folder.rea}/${fileID}.pdf`;
+      RNFS.mkdir(`${rootDir}/${user.id}/${businessId}/${Folder.rea}`)
+        .then(() => RNFS.copyFile(filePath, destPath)
           .then(() => {
             const newDoc = {
               localPath: '',
@@ -85,15 +76,15 @@ class AddFileScreen extends React.Component {
               preparedBy: '',
               revisable: 'N',
               size: 0,
-              createdBy: this.props.user.name,
+              createdBy: user.name,
               dossier2: 'Realisation',
               upLoadedOn: '1900-01-01',
-              fileName: this.state.FileNameFinal,
+              fileName: FileNameFinal,
               createdOn,
               dossier1: businessId,
               id: fileID,
               updatedOn: createdOn,
-              updatedBy: this.props.user.name,
+              updatedBy: user.name,
               commentaire: '',
               dossier3,
               serverPath: `${businessId}/Realisation/${dossier3}/${fileID}.pdf`,
@@ -105,7 +96,7 @@ class AddFileScreen extends React.Component {
             }
             const page1 = PDFPage
               .modify(0)
-              .drawText('Rédigé par : ' + this.props.user.name, {
+              .drawText('Rédigé par : ' + user.name, {
                 x: modeleSelected.Zone1X ? parseInt(modeleSelected.Zone1X, 10) : 5,
                 y: modeleSelected.Zone1Y ? parseInt(modeleSelected.Zone1Y, 10) : 830,
                 fontSize: 10
@@ -120,98 +111,111 @@ class AddFileScreen extends React.Component {
                 y: modeleSelected.Zone3Y ? parseInt(modeleSelected.Zone3Y, 10) : 830,
                 fontSize: 10
               })
-              
-            this.props.navigation.goBack();
+
+            navigation.goBack();
             return PDFDocument
               .modify(destPath)
               .modifyPages(page1)
               .write()
               .then(() => {
-                this.props.addNewDoc(newDoc)
-                return this.props.editFile({ id: fileID, editPath: `${EXTERNAL_PATH}${fileID}.pdf`, isNew: true, affaire: businessId, extension: 'pdf', dossier3 }, destPath)
+                addNewDoc(newDoc)
+                return editFile({ id: fileID, editPath: `${EXTERNAL_PATH}${fileID}.pdf`, isNew: true, affaire: businessId, extension: 'pdf', dossier3 }, destPath)
               })
               .catch(e => {
                 Sentry.captureException(e, { func: 'modifyPages', doc: 'AddFileScreen.js' })
-                this.setState({creatingFile: false})
+                setCreatingFile(false)
                 return;
               })
           })
           .catch(e => {
             Sentry.captureException(e, { func: 'copyFile', doc: 'AddFileScreen.js' })
-            this.setState({creatingFile: false})
+            setCreatingFile(false)
             return;
           }))
         .catch((e) => {
           Sentry.captureException(e, { func: 'onCreateFile', doc: 'AddFileScreen.js' })
-          this.setState({creatingFile: false})
+          setCreatingFile(false)
           return;
         })
     }
   }
 
-  forceDownload = () => {
-    if (this.props.modeleDownloaded !== 'in progress') {
-      this.props.forceDownloadModels(this.props.modeles);
+  const forceDownload = () => {
+    if (modeleDownloaded !== 'in progress') {
+      forceDownloadModels(modeles);
     }
   }
 
-  render() {
-    const id_affaire = this.props.navigation.getParam('affaire', '')
-    const business = this.props.userBusiness.find((b) => b.id === id_affaire)
-    const clientName = business ? `${business.client} - ${business.designation}` : id_affaire;
-    return (
-      <View>
-        <OfflineNotice />
-        <Wrapper>
-          <Title>{clientName}</Title>
-          <Section>Sélectionner un modèle</Section>
-          <StyledButton onPress={this.forceDownload}>
-            <StyledText>Retélécharger les modèles</StyledText>
+  const onPress = (type) => {
+    setTypeModele(type);
+    setFileName('');
+    setFileNameFinal('');
+  }
+
+  const id_affaire = navigation.getParam('affaire', '')
+  const business = userBusiness.find((b) => b.id === id_affaire)
+  const clientName = business ? `${business.client} - ${business.designation}` : id_affaire;
+  return (
+    <View>
+      <OfflineNotice />
+      <Wrapper>
+        <Title>{clientName}</Title>
+        <Section>Sélectionner un modèle</Section>
+        <StyledButton onPress={forceDownload}>
+          <StyledText>Retélécharger les modèles</StyledText>
+        </StyledButton>
+        <Selector>
+          <Option
+            isSelected={typeModele === 'PV'}
+            onPress={() => onPress('PV')}
+          >
+            <OptionText isSelected={typeModele === 'PV'}>PV</OptionText>
+          </Option>
+          <Option
+            isSelected={typeModele === 'DMOS'}
+            onPress={() => onPress('DMOS')}
+          >
+            <OptionText isSelected={typeModele === 'DMOS'}>DMOS</OptionText>
+          </Option>
+          <Option
+            isSelected={typeModele === 'CR'}
+            onPress={() => onPress('CR')}
+          >
+            <OptionText isSelected={typeModele === 'CR'}>CR</OptionText>
+          </Option>
+        </Selector>
+        <ModeleList>
+          {modeles.filter(m => m.typeModele === typeModele).map(m => (
+            <Modele
+              key={m.id}
+              fileName={m.designation}
+              handleSelect={() => handleSelectModele(m.iD_Document, m.designation, `${rootDir}/${Folder.modeleDocs}/${m.iD_Document}.pdf`)}
+              selected={fileName === m.designation}
+              openFile={() => navigation.navigate('Pdf', { title: m.designation, id: m.iD_Document, isModel: true, })}
+            />))
+          }
+        </ModeleList>
+        <ButtonWrapper>
+          <FileNameInput
+            placeholder="Nom du fichier"
+            onChangeText={(FileNameFinal) => setFileNameFinal(FileNameFinal)}
+            value={FileNameFinal}
+          />
+          <StyledButton disabled={fileName === '' || creatingFile} onPress={onCreateFile}>
+            <StyledText>{creatingFile ? 'Création en cours' : 'Créer le fichier'}</StyledText>
           </StyledButton>
-          <Selector>
-            <Option
-              isSelected={this.state.typeModele === 'PV'}
-              onPress={() => this.setState({ typeModele: 'PV', fileName: '', FileNameFinal: '' })}
-            >
-              <OptionText isSelected={this.state.typeModele === 'PV'}>PV</OptionText>
-            </Option>
-            <Option
-              isSelected={this.state.typeModele === 'DMOS'}
-              onPress={() => this.setState({ typeModele: 'DMOS', fileName: '', FileNameFinal: '' })}
-            >
-              <OptionText isSelected={this.state.typeModele === 'DMOS'}>DMOS</OptionText>
-            </Option>
-            <Option
-              isSelected={this.state.typeModele === 'CR'}
-              onPress={() => this.setState({ typeModele: 'CR', fileName: '', FileNameFinal: '' })}
-            >
-              <OptionText isSelected={this.state.typeModele === 'CR'}>CR</OptionText>
-            </Option>
-          </Selector>
-          <ModeleList>
-            {this.props.modeles.filter(m => m.typeModele === this.state.typeModele).map(m => (
-              <Modele 
-                key={m.id}
-                fileName={m.designation}
-                handleSelect={() => this.handleSelectModele(m.iD_Document, m.designation, `${rootDir}/${Folder.modeleDocs}/${m.iD_Document}.pdf`)}
-                selected={this.state.fileName === m.designation}
-                openFile={() => this.props.navigation.navigate('Pdf', { title: m.designation, id: m.iD_Document, isModel: true, })}
-              />))
-            }
-          </ModeleList>
-          <ButtonWrapper>
-            <FileNameInput
-              placeholder="Nom du fichier"
-              onChangeText={(FileNameFinal) => this.setState({ FileNameFinal })}
-              value={this.state.FileNameFinal}
-            />
-            <StyledButton disabled={this.state.fileName === '' || this.state.creatingFile} onPress={this.onCreateFile}>
-              <StyledText>{this.state.creatingFile ? 'Création en cours' : 'Créer le fichier'}</StyledText>
-            </StyledButton>
-          </ButtonWrapper>
-        </Wrapper>
-      </View>
-    );
+        </ButtonWrapper>
+      </Wrapper>
+    </View>
+  );
+
+})
+
+AddFileScreen.navigationOptions = {
+  headerTitle: <HeaderTitle noLogo title="Ajouter un document" />,
+  headerRight: <Logout />,
+  headerStyle: {
+    height: 70
   }
 }
 
