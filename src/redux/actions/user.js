@@ -316,7 +316,7 @@ export const createFile = (filePath, file) => (dispatch) => {
     data: RNFetchBlob.wrap(filePath)
   }])
   .then(() => {
-    return api.put(`/api/documents/${file.id}`, { ...file }, { headers: { Authorization: `Bearer ${user.bearerToken}` }})
+    return api.post(`/api/documents/${file.id}`, { ...file }, { headers: { Authorization: `Bearer ${user.bearerToken}` }})
       .then(() => {
         dispatch(removeNewDoc(file.id))
         dispatch(addDoc(file))
@@ -352,16 +352,19 @@ export const uploadMultipleFiles = (files) => async (dispatch) => {
         filename: `${files[i].id}.${files[i].extension}`,
         data: RNFetchBlob.wrap(files[i].filePath)
       }])
-      api.put(`/api/documents/${files[i].id}`, { ...files[i] }, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
-        .then(() => {
-          if (files[i].isNew) {
+      if (files[i].isNew) {
+        api.post(`/api/documents/${files[i].id}`, { ...files[i] }, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
+          .then(() => {
             dispatch(removeNewDoc(files[i].id))
             dispatch(addDoc(files[i]))
             dispatch(removeFromEdit(files[i].id))
-          } else {
+          })
+      } else {
+        api.put(`/api/documents/${files[i].id}`, { ...files[i] }, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
+          .then(() => {
             dispatch(removeFromEdit(files[i].id))
-          }
-        })
+          })
+      }
     } catch (e) {
       Sentry.captureException(e, { func: 'uploadMultipleFiles', doc: 'userActions' })
       return dispatch(cancelUploadingFile(files[i].id))

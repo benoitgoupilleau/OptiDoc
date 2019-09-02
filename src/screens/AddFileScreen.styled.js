@@ -3,7 +3,7 @@ import styled from 'styled-components/native';
 import Colors from '../constants/Colors'
 import Layout from '../constants/Layout'
 
-export const Wrapper = styled.View`
+export const Wrapper = styled.ScrollView`
   padding: 20px;
 `;
 
