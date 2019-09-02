@@ -151,7 +151,7 @@ export default (state = defaultState, action) => {
     }
     case EDIT_FILE: {
       const currentFiles = [...state.editedDocs];
-      const indexToUpdate = currentFiles.findIndex(c => c.ID === action.file.ID)
+      const indexToUpdate = currentFiles.findIndex(c => c.id === action.file.id)
       if (indexToUpdate === -1) {
         currentFiles.push(action.file)
         return {
@@ -170,7 +170,7 @@ export default (state = defaultState, action) => {
     }
     case REMOVE_EDIT_PREPARE: {
       const currentFiles = [...state.editedDocs];
-      const indexToUpdate = currentFiles.findIndex(c => c.ID === action.id)
+      const indexToUpdate = currentFiles.findIndex(c => c.id === action.id)
       const fileEdit = currentFiles[indexToUpdate];
       if (fileEdit.editPath) {
         delete fileEdit.prepared;
@@ -215,7 +215,7 @@ export default (state = defaultState, action) => {
     }
     case REMOVE_EDIT_FILE: {
       const currentFiles = [...state.editedDocs];
-      const indexToRemove = currentFiles.findIndex(el => el.ID === action.id);
+      const indexToRemove = currentFiles.findIndex(el => el.id === action.id);
       const newFiles = [...currentFiles.slice(0, indexToRemove), ...currentFiles.slice(indexToRemove + 1)]
       const multiDocs = [...state.multipleUploadDocs]
       const indexMulti = multiDocs.findIndex(el => el.fileId === action.id)

@@ -51,12 +51,12 @@ class PdfScreen extends React.Component {
     }, 500);
   }
 
-  onPressEdit = async (ID, Extension, Dossier1, filePath, isEdited, Dossier3) => {
+  onPressEdit = async (id, Extension, Dossier1, filePath, isEdited, Dossier3) => {
     this.props.navigation.goBack();
     if (isEdited) {
-      await openFile(ID, Extension)
+      await openFile(id, Extension)
     } else {
-      this.props.editFile({ ID, editPath: `${EXTERNAL_PATH}${ID}.${Extension}`, affaire: Dossier1, Extension, Dossier3}, filePath)
+      this.props.editFile({ id, editPath: `${EXTERNAL_PATH}${id}.${Extension}`, affaire: Dossier1, Extension, Dossier3}, filePath)
     }
   }
 
@@ -71,7 +71,7 @@ class PdfScreen extends React.Component {
       const isEdited = this.props.navigation.getParam('isEdited', false)
       const isModel = this.props.navigation.getParam('isModel', false)
       const isPrepared = this.props.navigation.getParam('isPrepared', false)
-      const ID = this.props.navigation.getParam('id', '')
+      const id = this.props.navigation.getParam('id', '')
       const Extension = this.props.navigation.getParam('extension', '')
       const Dossier1 = this.props.navigation.getParam('dossier1', '')
       const Dossier3 = this.props.navigation.getParam('dossier3', '')
@@ -79,14 +79,14 @@ class PdfScreen extends React.Component {
       const Locked = this.props.navigation.getParam('locked', '')
       const Prepared = this.props.navigation.getParam('prepared', '');
       const type = this.props.navigation.getParam('type', Folder.prep)
-      const filePath = isEdited ? `${EXTERNAL_PATH}${ID}.${Extension}` : 
-        isModel ? `${rootDir}/${Folder.modeleDocs}/${ID}.pdf` : `${rootDir}/${this.props.userId}/${Dossier1}/${type}/${ID}.${Extension}`;
+      const filePath = isEdited ? `${EXTERNAL_PATH}${id}.${Extension}` : 
+        isModel ? `${rootDir}/${Folder.modeleDocs}/${id}.pdf` : `${rootDir}/${this.props.userId}/${Dossier1}/${type}/${id}.${Extension}`;
   
       const source = { uri: filePath };
       return (
         <Main>
           <View>
-            {type === Folder.rea && Reviewed === 'N' && Locked === 'N' && (Prepared === 'N' || isPrepared) && (<Edit onPress={() => this.onPressEdit(ID, Extension, Dossier1, filePath, isEdited, Dossier3)}>
+            {type === Folder.rea && Reviewed === 'N' && Locked === 'N' && (Prepared === 'N' || isPrepared) && (<Edit onPress={() => this.onPressEdit(id, Extension, Dossier1, filePath, isEdited, Dossier3)}>
               <EditText>Modifier</EditText>
             </Edit>)}
             <Pdf

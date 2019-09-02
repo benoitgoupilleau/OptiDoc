@@ -20,11 +20,11 @@ export const Title = styled.Text`
 `;
 
 export const StyledInput = styled.TextInput`
-  ${({ editable }) => editable && 'border-bottom-color: gray; border-bottom-width: 1px;'}
   padding: 0;
   color: gray;
   font-size: ${Layout.font.medium};
-  max-width: ${({ width }) => width / 2}px;
+  width: ${({ width }) => (width / 2)}px;
+  ${({ editable }) => editable && 'border-bottom-color: gray; border-bottom-width: 1px;'}
 `;
 
 export const IconsWrapper = styled.View`

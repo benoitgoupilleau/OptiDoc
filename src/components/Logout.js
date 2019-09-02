@@ -84,7 +84,6 @@ Logout.propTypes = {
   uploadingDocs: PropTypes.array.isRequired,
   downloadedBusiness: PropTypes.array.isRequired,
   docs: PropTypes.array.isRequired,
-  connectedHome: PropTypes.bool.isRequired
 }
 
 Logout.defaultProps = {
@@ -99,7 +98,6 @@ const mapStateToProps = state => ({
   downloadedBusiness: state.user.downloadedBusiness,
   loadingBusiness: state.user.loadingBusiness,
   uploadingDocs: state.user.uploadingDocs,
-  connectedHome: state.network.connectedHome
 })
 
 export default withNavigation(connect(mapStateToProps, {

@@ -25,11 +25,11 @@ export default (state = defaultState, action) => {
         const newDocs = [];
         const currentDocs = [...state.docs];
         for (let i = 0; i< action.docs.length; i++) {
-          const indexOfEdited = action.editedDocs.findIndex(el => el.ID === action.docs[i].ID)
+          const indexOfEdited = action.editedDocs.findIndex(el => el.id === action.docs[i].id)
           if (indexOfEdited === -1) {
             newDocs.push(action.docs[i])
           } else {
-            const indexToKeep = currentDocs.findIndex(el => el.ID === action.docs[i].ID);
+            const indexToKeep = currentDocs.findIndex(el => el.id === action.docs[i].id);
             newDocs.push(currentDocs[indexToKeep])
           }
         }
@@ -72,14 +72,14 @@ export default (state = defaultState, action) => {
     }
     case REMOVED_NEW_DOC: {
       const currentNewDoc = [...state.newDocs];
-      const indexToRemove = currentNewDoc.findIndex(el => el.ID === action.id)
+      const indexToRemove = currentNewDoc.findIndex(el => el.id === action.id)
       return {
         ...state,
         newDocs: [...currentNewDoc.slice(0, indexToRemove), ...currentNewDoc.slice(indexToRemove + 1)]
       }
     }
     case UPDATE_DOC: {
-      const indexToUpdate = state.newDocs.findIndex(d => d.ID === action.id)
+      const indexToUpdate = state.newDocs.findIndex(d => d.id === action.id)
       const docToUpdate = { ...state.newDocs[indexToUpdate], FileName: action.FileName };
       return {
         ...state,
@@ -87,18 +87,19 @@ export default (state = defaultState, action) => {
       }
     }
     case UPDATE_PREPARE: {
+      const { fileId, prepared, preparedOn, preparedBy, revisable } = action;
       const currentDoc = [...state.docs];
       const currentNewDoc = [...state.newDocs];
-      const indexDocToUpdate = currentDoc.findIndex(el => el.ID === action.fileId);
-      const indexNewDocToUpdate = currentNewDoc.findIndex(el => el.ID === action.fileId);
+      const indexDocToUpdate = currentDoc.findIndex(el => el.id === fileId);
+      const indexNewDocToUpdate = currentNewDoc.findIndex(el => el.id === fileId);
       if (indexNewDocToUpdate > -1) {
-        const newDoc = { ...currentNewDoc[indexNewDocToUpdate], Prepared: action.Prepared, PreparedOn: action.PreparedOn, PreparedBy: action.PreparedBy, Revisable: action.Revisable }
+        const newDoc = { ...currentNewDoc[indexNewDocToUpdate], prepared, preparedOn, preparedBy, revisable }
         return {
           ...state,
           newDocs: [...currentNewDoc.slice(0, indexNewDocToUpdate), newDoc, ...currentNewDoc.slice(indexNewDocToUpdate+1)]
         }
       } else {
-        const newDoc = { ...currentDoc[indexDocToUpdate], Prepared: action.Prepared, PreparedOn: action.PreparedOn, PreparedBy: action.PreparedBy, Revisable: action.Revisable }
+        const newDoc = { ...currentDoc[indexDocToUpdate], prepared, preparedOn, preparedBy, revisable }
         return {
           ...state,
           docs: [...currentDoc.slice(0, indexDocToUpdate), newDoc, ...currentDoc.slice(indexDocToUpdate+1)]

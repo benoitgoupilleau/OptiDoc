@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -57,38 +56,37 @@ class Document extends React.Component {
   }
 
   confirmedOnUpload = async () => {
-    const { id, extension, isNew, userId, dossier1, dossier3, type, connectedHome } = this.props;
-    const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${id}(0).${extension}`);
-    if (secondVersion) {
-      await RNFS.copyFile(`${EXTERNAL_PATH}${id}(0).${extension}`, `${EXTERNAL_PATH}${id}.${extension}`);
-      await RNFS.unlink(`${EXTERNAL_PATH}${id}(0).${extension}`)
-    }
+    const { id, extension, isNew, userId, dossier1, type } = this.props;
     const filePath = `${EXTERNAL_PATH}${id}.${extension}`;
     const destPath = `${rootDir}/${userId}/${dossier1}/${type}/${id}.${extension}`;
     const file = pick(this.props, Tables.docField);
-    await RNFS.copyFile(filePath, destPath);
-    const remoteDir = `./${dossier1}/Realisation${dossier3 !== '' ? `/${dossier3}` : ''}`
     const userName = this.props.name;
     const now = new Date();
     const date = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
     const fileToUpLoad = {
       ...file,
-      UpLoadedOn: date,
-      UpdatedOn: date,
-      UpdatedBy: userName,
-      UpLoadedBy: userName
+      upLoadedOn: date,
+      updatedOn: date,
+      updatedBy: userName,
+      upLoadedBy: userName
     }
+    const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${id}(0).${extension}`);
+    if (secondVersion) {
+      await RNFS.copyFile(`${EXTERNAL_PATH}${id}(0).${extension}`, `${EXTERNAL_PATH}${id}.${extension}`);
+      await RNFS.unlink(`${EXTERNAL_PATH}${id}(0).${extension}`)
+    }
+    await RNFS.copyFile(filePath, destPath);
     this.props.uploadingFile(id);
     if (isNew) {
-      return this.props.createFile(connectedHome, filePath, fileToUpLoad, remoteDir)
+      return this.props.createFile(filePath, fileToUpLoad)
     } else {
-      return this.props.uploadFile(connectedHome, filePath, fileToUpLoad, remoteDir);
+      return this.props.uploadFile(filePath, fileToUpLoad);
     }
   }
 
   onUpload = () => {
-    const { isConnected, mssqlConnected, prepared } = this.props;
-    if (isConnected && mssqlConnected) {
+    const { isConnected, prepared } = this.props;
+    if (isConnected) {
       if (prepared === 'O') {
         Alert.alert("Confirmer l'envoi", "Etes-vous sûr de vouloir envoyer ce fichier ?", [{
           text: 'Annuler',
@@ -352,14 +350,12 @@ Document.propTypes = {
   prepared: PropTypes.string.isRequired,
   locked: PropTypes.string.isRequired,
   isConnected: PropTypes.bool.isRequired,
-  mssqlConnected: PropTypes.bool.isRequired,
   modeleDownloaded: PropTypes.string.isRequired,
   updatePrepared: PropTypes.func.isRequired,
   removeNewDoc: PropTypes.func.isRequired,
   editPrepare: PropTypes.func.isRequired,
   removePrepare: PropTypes.func.isRequired,
   createFile: PropTypes.func.isRequired,
-  connectedHome: PropTypes.bool.isRequired,
   updateDocName: PropTypes.func.isRequired,
 };
 
@@ -370,8 +366,6 @@ Document.defaultProps = {
 
 const mapStateToProps = state => ({
   isConnected: state.network.isConnected,
-  mssqlConnected: state.network.mssqlConnected,
-  mssqlConnectionFailed: state.network.mssqlConnectionFailed,
   loadingBusiness: state.user.loadingBusiness,
   editedDocs: state.user.editedDocs,
   uploadingDocs: state.user.uploadingDocs,
@@ -381,7 +375,6 @@ const mapStateToProps = state => ({
   name: state.user.name,
   modeleDocs: state.business.modeles,
   modeleDownloaded: state.user.modeleDownloaded,
-  connectedHome: state.network.connectedHome,
 })
 
 export default withNavigation(connect(mapStateToProps, { downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, updatePrepared, editPrepare, removePrepare, removeNewDoc, createFile, updateDocName })(Document));

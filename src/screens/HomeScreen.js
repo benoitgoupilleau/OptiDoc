@@ -25,7 +25,7 @@ const StyledScroll = styled.ScrollView`
   width: ${width};
 `;
 
-const HomeScreen = React.memo(({ token, refreshing, loaded, newsList, getNews, refreshNews, getBusiness, mssqlConnected, getDocs, docs, downloadedBusiness, editedDocs, getModeles, getArbo, modeleDownloaded, modeleDocs }) => {
+const HomeScreen = React.memo(({ token, refreshing, loaded, newsList, getNews, refreshNews, getBusiness, getDocs, docs, downloadedBusiness, editedDocs, getModeles, getArbo, modeleDownloaded, modeleDocs }) => {
   const [updatingNews, setUpdatingNews] = useState(refreshing);
   
   useEffect(() => {
@@ -50,11 +50,9 @@ const HomeScreen = React.memo(({ token, refreshing, loaded, newsList, getNews, r
   }, [refreshing])
 
   const onRefresh = () => {
-    if (mssqlConnected) {
-      setUpdatingNews(true)
-      refreshNews();
-      getNews()
-    }
+    setUpdatingNews(true)
+    refreshNews();
+    getNews()
   }
 
   if (!loaded) {
@@ -105,7 +103,6 @@ HomeScreen.propTypes = {
   refreshing: PropTypes.bool.isRequired,
   refreshNews: PropTypes.func.isRequired,
   loaded: PropTypes.bool.isRequired,
-  mssqlConnected: PropTypes.bool.isRequired,
   getBusiness: PropTypes.func.isRequired,
   getModeles: PropTypes.func.isRequired,
   getArbo: PropTypes.func.isRequired,
@@ -124,7 +121,6 @@ const mapStateToProps = (state) => ({
   newsList: filterNews([...state.news.newsList]),
   loaded: state.news.loaded,
   refreshing: state.news.refreshing,
-  mssqlConnected: state.network.mssqlConnected,
   userId: state.user.id,
   editedDocs: state.user.editedDocs,
   downloadedBusiness: state.user.downloadedBusiness,

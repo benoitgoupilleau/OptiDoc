@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React from 'react';
 import RNFS from 'react-native-fs';
 import { connect } from 'react-redux';
@@ -46,7 +45,7 @@ class AddFileScreen extends React.Component {
 
   componentDidMount() {
     Orientation.lockToPortrait();
-    if (this.props.modeleDownloaded !== 'in progress' && this.props.mssqlConnected) {
+    if (this.props.modeleDownloaded !== 'in progress') {
       this.props.downloadModels(this.props.modeles);
     }
   }
@@ -68,41 +67,41 @@ class AddFileScreen extends React.Component {
       const affaire = this.props.userBusiness.find((b) => b.id === businessId)
       const clientName = affaire ? `${affaire.client} - ${affaire.designation}` : businessId;
       const { day, month, year, hours, minutes, secondes } = getDateFormat(now);
-      const CreatedOn = `${year}-${month}-${day}`;
+      const createdOn = `${year}-${month}-${day}`;
       const date = `${year}${month}${day}${hours}${minutes}${secondes}`;
       const fileID= 'DOC_' + date;
-      const modeleSelected = this.props.modeles.filter(m => m.ID_Document === this.state.ModeleID)[0]
-      const Dossier3 = modeleSelected.DossierDestination;
+      const modeleSelected = this.props.modeles.filter(m => m.iD_Document === this.state.ModeleID)[0]
+      const dossier3 = modeleSelected.dossierDestination;
       const destPath= `${rootDir}/${this.props.user.id}/${businessId}/${Folder.rea}/${fileID}.pdf`;
       RNFS.mkdir(`${rootDir}/${this.props.user.id}/${businessId}/${Folder.rea}`)
         .then(() => RNFS.copyFile(this.state.filePath, destPath)
           .then(() => {
             const newDoc = {
-              LocalPath: '',
-              Prepared: 'N',
-              PreparedOn: '1900-01-01',
-              PageNumber: 1,
-              ReviewedOn: '1900-01-01',
-              PreparedBy: '',
-              Revisable: 'N',
-              Size: 0,
-              CreatedBy: this.props.user.name,
-              Dossier2: 'Realisation',
-              UpLoadedOn: '1900-01-01',
+              localPath: '',
+              prepared: 'N',
+              preparedOn: '1900-01-01',
+              pageNumber: 1,
+              reviewedOn: '1900-01-01',
+              preparedBy: '',
+              revisable: 'N',
+              size: 0,
+              createdBy: this.props.user.name,
+              dossier2: 'Realisation',
+              upLoadedOn: '1900-01-01',
               fileName: this.state.FileNameFinal,
-              CreatedOn,
-              Dossier1: businessId,
-              ID: fileID,
-              UpdatedOn: CreatedOn,
-              UpdatedBy: this.props.user.name,
-              Commentaire: '',
-              Dossier3,
-              ServerPath: `${businessId}/Realisation/${Dossier3}/${fileID}.pdf`,
-              ReviewedBy: '',
-              Extension: 'pdf',
-              Reviewed: 'N',
-              Locked: 'N',
-              UpLoadedBy: ''
+              createdOn,
+              dossier1: businessId,
+              id: fileID,
+              updatedOn: createdOn,
+              updatedBy: this.props.user.name,
+              commentaire: '',
+              dossier3,
+              serverPath: `${businessId}/Realisation/${dossier3}/${fileID}.pdf`,
+              reviewedBy: '',
+              extension: 'pdf',
+              reviewed: 'N',
+              locked: 'N',
+              upLoadedBy: ''
             }
             const page1 = PDFPage
               .modify(0)
@@ -116,7 +115,7 @@ class AddFileScreen extends React.Component {
                 y: modeleSelected.Zone2Y ? parseInt(modeleSelected.Zone2Y, 10) : 830,
                 fontSize: 10
               })
-              .drawText('Date : ' + CreatedOn, {
+              .drawText('Date : ' + createdOn, {
                 x: modeleSelected.Zone3X ? parseInt(modeleSelected.Zone3X, 10) : 500,
                 y: modeleSelected.Zone3Y ? parseInt(modeleSelected.Zone3Y, 10) : 830,
                 fontSize: 10
@@ -128,25 +127,22 @@ class AddFileScreen extends React.Component {
               .modifyPages(page1)
               .write()
               .then(() => {
-                this.props.editFile({ ID: fileID, editPath: `${EXTERNAL_PATH}${fileID}.pdf`, isNew: true, affaire: businessId, Extension: 'pdf', Dossier3 }, destPath)
-                return this.props.addNewDoc(newDoc)
+                this.props.addNewDoc(newDoc)
+                return this.props.editFile({ id: fileID, editPath: `${EXTERNAL_PATH}${fileID}.pdf`, isNew: true, affaire: businessId, extension: 'pdf', dossier3 }, destPath)
               })
               .catch(e => {
                 Sentry.captureException(e, { func: 'modifyPages', doc: 'AddFileScreen.js' })
-                console.error({ e, func: 'modifyPages', doc: 'AddFileScreen.js' })
                 this.setState({creatingFile: false})
                 return;
               })
           })
           .catch(e => {
             Sentry.captureException(e, { func: 'copyFile', doc: 'AddFileScreen.js' })
-            console.error({ e, func: 'copyFile', doc: 'AddFileScreen.js' })
             this.setState({creatingFile: false})
             return;
           }))
         .catch((e) => {
           Sentry.captureException(e, { func: 'onCreateFile', doc: 'AddFileScreen.js' })
-          console.error({ e, func: 'onCreateFile', doc: 'AddFileScreen.js' })
           this.setState({creatingFile: false})
           return;
         })
@@ -154,7 +150,7 @@ class AddFileScreen extends React.Component {
   }
 
   forceDownload = () => {
-    if (this.props.modeleDownloaded !== 'in progress' && this.props.mssqlConnected) {
+    if (this.props.modeleDownloaded !== 'in progress') {
       this.props.forceDownloadModels(this.props.modeles);
     }
   }
@@ -229,12 +225,10 @@ AddFileScreen.propTypes = {
   downloadModels: PropTypes.func.isRequired,
   modeles: PropTypes.array.isRequired,
   modeleDownloaded: PropTypes.string.isRequired,
-  mssqlConnected: PropTypes.bool.isRequired
 }
 
 const mapStateToProps = state => ({
   modeles: state.business.modeles,
-  mssqlConnected: state.network.mssqlConnected,
   user: state.user,
   userBusiness: state.business.business,
   modeleDownloaded: state.user.modeleDownloaded

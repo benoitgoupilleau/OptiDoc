@@ -1,11 +1,7 @@
 import RNFS from 'react-native-fs';
-import omit from 'lodash.omit';
 import RNFetchBlob from 'rn-fetch-blob'
-import FTP from '../../services/ftp';
-import { FTP_USERNAME, FTP_PASSWORD, API_URL } from 'react-native-dotenv';
+import { API_URL } from 'react-native-dotenv';
 import FileViewer from 'react-native-file-viewer';
-import MSSQL_Out from '../../services/mssqlOut';
-import MSSQL_Home from '../../services/mssqlHome';
 import Sentry from '../../services/sentry'
 import api from '../../services/api';
 
@@ -35,12 +31,8 @@ import {
 import { removeNewDoc, addDoc } from './business'
 
 import Folder from '../../constants/Folder'
-import Tables from '../../constants/Tables';
 
 import rootDir from '../../services/rootDir';
-
-let isDownloadingFiles = false;
-let isDownloadingModeles = false;
 
 export const loginApi = (userName, MdP, successCallback, errorCallback) => dispatch => api.post('/api/login', { login: userName, MdP })
   .then((res) => {
@@ -69,9 +61,6 @@ export const sessionExpired = () => ({
 });
 
 export const downLoadOneFile = (id, extension, businessId) => async (dispatch) => {
-  if (isDownloadingFiles) {
-    return dispatch(cancelDownloadOneFile(id))
-  }
   const { user } = store.getState();
   const destinationFolder = `${rootDir}/${user.id}/${businessId}`;
   dispatch(downloadingFile(id))
@@ -87,7 +76,6 @@ export const downLoadOneFile = (id, extension, businessId) => async (dispatch) =
     })
     .catch((e) => {
       Sentry.captureException(e, { func: 'downLoadOneFile', doc: 'userActions' })
-      isDownloadingFiles = false;
       dispatch(cancelDownloadOneFile(id))
       return;
     })
@@ -109,10 +97,6 @@ const fileDownloaded = (id) => ({
 })
 
 export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
-  if (isDownloadingModeles) {
-    return dispatch(cancelDownload(businessId))
-  }
-  isDownloadingFiles = true;
   dispatch(downloading(businessId, 0, 0));
   const { user } = store.getState();
   const total = prep.length + rea.length;
@@ -164,12 +148,10 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
           }
         }
       }
-      isDownloadingFiles = false;
       return dispatch(businessDownloaded(businessId))
     })
     .catch(async (e) => {
       Sentry.captureException(e, { func: 'downloadBusiness', doc: 'userActions' })
-      isDownloadingFiles = false;
       return dispatch(cancelDownload(businessId))
     })
 }
@@ -210,10 +192,6 @@ export const editFile = (file, filePath) => {
 }
 
 export const forceDownloadModels = (modeleDocs) => dispatch => {
-  if (isDownloadingFiles) {
-    return dispatch(cancelDownloadModel())
-  }
-  isDownloadingModeles = true;
   const { user } = store.getState();
   const destinationFolder = `${rootDir}/${Folder.modeleDocs}`;
   const total = modeleDocs.length;
@@ -229,22 +207,16 @@ export const forceDownloadModels = (modeleDocs) => dispatch => {
             Authorization: `Bearer ${user.bearerToken}`
           })
       }
-      isDownloadingModeles = false;
       return dispatch(modeleDownloaded())
     })
     .catch((e) => {
       dispatch(cancelDownloadModel())
-      isDownloadingModeles = false;
       Sentry.captureException(e, { func: 'forceDownloadModels', doc: 'userActions' })
       return
     })
 }
 
 export const downloadModels = (modeleDocs) => dispatch => {
-  if (isDownloadingFiles) {
-    return dispatch(cancelDownloadModel())
-  }
-  isDownloadingModeles = true;
   const { user } = store.getState();
   const total = modeleDocs.length;
   const destinationFolder = `${rootDir}/${Folder.modeleDocs}`;
@@ -263,12 +235,10 @@ export const downloadModels = (modeleDocs) => dispatch => {
             })
         }
       }
-      isDownloadingModeles = false;
       return dispatch(modeleDownloaded())
     })
       .catch((e) => {
         dispatch(cancelDownloadModel())
-        isDownloadingModeles = false;
         Sentry.captureException(e, { func: 'downloadModels', doc: 'userActions' })
         return;
       })
@@ -298,56 +268,66 @@ export const cancelUploadingFile = (fileId) => ({
   fileId
 })
 
-export const uploadFile = (connectedHome = false, filePath, file, remoteDir) => async (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
-  .then(() => FTP.uploadFile(filePath, remoteDir)
-    .then(() => {
-      //MSSQL update
-      if (connectedHome) {
-        return MSSQL_Home.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}', PreparedBy='${file.PreparedBy}', Revisable='${file.Revisable}' WHERE ID='${file.ID}'`)
-          .then(() => dispatch(removeFromEdit(file.ID)))
-      }
-      return MSSQL_Out.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${file.UpLoadedOn}', UpdatedOn='${file.UpdatedOn}', UpdatedBy='${file.UpdatedBy}', UpLoadedBy='${file.UpLoadedBy}', Prepared='${file.Prepared}', PreparedOn='${file.PreparedOn}', PreparedBy='${file.PreparedBy}', Revisable='${file.Revisable}' WHERE ID='${file.ID}'`)
-        .then(() => dispatch(removeFromEdit(file.ID)))
-    }))
+export const uploadFile = (filePath, file) => async (dispatch) => {
+  const { user } = store.getState();
+  return RNFetchBlob.fetch('PUT', `${API_URL}/api/pdffile/upload/${file.id}`, {
+    Authorization: `Bearer ${user.bearerToken}`,
+    'Content-Type': 'multipart/form-data',
+    'ID_Affaire': file.dossier1,
+    'Doss1': file.dossier1,
+    'Doss2': file.dossier2,
+    'ID_Document': file.id,
+    'Extension': file.extension
+  }, [{
+    name: file.fileName,
+    filename: `${file.id}.${file.extension}`,
+    data: RNFetchBlob.wrap(filePath)
+  }])
+  .then(() => {
+    return api.put(`/api/documents/${file.id}`, { ...file }, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
+      .then(() => {
+        dispatch(removeFromEdit(file.id))
+      })
+  })
   .catch((e) => {
     Sentry.captureException(e, { func: 'uploadFile', doc: 'userActions' })
-    console.error({ e, func: 'uploadFile', doc: 'userActions' })
-    return dispatch(cancelUploadingFile(file.ID))
+    return dispatch(cancelUploadingFile(file.id))
   })
+}
 
 export const removeFromEdit = (id) => ({
   type: REMOVE_EDIT_FILE,
   id
 })
 
-export const createFile = (connectedHome = false, filePath, file, remoteDir) => (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
-  .then(() => FTP.uploadFile(filePath, remoteDir)
-    .then(() => {
-      //MSSQL update
-      if (connectedHome) {
-        return MSSQL_Home.executeUpdate(`INSERT INTO ${Tables.t_docs} 
-        (LocalPath, Prepared, PreparedOn, PageNumber, ReviewedOn, PreparedBy, Revisable, Size, CreatedBy, Dossier2, UpLoadedOn, FileName, CreatedOn, Dossier1, ID, UpdatedOn, UpdatedBy, Commentaire, Dossier3, ServerPath, ReviewedBy, Extension, Reviewed, Locked, UpLoadedBy) 
-        VALUES ('${file.LocalPath}', '${file.Prepared}', '${file.PreparedOn}', '${file.PageNumber}', '${file.ReviewedOn}', '${file.PreparedBy}', '${file.Revisable}', '${file.Size}', '${file.CreatedBy}', '${file.Dossier2}', '${file.UpLoadedOn}', '${file.FileName}', '${file.CreatedOn}', '${file.Dossier1}', '${file.ID}', '${file.UpdatedOn}', '${file.UpdatedBy}', '${file.Commentaire}', '${file.Dossier3}', '${file.ServerPath}', '${file.ReviewedBy}', '${file.Extension}', '${file.Reviewed}', '${file.Locked}', '${file.UpLoadedBy}');`)
-          .then(() => {
-            dispatch(removeNewDoc(file.ID))
-            dispatch(addDoc(file))
-            dispatch(removeFromEdit(file.ID))
-          })
-      }
-      return MSSQL_Out.executeUpdate(`INSERT INTO ${Tables.t_docs} 
-        (LocalPath, Prepared, PreparedOn, PageNumber, ReviewedOn, PreparedBy, Revisable, Size, CreatedBy, Dossier2, UpLoadedOn, FileName, CreatedOn, Dossier1, ID, UpdatedOn, UpdatedBy, Commentaire, Dossier3, ServerPath, ReviewedBy, Extension, Reviewed, Locked, UpLoadedBy) 
-        VALUES ('${file.LocalPath}', '${file.Prepared}', '${file.PreparedOn}', '${file.PageNumber}', '${file.ReviewedOn}', '${file.PreparedBy}', '${file.Revisable}', '${file.Size}', '${file.CreatedBy}', '${file.Dossier2}', '${file.UpLoadedOn}', '${file.FileName}', '${file.CreatedOn}', '${file.Dossier1}', '${file.ID}', '${file.UpdatedOn}', '${file.UpdatedBy}', '${file.Commentaire}', '${file.Dossier3}', '${file.ServerPath}', '${file.ReviewedBy}', '${file.Extension}', '${file.Reviewed}', '${file.Locked}', '${file.UpLoadedBy}');`)
-        .then(() => {
-          dispatch(removeNewDoc(file.ID))
-          dispatch(addDoc(file))
-          dispatch(removeFromEdit(file.ID))
-        })
-    }))
+export const createFile = (filePath, file) => (dispatch) => {
+  const { user } = store.getState();
+  return RNFetchBlob.fetch('PUT', `${API_URL}/api/pdffile/upload/${file.id}`, {
+    Authorization: `Bearer ${user.bearerToken}`,
+    'Content-Type': 'multipart/form-data',
+    'ID_Affaire': file.dossier1,
+    'Doss1': file.dossier1,
+    'Doss2': file.dossier2,
+    'ID_Document': file.id,
+    'Extension': file.extension
+  }, [{
+    name: file.fileName,
+    filename: `${file.id}.${file.extension}`,
+    data: RNFetchBlob.wrap(filePath)
+  }])
+  .then(() => {
+    return api.put(`/api/documents/${file.id}`, { ...file }, { headers: { Authorization: `Bearer ${user.bearerToken}` }})
+      .then(() => {
+        dispatch(removeNewDoc(file.id))
+        dispatch(addDoc(file))
+        dispatch(removeFromEdit(file.id))
+      })
+  })
   .catch((e) => {
     Sentry.captureException(e, { func: 'createFile', doc: 'userActions' })
-    console.error({ e, func: 'createFile', doc: 'userActions' })
-    return dispatch(cancelUploadingFile(file.ID))
+    return dispatch(cancelUploadingFile(file.id))
   })
+}
 
 export const uploadingMulti = (uploads) => ({
   type: MULTI_UPLOAD,
@@ -355,54 +335,37 @@ export const uploadingMulti = (uploads) => ({
 })
 
 
-export const uploadMultipleFiles = (connectedHome = false, files) => (dispatch) => FTP.login(FTP_USERNAME, FTP_PASSWORD)
-  .then(async () => {
-    for (let i = 0; i < files.length; i++) {
-      try {
-        await FTP.uploadFile(files[i].filePath, files[i].remoteDir);
-        if (files[i].isNew) {
-          if (connectedHome) {
-            MSSQL_Home.executeUpdate(`INSERT INTO ${Tables.t_docs} 
-            (LocalPath, Prepared, PreparedOn, PageNumber, ReviewedOn, PreparedBy, Revisable, Size, CreatedBy, Dossier2, UpLoadedOn, FileName, CreatedOn, Dossier1, ID, UpdatedOn, UpdatedBy, Commentaire, Dossier3, ServerPath, ReviewedBy, Extension, Reviewed, Locked, UpLoadedBy) 
-            VALUES ('${files[i].LocalPath}', '${files[i].Prepared}', '${files[i].PreparedOn}', '${files[i].PageNumber}', '${files[i].ReviewedOn}', '${files[i].PreparedBy}', '${files[i].Revisable}', '${files[i].Size}', '${files[i].CreatedBy}', '${files[i].Dossier2}', '${files[i].UpLoadedOn}', '${files[i].FileName}', '${files[i].CreatedOn}', '${files[i].Dossier1}', '${files[i].ID}', '${files[i].UpdatedOn}', '${files[i].UpdatedBy}', '${files[i].Commentaire}', '${files[i].Dossier3}', '${files[i].ServerPath}', '${files[i].ReviewedBy}', '${files[i].Extension}', '${files[i].Reviewed}', '${files[i].Locked}', '${files[i].UpLoadedBy}');`)
-              .then(() => {
-                dispatch(removeNewDoc(files[i].ID))
-                dispatch(addDoc(omit(files[i], ['remoteDir', 'isNew', 'filePath'])))
-                dispatch(removeFromEdit(files[i].ID))
-              })
+export const uploadMultipleFiles = (files) => async (dispatch) => {
+  const { user } = store.getState();
+  for (let i = 0; i < files.length; i++) {
+    try {
+      await RNFetchBlob.fetch('PUT', `${API_URL}/api/pdffile/upload/${files[i].id}`, {
+        Authorization: `Bearer ${user.bearerToken}`,
+        'Content-Type': 'multipart/form-data',
+        'ID_Affaire': files[i].dossier1,
+        'Doss1': files[i].dossier1,
+        'Doss2': files[i].dossier2,
+        'ID_Document': files[i].id,
+        'Extension': files[i].extension
+      }, [{
+        name: files[i].fileName,
+        filename: `${files[i].id}.${files[i].extension}`,
+        data: RNFetchBlob.wrap(files[i].filePath)
+      }])
+      api.put(`/api/documents/${files[i].id}`, { ...files[i] }, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
+        .then(() => {
+          if (files[i].isNew) {
+            dispatch(removeNewDoc(files[i].id))
+            dispatch(addDoc(files[i]))
+            dispatch(removeFromEdit(files[i].id))
           } else {
-            MSSQL_Out.executeUpdate(`INSERT INTO ${Tables.t_docs} 
-            (LocalPath, Prepared, PreparedOn, PageNumber, ReviewedOn, PreparedBy, Revisable, Size, CreatedBy, Dossier2, UpLoadedOn, FileName, CreatedOn, Dossier1, ID, UpdatedOn, UpdatedBy, Commentaire, Dossier3, ServerPath, ReviewedBy, Extension, Reviewed, Locked, UpLoadedBy) 
-            VALUES ('${files[i].LocalPath}', '${files[i].Prepared}', '${files[i].PreparedOn}', '${files[i].PageNumber}', '${files[i].ReviewedOn}', '${files[i].PreparedBy}', '${files[i].Revisable}', '${files[i].Size}', '${files[i].CreatedBy}', '${files[i].Dossier2}', '${files[i].UpLoadedOn}', '${files[i].FileName}', '${files[i].CreatedOn}', '${files[i].Dossier1}', '${files[i].ID}', '${files[i].UpdatedOn}', '${files[i].UpdatedBy}', '${files[i].Commentaire}', '${files[i].Dossier3}', '${files[i].ServerPath}', '${files[i].ReviewedBy}', '${files[i].Extension}', '${files[i].Reviewed}', '${files[i].Locked}', '${files[i].UpLoadedBy}');`)
-              .then(() => {
-                dispatch(removeNewDoc(files[i].ID))
-                dispatch(addDoc(omit(files[i], ['remoteDir', 'isNew', 'filePath'])))
-                dispatch(removeFromEdit(files[i].ID))
-              })
+            dispatch(removeFromEdit(files[i].id))
           }
-          
-        } else {
-          if (connectedHome) {
-            MSSQL_Home.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${files[i].UpLoadedOn}', UpdatedOn='${files[i].UpdatedOn}', UpdatedBy='${files[i].UpdatedBy}', UpLoadedBy='${files[i].UpLoadedBy}', Prepared='${files[i].Prepared}', PreparedOn='${files[i].PreparedOn}', PreparedBy='${files[i].PreparedBy}', Revisable='${files[i].Revisable}' WHERE ID='${files[i].ID}'`)
-              .then(() => dispatch(removeFromEdit(files[i].ID)))
-          } else {
-            MSSQL_Out.executeUpdate(`UPDATE ${Tables.t_docs} SET UpLoadedOn='${files[i].UpLoadedOn}', UpdatedOn='${files[i].UpdatedOn}', UpdatedBy='${files[i].UpdatedBy}', UpLoadedBy='${files[i].UpLoadedBy}', Prepared='${files[i].Prepared}', PreparedOn='${files[i].PreparedOn}', PreparedBy='${files[i].PreparedBy}', Revisable='${files[i].Revisable}' WHERE ID='${files[i].ID}'`)
-              .then(() => dispatch(removeFromEdit(files[i].ID)))
-          }
-        }
-      } catch (e) {
-        Sentry.captureException(e, { func: 'uploadMultipleFiles', doc: 'userActions' })
-        console.error({ e, func: 'uploadMultipleFiles', doc: 'userActions' })
-        return dispatch(cancelUploadingFile(files[i].ID))
-      }
+        })
+    } catch (e) {
+      Sentry.captureException(e, { func: 'uploadMultipleFiles', doc: 'userActions' })
+      return dispatch(cancelUploadingFile(files[i].id))
     }
-  })
-  .catch((e) => {
-    Sentry.captureException(e, { func: 'uploadMultipleFiles', doc: 'userActions' })
-    console.error({ e, func: 'uploadMultipleFiles', doc: 'userActions' })
-    for (let i = 0; i < files.length; i++) {
-      dispatch(cancelUploadingFile(files[i].ID))
-    }
-    return;
-  })
+  }
+}
 

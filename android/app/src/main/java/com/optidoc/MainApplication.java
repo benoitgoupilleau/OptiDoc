@@ -13,13 +13,11 @@ import com.vinzscam.reactnativefileviewer.RNFileViewerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import org.wonday.pdf.RCTPdfView;
-import com.reactlibrary.RNFtpPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import com.stonem.mssql.MSSQLPackage;
 import com.rnfs.RNFSPackage;
 import com.github.yamill.orientation.OrientationPackage;
 
@@ -48,9 +46,7 @@ public class MainApplication extends Application implements ReactApplication {
         new RNFSPackage(),
         new VectorIconsPackage(),
         new RCTPdfView(),
-        new RNFtpPackage(),
         new RNGestureHandlerPackage(),
-        new MSSQLPackage(),
         new RNImageToPdfPackage(),
         new OrientationPackage(),
         new NetInfoPackage()

@@ -93,13 +93,13 @@ const setModeles = (modeles) => ({
   modeles
 })
 
-export const updatePrepared = (fileId, Prepared, PreparedOn, PreparedBy, Revisable) => ({
+export const updatePrepared = (fileId, prepared, preparedOn, preparedBy, revisable) => ({
   type: UPDATE_PREPARE,
   fileId,
-  Prepared,
-  PreparedOn,
-  PreparedBy,
-  Revisable
+  prepared,
+  preparedOn,
+  preparedBy,
+  revisable
 })
 
 export const getBusiness = () => dispatch => {

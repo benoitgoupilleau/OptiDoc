@@ -13,7 +13,7 @@ import Business from '../components/business/Business'
 
 import Layout from '../constants/Layout'
 
-import { listDocs, listNewDocs } from '../redux/selector/business'
+import { listDocs } from '../redux/selector/business'
 import { downloadModels } from '../redux/actions/user'
 
 const { width } = Dimensions.get('window');
@@ -24,7 +24,7 @@ const StyledScroll = styled.ScrollView`
   width: ${width};
 `;
 
-const BusinessScreen = React.memo(({ userBusiness, docs, newDocs, modeleDownloaded, downloadModels, modeleDocs }) => {
+const BusinessScreen = React.memo(({ userBusiness, docs, modeleDownloaded, downloadModels, modeleDocs }) => {
   useEffect(() => {
     Orientation.lockToPortrait();
     if (modeleDownloaded !== 'in progress') {
@@ -36,7 +36,7 @@ const BusinessScreen = React.memo(({ userBusiness, docs, newDocs, modeleDownload
       <Main>
         <View>
           <StyledScroll>
-            {userBusiness.map(b => <Business key={b.id} {...b} prep={docs[b.id].prep} rea={docs[b.id].rea} newDocs={newDocs[b.id]} />)}
+            {userBusiness.map(b => <Business key={b.id} {...b} prep={docs[b.id].prep} rea={docs[b.id].rea} />)}
           </StyledScroll>
         </View>
       </Main>
@@ -60,7 +60,6 @@ BusinessScreen.navigationOptions = {
 BusinessScreen.propTypes = {
   userBusiness: PropTypes.array.isRequired,
   docs: PropTypes.object.isRequired,
-  newDocs: PropTypes.object.isRequired,
   modeleDownloaded: PropTypes.string.isRequired,
   modeleDocs: PropTypes.array.isRequired,
   downloadModels: PropTypes.func.isRequired
@@ -70,11 +69,9 @@ BusinessScreen.propTypes = {
 const mapStateToProps = ({ user, business }) => {
   const userBusiness = business.business
   const docs = listDocs(business.docs, business.newDocs, userBusiness)
-  const newDocs = listNewDocs(business.newDocs, userBusiness)
   return ({
     userBusiness,
     docs,
-    newDocs,
     modeleDownloaded: user.modeleDownloaded,
     modeleDocs: business.modeles,
   })
