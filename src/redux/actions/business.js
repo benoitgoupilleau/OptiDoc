@@ -72,9 +72,9 @@ export const addDoc = (doc) => ({
   doc
 })
 
-export const updateDocName = (FileName, id) => ({
+export const updateDocName = (fileName, id) => ({
   type: UPDATE_DOC,
-  FileName,
+  fileName,
   id
 })
 

@@ -5,6 +5,7 @@ import Layout from '../constants/Layout'
 
 export const Wrapper = styled.ScrollView`
   padding: 20px;
+  margin-bottom: 70px;
 `;
 
 export const Title = styled.Text`

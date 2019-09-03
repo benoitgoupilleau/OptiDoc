@@ -66,6 +66,7 @@ export const downLoadOneFile = (id, extension, businessId) => async (dispatch) =
   dispatch(downloadingFile(id))
   return RNFetchBlob
     .config({
+      timeout: 60000,
       path: `${destinationFolder}/${Folder.prep}/${id}.${extension}`
     })
     .fetch('GET', `${API_URL}/api/pdffile/download/${id}`, {
@@ -114,6 +115,7 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
             if (!fileExists) {
               await RNFetchBlob
                 .config({
+                  timeout: 60000,
                   path: `${destinationFolder}/${Folder.prep}/${prep[i].id}.${prep[i].extension}`
                 })
                 .fetch('GET', `${API_URL}/api/pdffile/download/${prep[i].id}`, {
@@ -136,6 +138,7 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
             if (!fileExists) {
               await RNFetchBlob
                 .config({
+                  timeout: 60000,
                   path: `${destinationFolder}/${Folder.rea}/${rea[i].id}.${rea[i].extension}`
                 })
                 .fetch('GET', `${API_URL}/api/pdffile/download/${rea[i].id}`, {
@@ -201,6 +204,7 @@ export const forceDownloadModels = (modeleDocs) => dispatch => {
         dispatch(downloadModele(i + 1, total))
         await RNFetchBlob
           .config({
+            timeout: 60000,
             path: `${destinationFolder}/${modeleDocs[i].iD_Document}.pdf`
           })
           .fetch('GET', `${API_URL}/api/pdffile/download/${modeleDocs[i].iD_Document}`, {
@@ -228,6 +232,7 @@ export const downloadModels = (modeleDocs) => dispatch => {
           dispatch(downloadModele(i + 1, total))
           await RNFetchBlob
             .config({
+              timeout: 60000,
               path: `${destinationFolder}/${modeleDocs[i].iD_Document}.pdf`
             })
             .fetch('GET', `${API_URL}/api/pdffile/download/${modeleDocs[i].iD_Document}`, {
@@ -270,7 +275,7 @@ export const cancelUploadingFile = (fileId) => ({
 
 export const uploadFile = (filePath, file) => async (dispatch) => {
   const { user } = store.getState();
-  return RNFetchBlob.fetch('PUT', `${API_URL}/api/pdffile/upload/${file.id}`, {
+  return RNFetchBlob.config({ timeout: 60000 }).fetch('PUT', `${API_URL}/api/pdffile/upload/${file.id}`, {
     Authorization: `Bearer ${user.bearerToken}`,
     'Content-Type': 'multipart/form-data',
     'ID_Affaire': file.dossier1,
@@ -302,7 +307,7 @@ export const removeFromEdit = (id) => ({
 
 export const createFile = (filePath, file) => (dispatch) => {
   const { user } = store.getState();
-  return RNFetchBlob.fetch('PUT', `${API_URL}/api/pdffile/upload/${file.id}`, {
+  return RNFetchBlob.config({ timeout: 60000 }).fetch('PUT', `${API_URL}/api/pdffile/upload/${file.id}`, {
     Authorization: `Bearer ${user.bearerToken}`,
     'Content-Type': 'multipart/form-data',
     'ID_Affaire': file.dossier1,
@@ -339,7 +344,7 @@ export const uploadMultipleFiles = (files) => async (dispatch) => {
   const { user } = store.getState();
   for (let i = 0; i < files.length; i++) {
     try {
-      await RNFetchBlob.fetch('PUT', `${API_URL}/api/pdffile/upload/${files[i].id}`, {
+      await RNFetchBlob.config({ timeout: 60000 }).fetch('PUT', `${API_URL}/api/pdffile/upload/${files[i].id}`, {
         Authorization: `Bearer ${user.bearerToken}`,
         'Content-Type': 'multipart/form-data',
         'ID_Affaire': files[i].dossier1,

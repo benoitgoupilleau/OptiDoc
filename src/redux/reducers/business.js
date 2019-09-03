@@ -80,7 +80,7 @@ export default (state = defaultState, action) => {
     }
     case UPDATE_DOC: {
       const indexToUpdate = state.newDocs.findIndex(d => d.id === action.id)
-      const docToUpdate = { ...state.newDocs[indexToUpdate], FileName: action.FileName };
+      const docToUpdate = { ...state.newDocs[indexToUpdate], fileName: action.fileName };
       return {
         ...state,
         newDocs: [ ...state.newDocs.slice(0, indexToUpdate), docToUpdate, ...state.newDocs.slice(indexToUpdate + 1)]
