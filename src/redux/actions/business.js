@@ -21,18 +21,18 @@ import FilesToExclude from '../../constants/FilesToExclude';
 const identifyNewFiles = (downloadedAffaire, currentDocs, files) => {
   const fileToDownload = [];
   for (let i = 0; i < downloadedAffaire.length; i++) {
-    const currentBusinessFile = currentDocs.filter(c => c.dossier1 === downloadedAffaire[i]);
-    const newBusinessFile = files.filter(c => c.dossier1 === downloadedAffaire[i]);
+    const currentBusinessFile = currentDocs.filter(c => c && c.Dossier1 === downloadedAffaire[i]);
+    const newBusinessFile = files.filter(c => c.Dossier1 === downloadedAffaire[i]);
     for (let j = 0; j < newBusinessFile.length; j++) {
       if (currentBusinessFile.length > 0) {
-        const indexDoc = currentBusinessFile.findIndex(d => d.id === newBusinessFile[j].id)
+        const indexDoc = currentBusinessFile.findIndex(d => d.ID === newBusinessFile[j].ID)
         if (indexDoc > -1) {
-          if (currentBusinessFile[indexDoc].upLoadedOn < newBusinessFile[j].upLoadedOn) {
-            fileToDownload.push(newBusinessFile[j].id)
+          if (currentBusinessFile[indexDoc].UpLoadedOn < newBusinessFile[j].UpLoadedOn) {
+            fileToDownload.push(newBusinessFile[j].ID)
           }
         }
       } else {
-        fileToDownload.push(newBusinessFile[j].id)
+        fileToDownload.push(newBusinessFile[j].ID)
       }
     }
   }
@@ -41,9 +41,9 @@ const identifyNewFiles = (downloadedAffaire, currentDocs, files) => {
 
 export const getDocs = (currentDocs = [], downloadedAffaire = [], editedDocs = []) => dispatch => {
   const { user } = store.getState();
-  return api.get(`/api/documents/fromuser/${user.id}`, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
+  return api.get(`/api/documents/fromuser/${user.userId}`, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
     .then((res) => {
-      const files = res.data.filter(d => !FilesToExclude.includes(d.dossier3))
+      const files = res.data.filter(d => !FilesToExclude.includes(d.Dossier3))
       const fileToDownload = identifyNewFiles(downloadedAffaire, currentDocs, files);
       if (fileToDownload.length > 0) {
         dispatch(setDocsToDownload(fileToDownload))
@@ -72,10 +72,10 @@ export const addDoc = (doc) => ({
   doc
 })
 
-export const updateDocName = (fileName, id) => ({
+export const updateDocName = (FileName, ID) => ({
   type: UPDATE_DOC,
-  fileName,
-  id
+  FileName,
+  ID
 })
 
 export const getModeles = () => dispatch => {
@@ -93,18 +93,18 @@ const setModeles = (modeles) => ({
   modeles
 })
 
-export const updatePrepared = (fileId, prepared, preparedOn, preparedBy, revisable) => ({
+export const updatePrepared = (fileId, Prepared, PreparedOn, PreparedBy, Revisable) => ({
   type: UPDATE_PREPARE,
   fileId,
-  prepared,
-  preparedOn,
-  preparedBy,
-  revisable
+  Prepared,
+  PreparedOn,
+  PreparedBy,
+  Revisable
 })
 
 export const getBusiness = () => dispatch => {
   const { user } = store.getState();
-  return api.get(`/api/affaires/fromuser/${user.id}`, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
+  return api.get(`/api/affaires/fromuser/${user.userId}`, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
     .then((res) => {
       return dispatch(setBusiness(res.data))
     })
@@ -124,9 +124,9 @@ export const addNewDoc = (doc) => ({
   doc
 })
 
-export const removeNewDoc = id => ({
+export const removeNewDoc = ID => ({
   type: REMOVED_NEW_DOC,
-  id
+  ID
 })
 
 export const getArbo = () => dispatch => {

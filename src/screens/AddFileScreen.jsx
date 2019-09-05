@@ -3,7 +3,7 @@ import RNFS from 'react-native-fs';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Orientation from 'react-native-orientation';
-import { View, Alert } from 'react-native';
+import { Alert } from 'react-native';
 import { PDFDocument, PDFPage } from 'react-native-pdf-lib';
 import { EXTERNAL_PATH } from 'react-native-dotenv';
 
@@ -21,12 +21,12 @@ import { addNewDoc } from '../redux/actions/business'
 import rootDir from '../services/rootDir';
 import { getDateFormat } from '../services/dateFormat';
 
-import { Wrapper, Title, Section, Selector, Option, OptionText, ModeleList, ButtonWrapper, StyledButton, StyledText, FileNameInput } from './AddFileScreen.styled';
+import { Container, Wrapper, Title, Section, Selector, Option, OptionText, ModeleList, ButtonWrapper, StyledButton, StyledText, FileNameInput } from './AddFileScreen.styled';
 
 const AddFileScreen = React.memo(({ navigation, user, userBusiness, modeleDownloaded, modeles, editFile, addNewDoc, downloadModels, forceDownloadModels }) => {
-  const [typeModele, setTypeModele] = useState('PV');
+  const [TypeModele, setTypeModele] = useState('PV');
   const [ModeleID, setModeleID] = useState('');
-  const [fileName, setFileName] = useState('');
+  const [FileName, setFileName] = useState('');
   const [filePath, setFilePath] = useState('');
   const [FileNameFinal, setFileNameFinal] = useState('');
   const [creatingFile, setCreatingFile] = useState(false);
@@ -38,13 +38,13 @@ const AddFileScreen = React.memo(({ navigation, user, userBusiness, modeleDownlo
     }
   }, [])
 
-  const handleSelectModele = (ModeleID, fileName, filePath) => {
+  const handleSelectModele = (ModeleID, FileName, filePath) => {
     const now = new Date();
     const { day, month, year } = getDateFormat(now);
     const date = `${day}.${month}.${year}`;
     setModeleID(ModeleID);
-    setFileName(fileName);
-    setFileNameFinal(`${fileName} ${date}`);
+    setFileName(FileName);
+    setFileNameFinal(`${FileName} ${date}`);
     setFilePath(filePath);
   }
 
@@ -58,41 +58,41 @@ const AddFileScreen = React.memo(({ navigation, user, userBusiness, modeleDownlo
       const affaire = userBusiness.find((b) => b.id === businessId)
       const clientName = affaire ? `${affaire.client} - ${affaire.designation}` : businessId;
       const { day, month, year, hours, minutes, secondes } = getDateFormat(now);
-      const createdOn = `${year}-${month}-${day}`;
+      const CreatedOn = `${year}-${month}-${day}`;
       const date = `${year}${month}${day}${hours}${minutes}${secondes}`;
       const fileID = 'DOC_' + date;
-      const modeleSelected = modeles.filter(m => m.iD_Document === ModeleID)[0]
-      const dossier3 = modeleSelected.dossierDestination;
-      const destPath = `${rootDir}/${user.id}/${businessId}/${Folder.rea}/${fileID}.pdf`;
-      RNFS.mkdir(`${rootDir}/${user.id}/${businessId}/${Folder.rea}`)
+      const modeleSelected = modeles.filter(m => m.ID_Document === ModeleID)[0]
+      const Dossier3 = modeleSelected.DossierDestination;
+      const destPath = `${rootDir}/${user.userId}/${businessId}/${Folder.rea}/${fileID}.pdf`;
+      RNFS.mkdir(`${rootDir}/${user.userId}/${businessId}/${Folder.rea}`)
         .then(() => RNFS.copyFile(filePath, destPath)
           .then(() => {
             const newDoc = {
-              localPath: '',
-              prepared: 'N',
-              preparedOn: '1900-01-01',
-              pageNumber: 1,
-              reviewedOn: '1900-01-01',
-              preparedBy: '',
-              revisable: 'N',
-              size: 0,
-              createdBy: user.name,
-              dossier2: 'Realisation',
-              upLoadedOn: '1900-01-01',
-              fileName: FileNameFinal,
-              createdOn,
-              dossier1: businessId,
-              id: fileID,
-              updatedOn: createdOn,
-              updatedBy: user.name,
-              commentaire: '',
-              dossier3,
-              serverPath: `${businessId}/Realisation/${dossier3}/${fileID}.pdf`,
-              reviewedBy: '',
-              extension: 'pdf',
-              reviewed: 'N',
-              locked: 'N',
-              upLoadedBy: ''
+              LocalPath: '',
+              Prepared: 'N',
+              PreparedOn: '1900-01-01',
+              PageNumber: 1,
+              ReviewedOn: '1900-01-01',
+              PreparedBy: '',
+              Revisable: 'N',
+              Size: 0,
+              CreatedBy: user.name,
+              Dossier2: 'Realisation',
+              UpLoadedOn: '1900-01-01',
+              FileName: FileNameFinal,
+              CreatedOn,
+              Dossier1: businessId,
+              ID: fileID,
+              UpdatedOn: CreatedOn,
+              UpdatedBy: user.name,
+              Commentaire: '',
+              Dossier3,
+              ServerPath: `${businessId}/Realisation/${Dossier3}/${fileID}.pdf`,
+              ReviewedBy: '',
+              Extension: 'pdf',
+              Reviewed: 'N',
+              Locked: 'N',
+              UpLoadedBy: ''
             }
             const page1 = PDFPage
               .modify(0)
@@ -106,7 +106,7 @@ const AddFileScreen = React.memo(({ navigation, user, userBusiness, modeleDownlo
                 y: modeleSelected.Zone2Y ? parseInt(modeleSelected.Zone2Y, 10) : 830,
                 fontSize: 10
               })
-              .drawText('Date : ' + createdOn, {
+              .drawText('Date : ' + CreatedOn, {
                 x: modeleSelected.Zone3X ? parseInt(modeleSelected.Zone3X, 10) : 500,
                 y: modeleSelected.Zone3Y ? parseInt(modeleSelected.Zone3Y, 10) : 830,
                 fontSize: 10
@@ -119,7 +119,7 @@ const AddFileScreen = React.memo(({ navigation, user, userBusiness, modeleDownlo
               .write()
               .then(() => {
                 addNewDoc(newDoc)
-                return editFile({ id: fileID, editPath: `${EXTERNAL_PATH}${fileID}.pdf`, isNew: true, affaire: businessId, extension: 'pdf', dossier3 }, destPath)
+                return editFile({ ID: fileID, editPath: `${EXTERNAL_PATH}${fileID}.pdf`, isNew: true, affaire: businessId, Extension: 'pdf', Dossier3 }, destPath)
               })
               .catch(e => {
                 Sentry.captureException(e, { func: 'modifyPages', doc: 'AddFileScreen.js' })
@@ -156,7 +156,7 @@ const AddFileScreen = React.memo(({ navigation, user, userBusiness, modeleDownlo
   const business = userBusiness.find((b) => b.id === id_affaire)
   const clientName = business ? `${business.client} - ${business.designation}` : id_affaire;
   return (
-    <View>
+    <Container>
       <OfflineNotice />
       <Wrapper>
         <Title>{clientName}</Title>
@@ -166,32 +166,32 @@ const AddFileScreen = React.memo(({ navigation, user, userBusiness, modeleDownlo
         </StyledButton>
         <Selector>
           <Option
-            isSelected={typeModele === 'PV'}
+            isSelected={TypeModele === 'PV'}
             onPress={() => onPress('PV')}
           >
-            <OptionText isSelected={typeModele === 'PV'}>PV</OptionText>
+            <OptionText isSelected={TypeModele === 'PV'}>PV</OptionText>
           </Option>
           <Option
-            isSelected={typeModele === 'DMOS'}
+            isSelected={TypeModele === 'DMOS'}
             onPress={() => onPress('DMOS')}
           >
-            <OptionText isSelected={typeModele === 'DMOS'}>DMOS</OptionText>
+            <OptionText isSelected={TypeModele === 'DMOS'}>DMOS</OptionText>
           </Option>
           <Option
-            isSelected={typeModele === 'CR'}
+            isSelected={TypeModele === 'CR'}
             onPress={() => onPress('CR')}
           >
-            <OptionText isSelected={typeModele === 'CR'}>CR</OptionText>
+            <OptionText isSelected={TypeModele === 'CR'}>CR</OptionText>
           </Option>
         </Selector>
         <ModeleList>
-          {modeles.filter(m => m.typeModele === typeModele).map(m => (
+          {modeles.filter(m => m.TypeModele === TypeModele).map(m => (
             <Modele
-              key={m.id}
-              fileName={m.designation}
-              handleSelect={() => handleSelectModele(m.iD_Document, m.designation, `${rootDir}/${Folder.modeleDocs}/${m.iD_Document}.pdf`)}
-              selected={fileName === m.designation}
-              openFile={() => navigation.navigate('Pdf', { title: m.designation, id: m.iD_Document, isModel: true, })}
+              key={m.ID}
+              FileName={m.Designation}
+              handleSelect={() => handleSelectModele(m.ID_Document, m.Designation, `${rootDir}/${Folder.modeleDocs}/${m.ID_Document}.pdf`)}
+              selected={FileName === m.Designation}
+              openFile={() => navigation.navigate('Pdf', { title: m.Designation, ID: m.ID_Document, isModel: true, })}
             />))
           }
         </ModeleList>
@@ -201,12 +201,12 @@ const AddFileScreen = React.memo(({ navigation, user, userBusiness, modeleDownlo
             onChangeText={(FileNameFinal) => setFileNameFinal(FileNameFinal)}
             value={FileNameFinal}
           />
-          <StyledButton disabled={fileName === '' || creatingFile} onPress={onCreateFile}>
+          <StyledButton disabled={FileName === '' || creatingFile} onPress={onCreateFile}>
             <StyledText>{creatingFile ? 'Création en cours' : 'Créer le fichier'}</StyledText>
           </StyledButton>
         </ButtonWrapper>
       </Wrapper>
-    </View>
+    </Container>
   );
 
 })

@@ -19,7 +19,7 @@ const encoded = (str) => {
   return encodedChar.join('');
 }
 
-const Signing = React.memo(({ userName, navigation, loginApi, locked, sessionExpired }) => {
+const Signing = React.memo(({ userName, navigation, loginApi, lockedSession, sessionExpired }) => {
   const [localUserName, setUserName] = useState(userName)
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -63,7 +63,7 @@ const Signing = React.memo(({ userName, navigation, loginApi, locked, sessionExp
         onChangeText={(userName) => setUserName(userName)}
         placeholder="Identifiant"
         value={localUserName}
-        editable={!locked}
+        editable={!lockedSession}
         returnKeyType="next"
       />
       <StyledInput
@@ -78,7 +78,7 @@ const Signing = React.memo(({ userName, navigation, loginApi, locked, sessionExp
       <StyledButton onPress={signInAsync} disabled={loading}>
         <StyledText>Connexion</StyledText>
       </StyledButton>
-      {locked && <Logout title="Forcer la déconnexion" />}
+      {lockedSession && <Logout title="Forcer la déconnexion" />}
     </Wrapper>
   )
 })
@@ -86,14 +86,14 @@ const Signing = React.memo(({ userName, navigation, loginApi, locked, sessionExp
 Signing.propTypes = {
   navigation: PropTypes.object.isRequired,
   loginApi: PropTypes.func.isRequired,
-  locked: PropTypes.bool.isRequired,
+  lockedSession: PropTypes.bool.isRequired,
   userName: PropTypes.string.isRequired,
   sessionExpired: PropTypes.bool.isRequired
 }
 
 const mapStateToProps = state => ({
   userName: state.user.userName,
-  locked: state.user.locked,
+  lockedSession: state.user.lockedSession,
   sessionExpired: state.user.sessionExpired
 })
 

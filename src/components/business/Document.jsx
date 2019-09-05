@@ -23,29 +23,29 @@ const { width } = Dimensions.get('window');
 import { DocumentWrapper, File, Title, StyledInput, IconsWrapper, EditIcons, Icons } from './Document.styled'
 
 const Document = React.memo((props) => {
-  const { name, navigation, type, id, extension, dossier1, dossier2, dossier3, reviewed, locked, userId, loadingBusiness, loadingFiles, fileToDownload, uploadingDocs, prep, rea, editedDocs, fileName, prepared, isNew, modeleDownloaded, isConnected, downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, updatePrepared, editPrepare, removePrepare, removeNewDoc, createFile, updateDocName } = props;
+  const { name, navigation, type, ID, Extension, Dossier1, Dossier2, Dossier3, Reviewed, Locked, userId, loadingBusiness, loadingFiles, fileToDownload, uploadingDocs, prep, rea, editedDocs, FileName, Prepared, isNew, modeleDownloaded, isConnected, downloadBusiness, editFile, uploadFile, uploadingFile, removeFromEdit, downLoadOneFile, updatePrepared, editPrepare, removePrepare, removeNewDoc, createFile, updateDocName } = props;
   const [isDownloaded, setIsDownloaded] = useState(true);
-  const [localFileName, setlocalFileName] = useState(fileName);
+  const [localFileName, setlocalFileName] = useState(FileName);
 
   useEffect(() => {
     checkIfDownloaded()
   }, [])
 
   const onEdit = async () => {
-    const isEdited = editedDocs.filter(e => e.id === id).length > 0;
+    const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
     if (isEdited) {
-      await openFile(id, extension);
+      await openFile(ID, Extension);
     } else {
-      const filePath = `${rootDir}/${userId}/${dossier1}/${type}/${id}.${extension}`;
+      const filePath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
       const fileExists = await RNFS.exists(filePath);
       if (fileExists) {
-        editFile({ id, editPath: `${EXTERNAL_PATH}${id}.${extension}`, affaire: dossier1, extension, dossier3 }, filePath)
-      } else if (!loadingBusiness.includes(dossier1)) {
+        editFile({ ID, editPath: `${EXTERNAL_PATH}${ID}.${Extension}`, affaire: Dossier1, Extension, Dossier3 }, filePath)
+      } else if (!loadingBusiness.includes(Dossier1)) {
         if (modeleDownloaded === 'in progress') {
           Alert.alert('Modèle en cours de téléchargement', 'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants', [{ text: 'Ok' }]);
         } else {
           if (isConnected) {
-            downloadBusiness(userId, dossier1, prep, rea)
+            downloadBusiness(userId, Dossier1, prep, rea)
           } else {
             Alert.alert('Vous êtes en mode hors-ligne', 'Vous pourrez télécharger cette affaire une fois votre connexion rétablie', [{ text: 'Ok' }]);
           }
@@ -55,36 +55,36 @@ const Document = React.memo((props) => {
   }
 
   const confirmedOnUpload = async () => {
-    const filePath = `${EXTERNAL_PATH}${id}.${extension}`;
-    const destPath = `${rootDir}/${userId}/${dossier1}/${type}/${id}.${extension}`;
+    const filePath = `${EXTERNAL_PATH}${ID}.${Extension}`;
+    const destPath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
     const file = pick(props, Tables.docField);
     const userName = name;
     const now = new Date();
     const date = `${now.getFullYear()}-${(now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 })}-${now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })}`
     const fileToUpLoad = {
       ...file,
-      upLoadedOn: date,
-      updatedOn: date,
-      updatedBy: userName,
-      upLoadedBy: userName
+      UpLoadedOn: date,
+      UpdatedOn: date,
+      UpdatedBy: userName,
+      UpLoadedBy: userName
     }
-    const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${id}(0).${extension}`);
+    const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${ID}(0).${Extension}`);
     if (secondVersion) {
-      await RNFS.copyFile(`${EXTERNAL_PATH}${id}(0).${extension}`, `${EXTERNAL_PATH}${id}.${extension}`);
-      await RNFS.unlink(`${EXTERNAL_PATH}${id}(0).${extension}`)
+      await RNFS.copyFile(`${EXTERNAL_PATH}${ID}(0).${Extension}`, `${EXTERNAL_PATH}${ID}.${Extension}`);
+      await RNFS.unlink(`${EXTERNAL_PATH}${ID}(0).${Extension}`)
     }
     await RNFS.copyFile(filePath, destPath);
-    uploadingFile(id);
+    uploadingFile(ID);
     if (isNew) {
-      return createFile(filePath, fileToUpLoad)
+      return createFile(destPath, fileToUpLoad)
     } else {
-      return uploadFile(filePath, fileToUpLoad);
+      return uploadFile(destPath, fileToUpLoad);
     }
   }
 
   const onUpload = () => {
     if (isConnected) {
-      if (prepared === 'O') {
+      if (Prepared === 'O') {
         Alert.alert("Confirmer l'envoi", "Etes-vous sûr de vouloir envoyer ce fichier ?", [{
           text: 'Annuler',
           style: 'cancel',
@@ -103,19 +103,19 @@ const Document = React.memo((props) => {
   const confirmedOnPrepare = (newPrepared, now) => {
     const PreparedOn = now.getFullYear() + '-' + (now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 }) + '-' + now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })
     const Revisable = 'O';
-    updatePrepared(id, newPrepared, PreparedOn, name, Revisable);
-    editPrepare({ id: id, prepared: true, affaire: dossier1, extension: extension, dossier3: dossier3 })
+    updatePrepared(ID, newPrepared, PreparedOn, name, Revisable);
+    editPrepare({ ID, Prepared: true, affaire: Dossier1, Extension: Extension, Dossier3: Dossier3 })
   }
 
   const onPrepare = () => {
-    const newPrepared = prepared === 'O' ? 'N' : 'O';
+    const newPrepared = Prepared === 'O' ? 'N' : 'O';
     const now = new Date();
     if (newPrepared === 'N') {
       const PreparedOn = '1900-01-01';
       const Revisable = 'N';
       const PreparedBy = '';
-      updatePrepared(id, newPrepared, PreparedOn, PreparedBy, Revisable);
-      removePrepare(id)
+      updatePrepared(ID, newPrepared, PreparedOn, PreparedBy, Revisable);
+      removePrepare(ID)
     } else {
       Alert.alert("Confirmer la préparation", "Etes-vous sûr de vouloir cocher ce fichier comme préparé ?", [{
         text: 'Annuler',
@@ -129,17 +129,17 @@ const Document = React.memo((props) => {
 
   const removeFile = async () => {
     if (!isNew) {
-      const doc = editedDocs.filter(e => e.id === id)[0]
-      if (doc.prepared) {
-        updatePrepared(id, 'N', '1900-01-01', '');
+      const doc = editedDocs.filter(e => e.ID === ID)[0]
+      if (doc.Prepared) {
+        updatePrepared(ID, 'N', '1900-01-01', '');
       }
-      removeFromEdit(id);
+      removeFromEdit(ID);
     } else {
-      removeNewDoc(id);
-      removeFromEdit(id);
-      const localPath = `${rootDir}/${userId}/${dossier1}/${type}/${id}.${extension}`
-      await RNFS.unlink(localPath)
-      const externalPath = `${EXTERNAL_PATH}${id}.${extension}`;
+      removeNewDoc(ID);
+      removeFromEdit(ID);
+      const LocalPath = `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`
+      await RNFS.unlink(LocalPath)
+      const externalPath = `${EXTERNAL_PATH}${ID}.${Extension}`;
       try {
         await RNFS.unlink(externalPath)
       } catch (error) {
@@ -162,7 +162,7 @@ const Document = React.memo((props) => {
 
   const onDownloadFile = () => {
     if (isConnected) {
-      downLoadOneFile(id, extension, dossier1)
+      downLoadOneFile(ID, Extension, Dossier1)
       return ToastAndroid.showWithGravity(
         "Fichier en cours de téléchargement",
         ToastAndroid.SHORT,
@@ -174,16 +174,16 @@ const Document = React.memo((props) => {
   }
 
   const onOpenFile = async () => {
-    const isEdited = editedDocs.filter(e => e.id === id && !!e.editPath).length > 0;
-    const isPrepared = editedDocs.filter(e => e.id === id && e.prepared).length > 0;
-    const isDownloaded = await RNFS.exists(`${rootDir}/${userId}/${dossier1}/${dossier2}/${id}.${extension}`)
+    const isEdited = editedDocs.filter(e => e.ID === ID && !!e.editPath).length > 0;
+    const isPrepared = editedDocs.filter(e => e.ID === ID && e.Prepared).length > 0;
+    const isDownloaded = await RNFS.exists(`${rootDir}/${userId}/${Dossier1}/${Dossier2}/${ID}.${Extension}`)
     if (isDownloaded) {
-      const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${id}(0).${extension}`);
+      const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${ID}(0).${Extension}`);
       if (secondVersion && isEdited) {
-        RNFS.copyFile(`${EXTERNAL_PATH}${id}(0).${extension}`, `${EXTERNAL_PATH}${id}.${extension}`)
-          .then(() => RNFS.unlink(`${EXTERNAL_PATH}${id}(0).${extension}`)
+        RNFS.copyFile(`${EXTERNAL_PATH}${ID}(0).${Extension}`, `${EXTERNAL_PATH}${ID}.${Extension}`)
+          .then(() => RNFS.unlink(`${EXTERNAL_PATH}${ID}(0).${Extension}`)
             .then(() =>
-              navigation.navigate('Pdf', { title: fileName, id, dossier3, extension, dossier1, type, isEdited, prepared, reviewed, isPrepared, locked })
+              navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type, isEdited, Prepared, Reviewed, isPrepared, Locked })
             )
           )
           .catch((e) => {
@@ -191,10 +191,10 @@ const Document = React.memo((props) => {
             return;
           })
       } else {
-        return navigation.navigate('Pdf', { title: fileName, id, dossier3, extension, dossier1, type, isEdited, prepared, reviewed, isPrepared, locked })
+        return navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type, isEdited, Prepared, Reviewed, isPrepared, Locked })
       }
     }
-    if (!loadingBusiness.includes(dossier1)) {
+    if (!loadingBusiness.includes(Dossier1)) {
       if (modeleDownloaded === 'in progress') {
         return Alert.alert('Modèle en cours de téléchargement', 'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants', [{ text: 'Ok' }]);
       } else {
@@ -210,15 +210,15 @@ const Document = React.memo((props) => {
   }
 
   const checkIfDownloaded = async () => {
-    const filepath = `${rootDir}/${userId}/${dossier1}/${dossier2}/${id}.${extension}`
+    const filepath = `${rootDir}/${userId}/${Dossier1}/${Dossier2}/${ID}.${Extension}`
     const downloaded = await RNFS.exists(filepath)
     if (isDownloaded !== downloaded) setIsDownloaded(downloaded)
   }
 
   const displayLeftIcon = () => {
-    if (!isDownloaded || fileToDownload.includes(id)) {
+    if (!isDownloaded || fileToDownload.includes(ID)) {
       return (
-        loadingFiles.includes(id) ?
+        loadingFiles.includes(ID) ?
           <ActivityIndicator style={{ paddingLeft: 10, paddingRight: 10 }} />
           :
           <Icons
@@ -232,7 +232,7 @@ const Document = React.memo((props) => {
     return undefined;
   }
 
-  const isEdited = editedDocs.filter(e => e.id === id).length > 0;
+  const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
   return (
     <DocumentWrapper
       onPress={onOpenFile}
@@ -246,10 +246,10 @@ const Document = React.memo((props) => {
             onChangeText={(name) => setlocalFileName(name)}
             placeholder="Nom du fichier"
             value={localFileName}
-            editable={prepared === 'N'}
-            onEndEditing={() => updateDocName(localFileName, id)}
+            editable={Prepared === 'N'}
+            onEndEditing={() => updateDocName(localFileName, ID)}
           /> :
-          <Title width={width}>{fileName}</Title>}
+          <Title width={width}>{FileName}</Title>}
       </File>
       {type === Folder.rea ?
         <IconsWrapper>
@@ -261,7 +261,7 @@ const Document = React.memo((props) => {
                 color="red"
                 onPress={onCancel}
               />
-              {!uploadingDocs.includes(id) ?
+              {!uploadingDocs.includes(ID) ?
                 <Icons
                   name="md-cloud-upload"
                   size={Layout.icon.default}
@@ -271,16 +271,16 @@ const Document = React.memo((props) => {
               <Icons
                 name="md-checkbox-outline"
                 size={Layout.icon.default}
-                color={prepared === 'O' ? "green" : Colors.thirdColor}
-                onPress={locked === 'O' || (prepared === 'O' && !isEdited) ? () => { } : onPrepare}
+                color={Prepared === 'O' ? "green" : Colors.thirdColor}
+                onPress={Locked === 'O' || (Prepared === 'O' && !isEdited) ? () => { } : onPrepare}
               />
             </EditIcons>
           )}
-          {locked === 'O' ?
+          {Locked === 'O' ?
             <Icons
               name="md-lock"
               size={Layout.icon.default}
-            /> : (reviewed === 'O' || (prepared === 'O' && !isEdited)) ?
+            /> : (Reviewed === 'O' || (Prepared === 'O' && !isEdited)) ?
               <Icons
                 name="md-checkbox-outline"
                 size={Layout.icon.default}
@@ -306,13 +306,13 @@ const Document = React.memo((props) => {
 })
 
 Document.propTypes = {
-  fileName: PropTypes.string.isRequired,
-  id: PropTypes.string.isRequired,
+  FileName: PropTypes.string.isRequired,
+  ID: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
-  dossier3: PropTypes.string.isRequired,
-  extension: PropTypes.string.isRequired,
-  dossier1: PropTypes.string.isRequired,
-  serverPath: PropTypes.string.isRequired,
+  Dossier3: PropTypes.string.isRequired,
+  Extension: PropTypes.string.isRequired,
+  Dossier1: PropTypes.string.isRequired,
+  ServerPath: PropTypes.string.isRequired,
   type: PropTypes.string,
   navigation: PropTypes.object.isRequired,
   loadingBusiness: PropTypes.array.isRequired,
@@ -329,12 +329,12 @@ Document.propTypes = {
   removeFromEdit: PropTypes.func.isRequired,
   downLoadOneFile: PropTypes.func.isRequired,
   isNew: PropTypes.bool,
-  dossier2: PropTypes.string.isRequired,
+  Dossier2: PropTypes.string.isRequired,
   fileToDownload: PropTypes.array.isRequired,
   loadingFiles: PropTypes.array.isRequired,
-  reviewed: PropTypes.string.isRequired,
-  prepared: PropTypes.string.isRequired,
-  locked: PropTypes.string.isRequired,
+  Reviewed: PropTypes.string.isRequired,
+  Prepared: PropTypes.string.isRequired,
+  Locked: PropTypes.string.isRequired,
   isConnected: PropTypes.bool.isRequired,
   modeleDownloaded: PropTypes.string.isRequired,
   updatePrepared: PropTypes.func.isRequired,
@@ -357,7 +357,7 @@ const mapStateToProps = state => ({
   uploadingDocs: state.user.uploadingDocs,
   fileToDownload: state.user.fileToDownload,
   loadingFiles: state.user.loadingFiles,
-  userId: state.user.id,
+  userId: state.user.userId,
   name: state.user.name,
   modeleDocs: state.business.modeles,
   modeleDownloaded: state.user.modeleDownloaded,

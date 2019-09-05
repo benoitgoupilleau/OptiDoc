@@ -23,7 +23,7 @@ import rootDir from '../services/rootDir';
 import { getDateFormat } from '../services/dateFormat';
 import { checkAccessCamera } from '../utils/permissionsAndroid';
 
-import { Wrapper, Title, Section, ButtonWrapper, StyledButton, StyledText, FileNameInput, Comment, StyledScroll, PictureWrapper, ImageFrame, Icons } from './AddPictureScreen.styled';
+import { Container, Wrapper, Title, Section, ButtonWrapper, StyledButton, StyledText, FileNameInput, Comment, StyledScroll, PictureWrapper, ImageFrame, Icons } from './AddPictureScreen.styled';
 
 const { width, height } = Dimensions.get('window');
 
@@ -72,44 +72,44 @@ const AddPictureScreen = React.memo(({ navigation, user, userBusiness, editFile,
     const businessId = navigation.getParam('affaire', '')
     const now = new Date();
     const { day, month, year, hours, minutes, secondes } = getDateFormat(now);
-    const createdOn = `${year}-${month}-${day}`;
+    const CreatedOn = `${year}-${month}-${day}`;
     const date = `${year}${month}${day}${hours}${minutes}${secondes}`;
     const fileID = 'DOC_' + date;
-    const dossier3 = 'DOSS_5';
-    const destPath = `${rootDir}/${user.id}/${businessId}/${Folder.rea}/${fileID}.pdf`;
+    const Dossier3 = 'DOSS_5';
+    const destPath = `${rootDir}/${user.userId}/${businessId}/${Folder.rea}/${fileID}.pdf`;
     RNImageToPdf.createPDFbyImages({ imagePaths: [path], name: 'fileID' })
-      .then((file) => RNFS.mkdir(`${rootDir}/${user.id}/${businessId}/${Folder.rea}`)
+      .then((file) => RNFS.mkdir(`${rootDir}/${user.userId}/${businessId}/${Folder.rea}`)
         .then(() => RNFS.copyFile(file.filePath, destPath)
           .then(() => {
             const newDoc = {
-              localPath: '',
-              prepared: 'N',
-              preparedOn: '1900-01-01',
-              pageNumber: 1,
-              reviewedOn: '1900-01-01',
-              preparedBy: '',
-              revisable: 'N',
-              size: 0,
-              createdBy: user.name,
-              dossier2: 'Realisation',
-              upLoadedOn: '1900-01-01',
-              fileName: pictureNameFinal,
-              createdOn,
-              dossier1: businessId,
-              id: fileID,
-              updatedOn: createdOn,
-              updatedBy: user.name,
-              commentaire: comment,
-              dossier3,
-              serverPath: `${businessId}/Realisation/${dossier3}/${fileID}.pdf`,
-              reviewedBy: '',
-              extension: 'pdf',
-              reviewed: 'N',
-              locked: 'N',
-              upLoadedBy: ''
+              LocalPath: '',
+              Prepared: 'N',
+              PreparedOn: '1900-01-01',
+              PageNumber: 1,
+              ReviewedOn: '1900-01-01',
+              PreparedBy: '',
+              Revisable: 'N',
+              Size: 0,
+              CreatedBy: user.name,
+              Dossier2: 'Realisation',
+              UpLoadedOn: '1900-01-01',
+              FileName: pictureNameFinal,
+              CreatedOn,
+              Dossier1: businessId,
+              ID: fileID,
+              UpdatedOn: CreatedOn,
+              UpdatedBy: user.name,
+              Commentaire: comment,
+              Dossier3,
+              ServerPath: `${businessId}/Realisation/${Dossier3}/${fileID}.pdf`,
+              ReviewedBy: '',
+              Extension: 'pdf',
+              Reviewed: 'N',
+              Locked: 'N',
+              UpLoadedBy: ''
             }
             navigation.goBack();
-            editFile({ id: fileID, editPath: `${EXTERNAL_PATH}${fileID}.pdf`, isNew: true, affaire: businessId, extension: 'pdf', dossier3 }, destPath)
+            editFile({ ID: fileID, editPath: `${EXTERNAL_PATH}${fileID}.pdf`, isNew: true, affaire: businessId, Extension: 'pdf', Dossier3 }, destPath)
             return addNewDoc(newDoc)
           })
           .catch(e => {
@@ -128,7 +128,7 @@ const AddPictureScreen = React.memo(({ navigation, user, userBusiness, editFile,
   const business = userBusiness.find((b) => b.id === id_affaire)
   const clientName = business ? `${business.client} - ${business.designation}` : id_affaire;
   return (
-    <View>
+    <Container>
       <OfflineNotice />
       <Wrapper>
         <Title>{clientName}</Title>
@@ -173,7 +173,7 @@ const AddPictureScreen = React.memo(({ navigation, user, userBusiness, editFile,
           </StyledScroll>
         </View>
       </Wrapper>
-    </View>
+    </Container>
   );
 
 })

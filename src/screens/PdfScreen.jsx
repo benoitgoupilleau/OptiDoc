@@ -38,28 +38,28 @@ const PdfScreen = ({ userId, navigation, editFile }) => {
     }, 500);
   }, [])
 
-  const onPressEdit = async (id, Extension, Dossier1, filePath, isEdited, Dossier3) => {
+  const onPressEdit = async (ID, Extension, Dossier1, filePath, isEdited, Dossier3) => {
     navigation.goBack();
     if (isEdited) {
-      await openFile(id, Extension)
+      await openFile(ID, Extension)
     } else {
-      editFile({ id, editPath: `${EXTERNAL_PATH}${id}.${Extension}`, affaire: Dossier1, Extension, Dossier3 }, filePath)
+      editFile({ ID, editPath: `${EXTERNAL_PATH}${ID}.${Extension}`, affaire: Dossier1, Extension, Dossier3 }, filePath)
     }
   }
 
   const isEdited = navigation.getParam('isEdited', false)
   const isModel = navigation.getParam('isModel', false)
   const isPrepared = navigation.getParam('isPrepared', false)
-  const id = navigation.getParam('id', '')
-  const Extension = navigation.getParam('extension', '')
-  const Dossier1 = navigation.getParam('dossier1', '')
-  const Dossier3 = navigation.getParam('dossier3', '')
-  const Reviewed = navigation.getParam('reviewed', '');
-  const Locked = navigation.getParam('locked', '')
-  const Prepared = navigation.getParam('prepared', '');
+  const ID = navigation.getParam('ID', '')
+  const Extension = navigation.getParam('Extension', '')
+  const Dossier1 = navigation.getParam('Dossier1', '')
+  const Dossier3 = navigation.getParam('Dossier3', '')
+  const Reviewed = navigation.getParam('Reviewed', '');
+  const Locked = navigation.getParam('Locked', '')
+  const Prepared = navigation.getParam('Prepared', '');
   const type = navigation.getParam('type', Folder.prep)
-  const filePath = isEdited ? `${EXTERNAL_PATH}${id}.${Extension}` :
-    isModel ? `${rootDir}/${Folder.modeleDocs}/${id}.pdf` : `${rootDir}/${userId}/${Dossier1}/${type}/${id}.${Extension}`;
+  const filePath = isEdited ? `${EXTERNAL_PATH}${ID}.${Extension}` :
+    isModel ? `${rootDir}/${Folder.modeleDocs}/${ID}.pdf` : `${rootDir}/${userId}/${Dossier1}/${type}/${id}.${Extension}`;
 
   const source = { uri: filePath };
 
@@ -73,7 +73,7 @@ const PdfScreen = ({ userId, navigation, editFile }) => {
   return (
     <Main>
       <View>
-        {type === Folder.rea && Reviewed === 'N' && Locked === 'N' && (Prepared === 'N' || isPrepared) && (<Edit onPress={() => onPressEdit(id, Extension, Dossier1, filePath, isEdited, Dossier3)}>
+        {type === Folder.rea && Reviewed === 'N' && Locked === 'N' && (Prepared === 'N' || isPrepared) && (<Edit onPress={() => onPressEdit(ID, Extension, Dossier1, filePath, isEdited, Dossier3)}>
           <EditText>Modifier</EditText>
         </Edit>)}
         <Pdf
@@ -104,7 +104,7 @@ PdfScreen.propTypes = {
 }
 
 const mapStateToProps = state => ({
-  userId: state.user.id
+  userId: state.user.userId
 })
 
 export default connect(mapStateToProps, { editFile })(PdfScreen);

@@ -4,8 +4,11 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Colors from '../constants/Colors'
 import Layout from '../constants/Layout'
 
-export const Wrapper = styled.View`
-  padding: 40px;
+export const Container = styled.View`
+  padding: 10px 20px;
+`;
+
+export const Wrapper = styled.ScrollView`
 `;
 
 export const Title = styled.Text`

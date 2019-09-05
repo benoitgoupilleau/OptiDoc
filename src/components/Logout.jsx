@@ -92,7 +92,7 @@ Logout.defaultProps = {
 
 const mapStateToProps = state => ({
   hasEditFiles: state.user.editedDocs.length > 0,
-  userId: state.user.id,
+  userId: state.user.userId,
   editedDocs: state.user.editedDocs,
   docs: state.business.docs,
   downloadedBusiness: state.user.downloadedBusiness,

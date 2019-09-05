@@ -3,9 +3,11 @@ import styled from 'styled-components/native';
 import Colors from '../constants/Colors'
 import Layout from '../constants/Layout'
 
+export const Container = styled.View`
+  padding: 10px;
+`;
+
 export const Wrapper = styled.ScrollView`
-  padding: 20px;
-  margin-bottom: 70px;
 `;
 
 export const Title = styled.Text`

@@ -12,26 +12,22 @@ import Layout from '../../constants/Layout'
 
 import { BusinessWrapper, MainSection, Title, IconView } from './Business.styled'
 
-const Business = React.memo(({ isConnected, modeleDownloaded, userId, prep, rea, id, downloadBusiness, downloadedBusiness, loadingBusiness, nbDocBusiness, totalDocBusiness, navigation, client, designation }) => {
+const Business = React.memo(({ isConnected, userId, prep, rea, id, downloadBusiness, downloadedBusiness, loadingBusiness, nbDocBusiness, totalDocBusiness, navigation, client, designation }) => {
   const goToDocs = () => {
     navigation.navigate('Docs', { affaire: id })
   }
 
   const onDownload = () => {
-    if (modeleDownloaded === 'in progress') {
-      Alert.alert('Modèle en cours de téléchargement', 'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants', [{ text: 'Ok' }]);
+    if (isConnected) {
+      Alert.alert('Confirmer le téléchargement', "Etes-vous sûr de vouloir télécharger cette affaire ?", [{
+        text: 'Annuler',
+        style: 'cancel',
+      }, {
+        text: 'Oui',
+        onPress: () => downloadBusiness(userId, id, prep, rea)
+      }]);
     } else {
-      if (isConnected) {
-        Alert.alert('Confirmer le téléchargement', "Etes-vous sûr de vouloir télécharger cette affaire ?", [{
-          text: 'Annuler',
-          style: 'cancel',
-        }, {
-          text: 'Oui',
-          onPress: () => downloadBusiness(userId, id, prep, rea)
-        }]);
-      } else {
-        Alert.alert('Vous êtes en mode hors-ligne', 'Vous pourrez télécharger cette affaire une fois votre connexion rétablie', [{ text: 'Ok' }]);
-      }
+      Alert.alert('Vous êtes en mode hors-ligne', 'Vous pourrez télécharger cette affaire une fois votre connexion rétablie', [{ text: 'Ok' }]);
     }
   }
 
@@ -102,7 +98,6 @@ Business.propTypes = {
   nbDocBusiness: PropTypes.number.isRequired,
   totalDocBusiness: PropTypes.number.isRequired,
   isConnected: PropTypes.bool.isRequired,
-  modeleDownloaded: PropTypes.string.isRequired,
 }
 
 Business.defaultProps = {
@@ -116,8 +111,7 @@ const mapStateToProps = state => ({
   loadingBusiness: state.user.loadingBusiness,
   nbDocBusiness: state.user.nbDocBusiness,
   totalDocBusiness: state.user.totalDocBusiness,
-  modeleDownloaded: state.user.modeleDownloaded,
-  userId: state.user.id,
+  userId: state.user.userId,
 })
 
 export default withNavigation(connect(mapStateToProps, { downloadBusiness })(Business));

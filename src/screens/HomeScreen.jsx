@@ -121,7 +121,7 @@ const mapStateToProps = (state) => ({
   newsList: filterNews([...state.news.newsList]),
   loaded: state.news.loaded,
   refreshing: state.news.refreshing,
-  userId: state.user.id,
+  userId: state.user.userId,
   editedDocs: state.user.editedDocs,
   downloadedBusiness: state.user.downloadedBusiness,
   docs: state.business.docs,

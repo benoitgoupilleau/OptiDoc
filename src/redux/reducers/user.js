@@ -23,8 +23,7 @@ import {
 } from '../actions/types';
 
 const defaultState = {
-  id: undefined,
-  id_employe: undefined,
+  userId: undefined,
   bearerToken: '',
   userName: '',
   name: '',
@@ -37,7 +36,7 @@ const defaultState = {
   editedDocs: [],
   uploadingDocs: [],
   multipleUploadDocs: [],
-  locked: false,
+  lockedSession: false,
   modeleDownloaded: 'no',
   nbDownloaded: 0,
   totalModeles: 0,
@@ -63,7 +62,7 @@ export default (state = defaultState, action) => {
         ...state,
         userName: action.userName,
         bearerToken: action.bearerToken,
-        id: action.id,
+        userId: action.userId,
         name: action.name,
         sessionExpired: false
       }
@@ -76,10 +75,10 @@ export default (state = defaultState, action) => {
       return {
         ...state,
         sessionExpired: true,
-        locked: state.editedDocs.length > 0
+        lockedSession: state.editedDocs.length > 0
       }
     case DOWNLOADING_BUSINESS: {
-      const currentBusiness = state.loadingBusiness.includes(action.id) ? [...state.loadingBusiness] : [...state.loadingBusiness, action.id];
+      const currentBusiness = state.loadingBusiness.includes(action.ID) ? [...state.loadingBusiness] : [...state.loadingBusiness, action.ID];
       return {
         ...state,
         loadingBusiness: currentBusiness,
@@ -88,9 +87,9 @@ export default (state = defaultState, action) => {
       }
     }
     case BUSINESS_DOWNLOADED: {
-      const currentBusiness = state.downloadedBusiness.includes(action.id) ? [...state.downloadedBusiness] : [...state.downloadedBusiness, action.id];
+      const currentBusiness = state.downloadedBusiness.includes(action.ID) ? [...state.downloadedBusiness] : [...state.downloadedBusiness, action.ID];
       const downloading = [...state.loadingBusiness];
-      const indexToRemove = downloading.findIndex(el => el === action.id);
+      const indexToRemove = downloading.findIndex(el => el === action.ID);
       return {
         ...state,
         downloadedBusiness: currentBusiness,
@@ -101,7 +100,7 @@ export default (state = defaultState, action) => {
     }
     case CANCEL_DOWNLOAD: {
       const downloading = [...state.loadingBusiness];
-      const indexToRemove = downloading.findIndex(el => el === action.id);
+      const indexToRemove = downloading.findIndex(el => el === action.ID);
       return {
         ...state,
         loadingBusiness: [...downloading.slice(0, indexToRemove), ...downloading.slice(indexToRemove + 1)]
@@ -115,7 +114,7 @@ export default (state = defaultState, action) => {
       }
     }
     case DOWNLOADING_FILE: {
-      const currentFiles = state.loadingFiles.includes(action.id) ? [...state.loadingFiles] : [...state.loadingFiles, action.id];
+      const currentFiles = state.loadingFiles.includes(action.ID) ? [...state.loadingFiles] : [...state.loadingFiles, action.ID];
       return {
         ...state,
         loadingFiles: currentFiles
@@ -123,7 +122,7 @@ export default (state = defaultState, action) => {
     }
     case CANCEL_DOWNLOAD_FILE: {
       const downloading = [...state.loadingFiles];
-      const indexToRemove = downloading.findIndex(el => el === action.id);
+      const indexToRemove = downloading.findIndex(el => el === action.ID);
       return {
         ...state,
         loadingFiles: [...downloading.slice(0, indexToRemove), ...downloading.slice(indexToRemove + 1)]
@@ -131,9 +130,9 @@ export default (state = defaultState, action) => {
     }
     case FILE_DOWNLOADED: {
       const downloading = [...state.loadingFiles];
-      const indexToRemove = downloading.findIndex(el => el === action.id);
+      const indexToRemove = downloading.findIndex(el => el === action.ID);
       const currentfileToDownload = [...state.fileToDownload];
-      const indexToDownload = currentfileToDownload.findIndex(el => el === action.id);
+      const indexToDownload = currentfileToDownload.findIndex(el => el === action.ID);
       const leftToDownload = indexToDownload > -1 ? [...currentfileToDownload.slice(0, indexToDownload), ...currentfileToDownload.slice(indexToDownload +1)]
        : currentfileToDownload
       return {
@@ -151,29 +150,29 @@ export default (state = defaultState, action) => {
     }
     case EDIT_FILE: {
       const currentFiles = [...state.editedDocs];
-      const indexToUpdate = currentFiles.findIndex(c => c.id === action.file.id)
+      const indexToUpdate = currentFiles.findIndex(c => c.ID === action.file.ID)
       if (indexToUpdate === -1) {
         currentFiles.push(action.file)
         return {
           ...state,
           editedDocs: currentFiles,
-          locked: true
+          lockedSession: true
         }
       } else {
         const newEditFile = { ...currentFiles[indexToUpdate], ...action.file}
         return {
           ...state,
           editedDocs: [...currentFiles.slice(0, indexToUpdate), newEditFile, ...currentFiles.slice(indexToUpdate+1)],
-          locked: true
+          lockedSession: true
         }
       }
     }
     case REMOVE_EDIT_PREPARE: {
       const currentFiles = [...state.editedDocs];
-      const indexToUpdate = currentFiles.findIndex(c => c.id === action.id)
+      const indexToUpdate = currentFiles.findIndex(c => c.ID === action.ID)
       const fileEdit = currentFiles[indexToUpdate];
       if (fileEdit.editPath) {
-        delete fileEdit.prepared;
+        delete fileEdit.Prepared;
         return {
           ...state,
           editedDocs: [...currentFiles.slice(0, indexToUpdate), fileEdit, ...currentFiles.slice(indexToUpdate+1)]
@@ -183,7 +182,7 @@ export default (state = defaultState, action) => {
         return {
           ...state,
           editedDocs: newEditDocs,
-          locked: newEditDocs.length > 0
+          lockedSession: newEditDocs.length > 0
         }
       }
 
@@ -215,25 +214,25 @@ export default (state = defaultState, action) => {
     }
     case REMOVE_EDIT_FILE: {
       const currentFiles = [...state.editedDocs];
-      const indexToRemove = currentFiles.findIndex(el => el.id === action.id);
+      const indexToRemove = currentFiles.findIndex(el => el.ID === action.ID);
       const newFiles = [...currentFiles.slice(0, indexToRemove), ...currentFiles.slice(indexToRemove + 1)]
       const multiDocs = [...state.multipleUploadDocs]
-      const indexMulti = multiDocs.findIndex(el => el.fileId === action.id)
+      const indexMulti = multiDocs.findIndex(el => el.fileId === action.ID)
       const currentUpload = [...state.uploadingDocs];
-      const indexUpload = currentUpload.findIndex(el => el === action.id);
+      const indexUpload = currentUpload.findIndex(el => el === action.ID);
       if (indexMulti > -1) {
         return {
           ...state,
           editedDocs: newFiles,
           multipleUploadDocs: [...multiDocs.slice(0, indexMulti), ...multiDocs.slice(indexMulti + 1)],
-          locked: (newFiles.length > 0),
+          lockedSession: (newFiles.length > 0),
           uploadingDocs: [...currentUpload.slice(0, indexUpload), ...currentUpload.slice(indexUpload + 1)]
         }
       }
       return {
         ...state,
         editedDocs: newFiles,
-        locked: (newFiles.length > 0),
+        lockedSession: (newFiles.length > 0),
         uploadingDocs: [...currentUpload.slice(0, indexUpload), ...currentUpload.slice(indexUpload + 1)]
       }
     }

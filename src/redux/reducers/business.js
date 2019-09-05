@@ -23,13 +23,13 @@ export default (state = defaultState, action) => {
     case SET_DOCS: {
       if (action.editedDocs.length > 0) {
         const newDocs = [];
-        const currentDocs = [...state.docs];
+        const currentDocs = [...state.docs.filter(d => (d && d.ID))];
         for (let i = 0; i< action.docs.length; i++) {
-          const indexOfEdited = action.editedDocs.findIndex(el => el.id === action.docs[i].id)
+          const indexOfEdited = action.editedDocs.findIndex(el => el.ID === action.docs[i].ID)
           if (indexOfEdited === -1) {
             newDocs.push(action.docs[i])
           } else {
-            const indexToKeep = currentDocs.findIndex(el => el.id === action.docs[i].id);
+            const indexToKeep = currentDocs.findIndex(el => el && el.ID === action.docs[i].ID);
             newDocs.push(currentDocs[indexToKeep])
           }
         }
@@ -40,7 +40,7 @@ export default (state = defaultState, action) => {
       }
       return {
         ...state,
-        docs: action.docs,
+        docs: action.docs.filter(d => (d && d.ID)),
       }
     }
     case ADD_DOC: 
@@ -72,34 +72,34 @@ export default (state = defaultState, action) => {
     }
     case REMOVED_NEW_DOC: {
       const currentNewDoc = [...state.newDocs];
-      const indexToRemove = currentNewDoc.findIndex(el => el.id === action.id)
+      const indexToRemove = currentNewDoc.findIndex(el => el.ID === action.ID)
       return {
         ...state,
         newDocs: [...currentNewDoc.slice(0, indexToRemove), ...currentNewDoc.slice(indexToRemove + 1)]
       }
     }
     case UPDATE_DOC: {
-      const indexToUpdate = state.newDocs.findIndex(d => d.id === action.id)
-      const docToUpdate = { ...state.newDocs[indexToUpdate], fileName: action.fileName };
+      const indexToUpdate = state.newDocs.findIndex(d => d.ID === action.ID)
+      const docToUpdate = { ...state.newDocs[indexToUpdate], FileName: action.FileName };
       return {
         ...state,
         newDocs: [ ...state.newDocs.slice(0, indexToUpdate), docToUpdate, ...state.newDocs.slice(indexToUpdate + 1)]
       }
     }
     case UPDATE_PREPARE: {
-      const { fileId, prepared, preparedOn, preparedBy, revisable } = action;
+      const { fileId, Prepared, PreparedOn, PreparedBy, Revisable } = action;
       const currentDoc = [...state.docs];
       const currentNewDoc = [...state.newDocs];
-      const indexDocToUpdate = currentDoc.findIndex(el => el.id === fileId);
-      const indexNewDocToUpdate = currentNewDoc.findIndex(el => el.id === fileId);
+      const indexDocToUpdate = currentDoc.findIndex(el => (el && el.ID === fileId));
+      const indexNewDocToUpdate = currentNewDoc.findIndex(el => el.ID === fileId);
       if (indexNewDocToUpdate > -1) {
-        const newDoc = { ...currentNewDoc[indexNewDocToUpdate], prepared, preparedOn, preparedBy, revisable }
+        const newDoc = { ...currentNewDoc[indexNewDocToUpdate], Prepared, PreparedOn, PreparedBy, Revisable }
         return {
           ...state,
           newDocs: [...currentNewDoc.slice(0, indexNewDocToUpdate), newDoc, ...currentNewDoc.slice(indexNewDocToUpdate+1)]
         }
       } else {
-        const newDoc = { ...currentDoc[indexDocToUpdate], prepared, preparedOn, preparedBy, revisable }
+        const newDoc = { ...currentDoc[indexDocToUpdate], Prepared, PreparedOn, PreparedBy, Revisable }
         return {
           ...state,
           docs: [...currentDoc.slice(0, indexDocToUpdate), newDoc, ...currentDoc.slice(indexDocToUpdate+1)]

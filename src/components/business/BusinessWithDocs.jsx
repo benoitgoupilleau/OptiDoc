@@ -21,8 +21,8 @@ import rootDir from '../../services/rootDir';
 
 import { BusinessWrapper, MainSection, Title, SectionWrapper, Section, IconView, Icons, AddIcons } from './BusinessWithDocs.styled';
 
-const checkIfNew = (docs, id) => {
-  const doc = docs.filter(d => d.id === id)
+const checkIfNew = (docs, ID) => {
+  const doc = docs.filter(d => d.ID === ID)
   if (doc.length > 0 && !!doc[0].isNew) {
     return true;
   } 
@@ -41,20 +41,20 @@ const BusinessWithDocs = React.memo((props) => {
     const filesToUpload = [];
     const multiUpload = [];
     for (let i = 0; i < editedBusiness.length; i++) {
-      const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${editedBusiness[i].id}(0).${editedBusiness[i].Extension}`);
+      const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${editedBusiness[i].ID}(0).${editedBusiness[i].Extension}`);
       if (secondVersion) {
-        await RNFS.copyFile(`${EXTERNAL_PATH}${editedBusiness[i].id}(0).${editedBusiness[i].Extension}`, `${EXTERNAL_PATH}${editedBusiness[i].id}.${editedBusiness[i].Extension}`);
-        await RNFS.unlink(`${EXTERNAL_PATH}${editedBusiness[i].id}(0).${editedBusiness[i].Extension}`)
+        await RNFS.copyFile(`${EXTERNAL_PATH}${editedBusiness[i].ID}(0).${editedBusiness[i].Extension}`, `${EXTERNAL_PATH}${editedBusiness[i].ID}.${editedBusiness[i].Extension}`);
+        await RNFS.unlink(`${EXTERNAL_PATH}${editedBusiness[i].ID}(0).${editedBusiness[i].Extension}`)
       }
-      const filePath = `${EXTERNAL_PATH}${editedBusiness[i].id}.${editedBusiness[i].Extension}`;
-      const destPath = `${rootDir}/${userId}/${id}/${Folder.rea}/${editedBusiness[i].id}.${editedBusiness[i].Extension}`;
+      const filePath = `${EXTERNAL_PATH}${editedBusiness[i].ID}.${editedBusiness[i].Extension}`;
+      const destPath = `${rootDir}/${userId}/${id}/${Folder.rea}/${editedBusiness[i].ID}.${editedBusiness[i].Extension}`;
       let file = {}
       if (editedBusiness[i].isNew) {
-        file = { ...newDocs.filter(n => n.id === editedBusiness[i].id)[0] }
+        file = { ...newDocs.filter(n => n.ID === editedBusiness[i].ID)[0] }
       } else {
-        file = { ...docs.filter(n => n.id === editedBusiness[i].id)[0] }
+        file = { ...docs.filter(n => (n && n.ID === editedBusiness[i].ID))[0] }
       }
-      multiUpload.push({ affaire: id, fileId: editedBusiness[i].id });
+      multiUpload.push({ affaire: id, fileId: editedBusiness[i].ID });
       pick(props, Tables.docField);
       await RNFS.copyFile(filePath, destPath);
       const remoteDir = `./${id}/Realisation/${editedBusiness[i].Dossier3}`
@@ -63,16 +63,16 @@ const BusinessWithDocs = React.memo((props) => {
       const date = `${now.getFullYear()}-${(now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 })}-${now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })}`
       const fileToUpLoad = {
         ...file,
-        upLoadedOn: date,
-        updatedOn: date,
-        updatedBy: userName,
-        upLoadedBy: userName
+        UpLoadedOn: date,
+        UpdatedOn: date,
+        UpdatedBy: userName,
+        UpLoadedBy: userName
       }
-      uploadingFile(editedBusiness[i].id);
+      uploadingFile(editedBusiness[i].ID);
       if (editedBusiness[i].isNew) {
-        filesToUpload.push({ ...fileToUpLoad, filePath, remoteDir, isNew: true })
+        filesToUpload.push({ ...fileToUpLoad, filePath: destPath, remoteDir, isNew: true })
       } else {
-        filesToUpload.push({ ...fileToUpLoad, filePath, remoteDir, isNew: false })
+        filesToUpload.push({ ...fileToUpLoad, filePath: destPath, remoteDir, isNew: false })
       }
     }
     uploadingMulti(multiUpload)
@@ -86,7 +86,7 @@ const BusinessWithDocs = React.memo((props) => {
         Alert.alert('Envoi en cours', "Vous pourrez envoyer vos fichiers une fois l'envoi terminé", [{ text: 'Ok' }]);
       } else {
         const editedBusiness = editedDocs.filter(e => e.affaire === id)
-        const unPreparedDocs = editedBusiness.filter(d => !(d.prepared && d.prepared === true))
+        const unPreparedDocs = editedBusiness.filter(d => !(d.Prepared && d.Prepared === true))
         if (unPreparedDocs.length > 0) {
           Alert.alert('Envoi impossible', "Les fichiers ne sont pas tous cochés comme 'Préparé'", [{ text: 'Ok' }]);
         } else {
@@ -143,17 +143,17 @@ const BusinessWithDocs = React.memo((props) => {
   const displayPrep = () => {
     const listArbo = [];
     for (let i = 0; i < prep.length; i++) {
-      const indexArbo = listArbo.findIndex(a => (a.nomDossier === prep[i].dossier3 && a.etape === 'Preparation'))
+      const indexArbo = listArbo.findIndex(a => (a.nomDossier === prep[i].Dossier3 && a.etape === 'Preparation'))
       if (indexArbo === -1) {
-        const newArbo = subFolder.filter(s => (s.nomDossier === prep[i].dossier3 && s.etape === 'Preparation'))[0]
+        const newArbo = subFolder.filter(s => (s.nomDossier === prep[i].Dossier3 && s.etape === 'Preparation'))[0]
         listArbo.push(newArbo)
       }
     }
     if (listArbo.length > 0) {
       listArbo.sort((a, b) => (a.nomDossier > b.nomDossier ? 1 : -1));
-      return listArbo.map(arbo => <SubArbo key={'Prep' + arbo.nomDossier} title={arbo.designation}>{prep.filter(p => p.dossier3 === arbo.nomDossier)
-        .sort((a, b) => (a.fileName > b.fileName ? 1 : -1))
-        .map(p => <Document key={p.id} {...p} type={Folder.prep} prep={prep} rea={rea} />)}
+      return listArbo.map(arbo => <SubArbo key={'Prep' + arbo.nomDossier} title={arbo.designation}>{prep.filter(p => p.Dossier3 === arbo.nomDossier)
+        .sort((a, b) => (a.FileName > b.FileName ? 1 : -1))
+        .map(p => <Document key={p.ID} {...p} type={Folder.prep} prep={prep} rea={rea} />)}
       </SubArbo>)
     }
     return <React.Fragment></React.Fragment>
@@ -162,17 +162,17 @@ const BusinessWithDocs = React.memo((props) => {
   const displayRea = () => {
     const listArbo = [];
     for (let i = 0; i < rea.length; i++) {
-      const indexArbo = listArbo.findIndex(a => (a.nomDossier === rea[i].dossier3 && a.etape === 'Realisation'))
+      const indexArbo = listArbo.findIndex(a => (a.nomDossier === rea[i].Dossier3 && a.etape === 'Realisation'))
       if (indexArbo === -1) {
-        const newArbo = subFolder.filter(s => (s.nomDossier === rea[i].dossier3 && s.etape === 'Realisation'))[0]
+        const newArbo = subFolder.filter(s => (s.nomDossier === rea[i].Dossier3 && s.etape === 'Realisation'))[0]
         listArbo.push(newArbo)
       }
     }
     if (listArbo.length > 0) {
       listArbo.sort((a, b) => (a.nomDossier > b.nomDossier ? 1 : -1));
-      return listArbo.map(arbo => <SubArbo key={'Rea' + arbo.nomDossier} title={arbo.designation}>{rea.filter(r => r.dossier3 === arbo.nomDossier)
-        .sort((a, b) => (a.fileName > b.fileName ? 1 : -1))
-        .map(r => <Document key={r.id} isNew={checkIfNew(editedDocs, r.id)} {...r} type={Folder.rea} prep={prep} rea={rea} />)}
+      return listArbo.map(arbo => <SubArbo key={'Rea' + arbo.nomDossier} title={arbo.designation}>{rea.filter(r => r.Dossier3 === arbo.nomDossier)
+        .sort((a, b) => (a.FileName > b.FileName ? 1 : -1))
+        .map(r => <Document key={r.ID} isNew={checkIfNew(editedDocs, r.ID)} {...r} type={Folder.rea} prep={prep} rea={rea} />)}
       </SubArbo>)
     }
     return <React.Fragment></React.Fragment>
@@ -259,7 +259,7 @@ const mapStateToProps = (state, props) => ({
   nbDocBusiness: state.user.nbDocBusiness,
   uploadingDocs: state.user.uploadingDocs,
   totalDocBusiness: state.user.totalDocBusiness,
-  userId: state.user.id,
+  userId: state.user.userId,
   name: state.user.name,
   editedDocs: state.user.editedDocs,
   modeleDocs: state.business.modeles,

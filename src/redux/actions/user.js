@@ -48,7 +48,7 @@ const setUser = (userName, userId, bearerToken, name) => ({
   type: LOGIN,
   userName,
   bearerToken,
-  id: userId,
+  userId,
   name
 })
 
@@ -60,41 +60,41 @@ export const sessionExpired = () => ({
   type: SESSION_EXPIRED
 });
 
-export const downLoadOneFile = (id, extension, businessId) => async (dispatch) => {
+export const downLoadOneFile = (ID, Extension, businessId) => async (dispatch) => {
   const { user } = store.getState();
-  const destinationFolder = `${rootDir}/${user.id}/${businessId}`;
-  dispatch(downloadingFile(id))
+  const destinationFolder = `${rootDir}/${user.userId}/${businessId}`;
+  dispatch(downloadingFile(ID))
   return RNFetchBlob
     .config({
       timeout: 60000,
-      path: `${destinationFolder}/${Folder.prep}/${id}.${extension}`
+      path: `${destinationFolder}/${Folder.prep}/${ID}.${Extension}`
     })
-    .fetch('GET', `${API_URL}/api/pdffile/download/${id}`, {
+    .fetch('GET', `${API_URL}/api/pdffile/download/${ID}`, {
       Authorization: `Bearer ${user.bearerToken}`
     })
     .then(() => {
-      dispatch(fileDownloaded(id));
+      dispatch(fileDownloaded(ID));
     })
     .catch((e) => {
       Sentry.captureException(e, { func: 'downLoadOneFile', doc: 'userActions' })
-      dispatch(cancelDownloadOneFile(id))
+      dispatch(cancelDownloadOneFile(ID))
       return;
     })
 }
 
-const downloadingFile = (id) => ({
+const downloadingFile = (ID) => ({
   type: DOWNLOADING_FILE,
-  id
+  ID
 })
 
-const cancelDownloadOneFile = (id) => ({
+const cancelDownloadOneFile = (ID) => ({
   type: CANCEL_DOWNLOAD_FILE,
-  id
+  ID
 });
 
-const fileDownloaded = (id) => ({
+const fileDownloaded = (ID) => ({
   type: FILE_DOWNLOADED,
-  id
+  ID
 })
 
 export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
@@ -109,16 +109,16 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
         await RNFS.mkdir(`${destinationFolder}/${Folder.prep}`);
         for (let i = 0; i < prep.length; i += 1) {
           try {
-            const fileExists = await RNFS.exists(`${destinationFolder}/${Folder.prep}/${prep[i].id}.${prep[i].extension}`)
+            const fileExists = await RNFS.exists(`${destinationFolder}/${Folder.prep}/${prep[i].ID}.${prep[i].Extension}`)
             nbDownloading = nbDownloading + 1;
             dispatch(downloading(businessId, nbDownloading, total))
             if (!fileExists) {
               await RNFetchBlob
                 .config({
                   timeout: 60000,
-                  path: `${destinationFolder}/${Folder.prep}/${prep[i].id}.${prep[i].extension}`
+                  path: `${destinationFolder}/${Folder.prep}/${prep[i].ID}.${prep[i].Extension}`
                 })
-                .fetch('GET', `${API_URL}/api/pdffile/download/${prep[i].id}`, {
+                .fetch('GET', `${API_URL}/api/pdffile/download/${prep[i].ID}`, {
                   Authorization: `Bearer ${user.bearerToken}`
                 })
             }
@@ -132,16 +132,16 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
         await RNFS.mkdir(`${destinationFolder}/${Folder.rea}`);
         for (let i = 0; i < rea.length; i += 1) {
           try {
-            const fileExists = await RNFS.exists(`${destinationFolder}/${Folder.rea}/${rea[i].id}.${rea[i].extension}`)
+            const fileExists = await RNFS.exists(`${destinationFolder}/${Folder.rea}/${rea[i].ID}.${rea[i].Extension}`)
             nbDownloading = nbDownloading + 1;
             dispatch(downloading(businessId, nbDownloading, total))
             if (!fileExists) {
               await RNFetchBlob
                 .config({
                   timeout: 60000,
-                  path: `${destinationFolder}/${Folder.rea}/${rea[i].id}.${rea[i].extension}`
+                  path: `${destinationFolder}/${Folder.rea}/${rea[i].ID}.${rea[i].Extension}`
                 })
-                .fetch('GET', `${API_URL}/api/pdffile/download/${rea[i].id}`, {
+                .fetch('GET', `${API_URL}/api/pdffile/download/${rea[i].ID}`, {
                   Authorization: `Bearer ${user.bearerToken}`
                 })
             }
@@ -159,21 +159,21 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
     })
 }
 
-const cancelDownload = (id) => ({
+const cancelDownload = (ID) => ({
   type: CANCEL_DOWNLOAD,
-  id
+  ID
 })
 
-const downloading = (id, nb, total) => ({
+const downloading = (ID, nb, total) => ({
   type: DOWNLOADING_BUSINESS,
-  id,
+  ID,
   nb,
   total
 })
 
-const businessDownloaded = (id) => ({
+const businessDownloaded = (ID) => ({
   type: BUSINESS_DOWNLOADED,
-  id
+  ID
 })
 
 export const editPrepare = (file) => ({
@@ -181,9 +181,9 @@ export const editPrepare = (file) => ({
   file
 })
 
-export const removePrepare = (id) => ({
+export const removePrepare = (ID) => ({
   type: REMOVE_EDIT_PREPARE,
-  id
+  ID
 })
 
 export const editFile = (file, filePath) => {
@@ -205,9 +205,9 @@ export const forceDownloadModels = (modeleDocs) => dispatch => {
         await RNFetchBlob
           .config({
             timeout: 60000,
-            path: `${destinationFolder}/${modeleDocs[i].iD_Document}.pdf`
+            path: `${destinationFolder}/${modeleDocs[i].ID_Document}.pdf`
           })
-          .fetch('GET', `${API_URL}/api/pdffile/download/${modeleDocs[i].iD_Document}`, {
+          .fetch('GET', `${API_URL}/api/pdffile/download/${modeleDocs[i].ID_Document}`, {
             Authorization: `Bearer ${user.bearerToken}`
           })
       }
@@ -227,15 +227,15 @@ export const downloadModels = (modeleDocs) => dispatch => {
   return RNFS.mkdir(destinationFolder)
     .then(async () => {
       for (let i = 0; i < modeleDocs.length; i += 1) {
-        const fileExists = await RNFS.exists(`${destinationFolder}/${modeleDocs[i].iD_Document}.pdf`);
+        const fileExists = await RNFS.exists(`${destinationFolder}/${modeleDocs[i].ID_Document}.pdf`);
         if (!fileExists) {
           dispatch(downloadModele(i + 1, total))
           await RNFetchBlob
             .config({
               timeout: 60000,
-              path: `${destinationFolder}/${modeleDocs[i].iD_Document}.pdf`
+              path: `${destinationFolder}/${modeleDocs[i].ID_Document}.pdf`
             })
-            .fetch('GET', `${API_URL}/api/pdffile/download/${modeleDocs[i].iD_Document}`, {
+            .fetch('GET', `${API_URL}/api/pdffile/download/${modeleDocs[i].ID_Document}`, {
               Authorization: `Bearer ${user.bearerToken}`
             })
         }
@@ -275,62 +275,70 @@ export const cancelUploadingFile = (fileId) => ({
 
 export const uploadFile = (filePath, file) => async (dispatch) => {
   const { user } = store.getState();
-  return RNFetchBlob.config({ timeout: 60000 }).fetch('PUT', `${API_URL}/api/pdffile/upload/${file.id}`, {
+  return RNFetchBlob.config({ timeout: 100000 }).fetch('POST', `${API_URL}/api/pdffile/upload`, {
     Authorization: `Bearer ${user.bearerToken}`,
     'Content-Type': 'multipart/form-data',
-    'ID_Affaire': file.dossier1,
-    'Doss1': file.dossier1,
-    'Doss2': file.dossier2,
-    'ID_Document': file.id,
-    'Extension': file.extension
+    'ID_Affaire': file.Dossier1,
+    'Doss1': file.Dossier1,
+    'Doss2': file.Dossier2,
+    'ID_Document': file.ID,
+    'Extension': file.Extension
   }, [{
-    name: file.fileName,
-    filename: `${file.id}.${file.extension}`,
-    data: RNFetchBlob.wrap(filePath)
+    name: 'file',
+    filename: `${file.FileName}.${file.Extension}`,
+    type: 'application/pdf',
+    data: `RNFetchBlob-file://${filePath}`
   }])
-  .then(() => {
-    return api.put(`/api/documents/${file.id}`, { ...file }, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
-      .then(() => {
-        dispatch(removeFromEdit(file.id))
-      })
+  .then((res) => {
+    const info = res.info();
+    if (info && info.status === 200) {
+      return api.put(`/api/documents/${file.ID}`, { ...file }, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
+        .then(() => {
+          dispatch(removeFromEdit(file.ID))
+        })
+    }
+    Sentry.captureException(info, { func: 'uploadFile', doc: 'userActions' })
+    return dispatch(cancelUploadingFile(file.ID))
   })
   .catch((e) => {
-    Sentry.captureException(e, { func: 'uploadFile', doc: 'userActions' })
-    return dispatch(cancelUploadingFile(file.id))
+    Sentry.captureException(e, { func: 'uploadFile', doc: 'userActions', status: 'upload failed' })
+    return dispatch(cancelUploadingFile(file.ID))
   })
 }
 
-export const removeFromEdit = (id) => ({
+export const removeFromEdit = (ID) => ({
   type: REMOVE_EDIT_FILE,
-  id
+  ID
 })
 
 export const createFile = (filePath, file) => (dispatch) => {
   const { user } = store.getState();
-  return RNFetchBlob.config({ timeout: 60000 }).fetch('PUT', `${API_URL}/api/pdffile/upload/${file.id}`, {
+  return RNFetchBlob.config({ timeout: 100000 }).fetch('POST', `${API_URL}/api/pdffile/upload`, {
     Authorization: `Bearer ${user.bearerToken}`,
     'Content-Type': 'multipart/form-data',
-    'ID_Affaire': file.dossier1,
-    'Doss1': file.dossier1,
-    'Doss2': file.dossier2,
-    'ID_Document': file.id,
-    'Extension': file.extension
-  }, [{
-    name: file.fileName,
-    filename: `${file.id}.${file.extension}`,
-    data: RNFetchBlob.wrap(filePath)
-  }])
-  .then(() => {
-    return api.post(`/api/documents/${file.id}`, { ...file }, { headers: { Authorization: `Bearer ${user.bearerToken}` }})
-      .then(() => {
-        dispatch(removeNewDoc(file.id))
-        dispatch(addDoc(file))
-        dispatch(removeFromEdit(file.id))
-      })
+    'ID_Affaire': file.Dossier1,
+    'Doss1': file.Dossier1,
+    'Doss2': file.Dossier2,
+    'ID_Document': file.ID,
+    'Extension': file.Extension
+  }, [{ name: 'file', filename: `${file.FileName}.pdf`, type: 'application/pdf', data: `RNFetchBlob-file://${filePath}`}])
+  .then((res) => {
+    const info = res.info();
+    if (info && info.status === 200) {
+      return api.post(`/api/documents/${file.ID}`, { ...file }, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
+        .then(() => {
+          dispatch(removeNewDoc(file.ID))
+          dispatch(addDoc(file))
+          dispatch(removeFromEdit(file.ID))
+        })
+    }
+    Sentry.captureException(info, { func: 'createFile', doc: 'userActions', status: 'upload failed' })
+    return dispatch(cancelUploadingFile(file.ID))    
   })
   .catch((e) => {
+    dispatch(cancelUploadingFile(file.ID))
     Sentry.captureException(e, { func: 'createFile', doc: 'userActions' })
-    return dispatch(cancelUploadingFile(file.id))
+    return;
   })
 }
 
@@ -344,35 +352,42 @@ export const uploadMultipleFiles = (files) => async (dispatch) => {
   const { user } = store.getState();
   for (let i = 0; i < files.length; i++) {
     try {
-      await RNFetchBlob.config({ timeout: 60000 }).fetch('PUT', `${API_URL}/api/pdffile/upload/${files[i].id}`, {
+      const res = await RNFetchBlob.config({ timeout: 100000 }).fetch('POST', `${API_URL}/api/pdffile/upload`, {
         Authorization: `Bearer ${user.bearerToken}`,
         'Content-Type': 'multipart/form-data',
-        'ID_Affaire': files[i].dossier1,
-        'Doss1': files[i].dossier1,
-        'Doss2': files[i].dossier2,
-        'ID_Document': files[i].id,
-        'Extension': files[i].extension
+        'ID_Affaire': files[i].Dossier1,
+        'Doss1': files[i].Dossier1,
+        'Doss2': files[i].Dossier2,
+        'ID_Document': files[i].ID,
+        'Extension': files[i].Extension
       }, [{
-        name: files[i].fileName,
-        filename: `${files[i].id}.${files[i].extension}`,
-        data: RNFetchBlob.wrap(files[i].filePath)
+        name: 'file',
+        filename: `${files[i].FileName}.pdf`,
+        type: 'application/pdf',
+        data: `RNFetchBlob-file://${files[i].filePath}`
       }])
-      if (files[i].isNew) {
-        api.post(`/api/documents/${files[i].id}`, { ...files[i] }, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
-          .then(() => {
-            dispatch(removeNewDoc(files[i].id))
-            dispatch(addDoc(files[i]))
-            dispatch(removeFromEdit(files[i].id))
-          })
+      const info = res.info();
+      if (info && info.status === 200) {
+        if (files[i].isNew) {
+          api.post(`/api/documents/${files[i].ID}`, { ...files[i] }, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
+            .then(() => {
+              dispatch(removeNewDoc(files[i].ID))
+              dispatch(addDoc(files[i]))
+              dispatch(removeFromEdit(files[i].ID))
+            })
+        } else {
+          api.put(`/api/documents/${files[i].ID}`, { ...files[i] }, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
+            .then(() => {
+              dispatch(removeFromEdit(files[i].ID))
+            })
+        }
       } else {
-        api.put(`/api/documents/${files[i].id}`, { ...files[i] }, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
-          .then(() => {
-            dispatch(removeFromEdit(files[i].id))
-          })
+        Sentry.captureException(info, { func: 'uploadMultipleFiles', doc: 'userActions', status: 'upload failed' })
+        dispatch(cancelUploadingFile(files[i].ID))   
       }
     } catch (e) {
       Sentry.captureException(e, { func: 'uploadMultipleFiles', doc: 'userActions' })
-      return dispatch(cancelUploadingFile(files[i].id))
+      return dispatch(cancelUploadingFile(files[i].ID))
     }
   }
 }
