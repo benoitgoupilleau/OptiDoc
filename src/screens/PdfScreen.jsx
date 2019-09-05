@@ -59,7 +59,7 @@ const PdfScreen = ({ userId, navigation, editFile }) => {
   const Prepared = navigation.getParam('Prepared', '');
   const type = navigation.getParam('type', Folder.prep)
   const filePath = isEdited ? `${EXTERNAL_PATH}${ID}.${Extension}` :
-    isModel ? `${rootDir}/${Folder.modeleDocs}/${ID}.pdf` : `${rootDir}/${userId}/${Dossier1}/${type}/${id}.${Extension}`;
+    isModel ? `${rootDir}/${Folder.modeleDocs}/${ID}.pdf` : `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
 
   const source = { uri: filePath };
 
