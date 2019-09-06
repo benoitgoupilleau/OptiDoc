@@ -29,7 +29,7 @@ const Document = React.memo((props) => {
 
   useEffect(() => {
     checkIfDownloaded()
-  }, [])
+  }, [loadingFiles])
 
   const onEdit = async () => {
     const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
@@ -40,7 +40,7 @@ const Document = React.memo((props) => {
       const fileExists = await RNFS.exists(filePath);
       if (fileExists) {
         editFile({ ID, editPath: `${EXTERNAL_PATH}${ID}.${Extension}`, affaire: Dossier1, Extension, Dossier3 }, filePath)
-      } else if (!loadingBusiness.includes(Dossier1)) {
+      } else if (!(loadingBusiness.findIndex(l => l.ID === Dossier1) > -1)) {
         if (modeleDownloaded === 'in progress') {
           Alert.alert('Modèle en cours de téléchargement', 'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants', [{ text: 'Ok' }]);
         } else {
@@ -162,7 +162,7 @@ const Document = React.memo((props) => {
 
   const onDownloadFile = () => {
     if (isConnected) {
-      downLoadOneFile(ID, Extension, Dossier1)
+      downLoadOneFile(ID, Extension, type, Dossier1)
       return ToastAndroid.showWithGravity(
         "Fichier en cours de téléchargement",
         ToastAndroid.SHORT,
@@ -194,7 +194,7 @@ const Document = React.memo((props) => {
         return navigation.navigate('Pdf', { title: FileName, ID, Dossier3, Extension, Dossier1, type, isEdited, Prepared, Reviewed, isPrepared, Locked })
       }
     }
-    if (!loadingBusiness.includes(Dossier1)) {
+    if (!(loadingBusiness.findIndex(l => l.ID === Dossier1) > -1)) {
       if (modeleDownloaded === 'in progress') {
         return Alert.alert('Modèle en cours de téléchargement', 'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants', [{ text: 'Ok' }]);
       } else {

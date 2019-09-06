@@ -31,8 +31,6 @@ const defaultState = {
   loadingBusiness: [],
   loadingFiles: [],
   fileToDownload: [],
-  nbDocBusiness: 0,
-  totalDocBusiness: 0,
   editedDocs: [],
   uploadingDocs: [],
   multipleUploadDocs: [],
@@ -78,29 +76,37 @@ export default (state = defaultState, action) => {
         lockedSession: state.editedDocs.length > 0
       }
     case DOWNLOADING_BUSINESS: {
-      const currentBusiness = state.loadingBusiness.includes(action.ID) ? [...state.loadingBusiness] : [...state.loadingBusiness, action.ID];
+      const indexToUpdate = state.loadingBusiness.findIndex((l) => l.ID === action.ID);
+      if (indexToUpdate > -1) {
+        const newBusiness = [...state.loadingBusiness.slice(0, indexToUpdate), { ID: action.ID, nbDocBusiness: action.nb, totalDocBusiness: action.total}, ...state.loadingBusiness.slice(indexToUpdate +1)]
+        return {
+          ...state,
+          loadingBusiness: newBusiness,
+        }
+      }
+      const currentBusiness = [...state.loadingBusiness, {
+        ID: action.ID,
+        nbDocBusiness: action.nb,
+        totalDocBusiness: action.total
+      }];
       return {
         ...state,
         loadingBusiness: currentBusiness,
-        nbDocBusiness: action.nb,
-        totalDocBusiness: action.total
       }
     }
     case BUSINESS_DOWNLOADED: {
       const currentBusiness = state.downloadedBusiness.includes(action.ID) ? [...state.downloadedBusiness] : [...state.downloadedBusiness, action.ID];
       const downloading = [...state.loadingBusiness];
-      const indexToRemove = downloading.findIndex(el => el === action.ID);
+      const indexToRemove = downloading.findIndex(el => el.ID === action.ID);
       return {
         ...state,
         downloadedBusiness: currentBusiness,
         loadingBusiness: [...downloading.slice(0, indexToRemove), ...downloading.slice(indexToRemove + 1)],
-        nbDocBusiness: 0,
-        totalDocBusiness: 0
       }
     }
     case CANCEL_DOWNLOAD: {
       const downloading = [...state.loadingBusiness];
-      const indexToRemove = downloading.findIndex(el => el === action.ID);
+      const indexToRemove = downloading.findIndex(el => el.ID === action.ID);
       return {
         ...state,
         loadingBusiness: [...downloading.slice(0, indexToRemove), ...downloading.slice(indexToRemove + 1)]

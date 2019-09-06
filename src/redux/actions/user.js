@@ -60,14 +60,14 @@ export const sessionExpired = () => ({
   type: SESSION_EXPIRED
 });
 
-export const downLoadOneFile = (ID, Extension, businessId) => async (dispatch) => {
+export const downLoadOneFile = (ID, Extension, type, businessId) => async (dispatch) => {
   const { user } = store.getState();
   const destinationFolder = `${rootDir}/${user.userId}/${businessId}`;
   dispatch(downloadingFile(ID))
   return RNFetchBlob
     .config({
       timeout: 60000,
-      path: `${destinationFolder}/${Folder.prep}/${ID}.${Extension}`
+      path: `${destinationFolder}/${type}/${ID}.${Extension}`
     })
     .fetch('GET', `${API_URL}/api/pdffile/download/${ID}`, {
       Authorization: `Bearer ${user.bearerToken}`

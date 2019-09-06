@@ -80,7 +80,6 @@ Logout.propTypes = {
   getModeles: PropTypes.func.isRequired,
   getArbo: PropTypes.func.isRequired,
   editedDocs: PropTypes.array.isRequired,
-  loadingBusiness: PropTypes.array.isRequired,
   uploadingDocs: PropTypes.array.isRequired,
   downloadedBusiness: PropTypes.array.isRequired,
   docs: PropTypes.array.isRequired,
@@ -96,7 +95,6 @@ const mapStateToProps = state => ({
   editedDocs: state.user.editedDocs,
   docs: state.business.docs,
   downloadedBusiness: state.user.downloadedBusiness,
-  loadingBusiness: state.user.loadingBusiness,
   uploadingDocs: state.user.uploadingDocs,
 })
 

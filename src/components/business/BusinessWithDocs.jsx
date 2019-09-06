@@ -256,9 +256,7 @@ BusinessWithDocs.defaultProps = {
 
 const mapStateToProps = (state, props) => ({
   isConnected: state.network.isConnected,
-  nbDocBusiness: state.user.nbDocBusiness,
   uploadingDocs: state.user.uploadingDocs,
-  totalDocBusiness: state.user.totalDocBusiness,
   userId: state.user.userId,
   name: state.user.name,
   editedDocs: state.user.editedDocs,

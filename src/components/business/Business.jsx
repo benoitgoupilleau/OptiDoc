@@ -12,7 +12,7 @@ import Layout from '../../constants/Layout'
 
 import { BusinessWrapper, MainSection, Title, IconView } from './Business.styled'
 
-const Business = React.memo(({ isConnected, userId, prep, rea, id, downloadBusiness, downloadedBusiness, loadingBusiness, nbDocBusiness, totalDocBusiness, navigation, client, designation }) => {
+const Business = React.memo(({ isConnected, userId, prep, rea, id, downloadBusiness, downloadedBusiness, loadingBusiness, navigation, client, designation }) => {
   const goToDocs = () => {
     navigation.navigate('Docs', { affaire: id })
   }
@@ -32,10 +32,11 @@ const Business = React.memo(({ isConnected, userId, prep, rea, id, downloadBusin
   }
 
   const displayIcon = () => {
-    if (loadingBusiness.includes(id)) {
+    if ((loadingBusiness.findIndex(l => l.ID === id) > -1)) {
+      const dowloadingBusiness = loadingBusiness.find(l => l.ID === id)
       return (
         <View>
-          {totalDocBusiness > 0 && <Text>{nbDocBusiness}/{totalDocBusiness}</Text>}
+          {dowloadingBusiness.totalDocBusiness > 0 && <Text>{dowloadingBusiness.nbDocBusiness}/{dowloadingBusiness.totalDocBusiness}</Text>}
           <ActivityIndicator />
         </View>)
     } else if (downloadedBusiness.includes(id)) {
@@ -73,7 +74,7 @@ const Business = React.memo(({ isConnected, userId, prep, rea, id, downloadBusin
         <Title onPress={() => {
           if (downloadedBusiness.includes(id)) {
             return goToDocs();
-          } else if (!loadingBusiness.includes(id)) {
+          } else if (!(loadingBusiness.findIndex(l => l.ID === id) > -1)) {
             return onDownload();
           }
           return;
@@ -95,8 +96,6 @@ Business.propTypes = {
   downloadBusiness: PropTypes.func.isRequired,
   userId: PropTypes.string.isRequired,
   navigation: PropTypes.object.isRequired,
-  nbDocBusiness: PropTypes.number.isRequired,
-  totalDocBusiness: PropTypes.number.isRequired,
   isConnected: PropTypes.bool.isRequired,
 }
 
@@ -109,8 +108,6 @@ const mapStateToProps = state => ({
   isConnected: state.network.isConnected,
   downloadedBusiness: state.user.downloadedBusiness,
   loadingBusiness: state.user.loadingBusiness,
-  nbDocBusiness: state.user.nbDocBusiness,
-  totalDocBusiness: state.user.totalDocBusiness,
   userId: state.user.userId,
 })
 
