@@ -43,7 +43,7 @@ export const getDocs = (currentDocs = [], downloadedAffaire = [], editedDocs = [
   const { user } = store.getState();
   return api.get(`/api/documents/fromuser/${user.userId}`, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
     .then((res) => {
-      const files = res.data.filter(d => !FilesToExclude.includes(d.Dossier3))
+      const files = res && res.data ? res.data.filter(d => !FilesToExclude.includes(d.Dossier3)) : [];
       const fileToDownload = identifyNewFiles(downloadedAffaire, currentDocs, files);
       if (fileToDownload.length > 0) {
         dispatch(setDocsToDownload(fileToDownload))
@@ -81,7 +81,9 @@ export const updateDocName = (FileName, ID) => ({
 export const getModeles = () => dispatch => {
   const { user } = store.getState();
   return api.get('/api/modeles', { headers: { Authorization: `Bearer ${user.bearerToken}` } })
-    .then((res) => dispatch(setModeles(res.data)))
+    .then((res) => {
+      if (res && res.data) return dispatch(setModeles(res.data))
+    })
     .catch(e => {
       Sentry.captureException(e, { func: 'getModeles', doc: 'businessActions' })
       return;
@@ -106,7 +108,7 @@ export const getBusiness = () => dispatch => {
   const { user } = store.getState();
   return api.get(`/api/affaires/fromuser/${user.userId}`, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
     .then((res) => {
-      return dispatch(setBusiness(res.data))
+      if(res && res.data) return dispatch(setBusiness(res.data))
     })
     .catch(e => {
       Sentry.captureException(e, { func: 'getBusiness', doc: 'businessActions' })
@@ -132,7 +134,9 @@ export const removeNewDoc = ID => ({
 export const getArbo = () => dispatch => {
   const { user } = store.getState();
   return api.get('/api/arbo', { headers: { Authorization: `Bearer ${user.bearerToken}` } })
-    .then((res) => dispatch(setArbo(res.data)))
+    .then((res) => {
+      if (res && res.data) return dispatch(setArbo(res.data))
+    })
     .catch(e => {
       Sentry.captureException(e, { func: 'getArbo', doc: 'businessActions' })
       return;

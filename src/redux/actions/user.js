@@ -73,7 +73,7 @@ export const downLoadOneFile = (ID, Extension, businessId) => async (dispatch) =
       Authorization: `Bearer ${user.bearerToken}`
     })
     .then(() => {
-      dispatch(fileDownloaded(ID));
+      return dispatch(fileDownloaded(ID));
     })
     .catch((e) => {
       Sentry.captureException(e, { func: 'downLoadOneFile', doc: 'userActions' })
@@ -275,12 +275,12 @@ export const cancelUploadingFile = (fileId) => ({
 
 export const uploadFile = (filePath, file) => async (dispatch) => {
   const { user } = store.getState();
-  return RNFetchBlob.config({ timeout: 100000 }).fetch('POST', `${API_URL}/api/pdffile/upload`, {
+  return RNFetchBlob.config({ timeout: 60000 }).fetch('POST', `${API_URL}/api/pdffile/upload`, {
     Authorization: `Bearer ${user.bearerToken}`,
     'Content-Type': 'multipart/form-data',
     'ID_Affaire': file.Dossier1,
-    'Doss1': file.Dossier1,
-    'Doss2': file.Dossier2,
+    'Doss1': file.Dossier2,
+    'Doss2': file.Dossier3,
     'ID_Document': file.ID,
     'Extension': file.Extension
   }, [{
@@ -294,14 +294,14 @@ export const uploadFile = (filePath, file) => async (dispatch) => {
     if (info && info.status === 200) {
       return api.put(`/api/documents/${file.ID}`, { ...file }, { headers: { Authorization: `Bearer ${user.bearerToken}` } })
         .then(() => {
-          dispatch(removeFromEdit(file.ID))
+          return dispatch(removeFromEdit(file.ID))
         })
     }
-    Sentry.captureException(info, { func: 'uploadFile', doc: 'userActions' })
+    Sentry.captureMessage(info, { func: 'uploadFile', doc: 'userActions', status: 'upload failed' })
     return dispatch(cancelUploadingFile(file.ID))
   })
   .catch((e) => {
-    Sentry.captureException(e, { func: 'uploadFile', doc: 'userActions', status: 'upload failed' })
+    Sentry.captureException(e, { func: 'uploadFile', doc: 'userActions' })
     return dispatch(cancelUploadingFile(file.ID))
   })
 }
@@ -313,12 +313,12 @@ export const removeFromEdit = (ID) => ({
 
 export const createFile = (filePath, file) => (dispatch) => {
   const { user } = store.getState();
-  return RNFetchBlob.config({ timeout: 100000 }).fetch('POST', `${API_URL}/api/pdffile/upload`, {
+  return RNFetchBlob.config({ timeout: 60000 }).fetch('POST', `${API_URL}/api/pdffile/upload`, {
     Authorization: `Bearer ${user.bearerToken}`,
     'Content-Type': 'multipart/form-data',
     'ID_Affaire': file.Dossier1,
-    'Doss1': file.Dossier1,
-    'Doss2': file.Dossier2,
+    'Doss1': file.Dossier2,
+    'Doss2': file.Dossier3,
     'ID_Document': file.ID,
     'Extension': file.Extension
   }, [{ name: 'file', filename: `${file.FileName}.pdf`, type: 'application/pdf', data: `RNFetchBlob-file://${filePath}`}])
@@ -329,10 +329,10 @@ export const createFile = (filePath, file) => (dispatch) => {
         .then(() => {
           dispatch(removeNewDoc(file.ID))
           dispatch(addDoc(file))
-          dispatch(removeFromEdit(file.ID))
+          return dispatch(removeFromEdit(file.ID))
         })
     }
-    Sentry.captureException(info, { func: 'createFile', doc: 'userActions', status: 'upload failed' })
+    Sentry.captureMessage(info, { func: 'createFile', doc: 'userActions', status: 'upload failed' })
     return dispatch(cancelUploadingFile(file.ID))    
   })
   .catch((e) => {
@@ -352,12 +352,12 @@ export const uploadMultipleFiles = (files) => async (dispatch) => {
   const { user } = store.getState();
   for (let i = 0; i < files.length; i++) {
     try {
-      const res = await RNFetchBlob.config({ timeout: 100000 }).fetch('POST', `${API_URL}/api/pdffile/upload`, {
+      const res = await RNFetchBlob.config({ timeout: 60000 }).fetch('POST', `${API_URL}/api/pdffile/upload`, {
         Authorization: `Bearer ${user.bearerToken}`,
         'Content-Type': 'multipart/form-data',
         'ID_Affaire': files[i].Dossier1,
-        'Doss1': files[i].Dossier1,
-        'Doss2': files[i].Dossier2,
+        'Doss1': files[i].Dossier2,
+        'Doss2': files[i].Dossier3,
         'ID_Document': files[i].ID,
         'Extension': files[i].Extension
       }, [{
@@ -382,7 +382,7 @@ export const uploadMultipleFiles = (files) => async (dispatch) => {
             })
         }
       } else {
-        Sentry.captureException(info, { func: 'uploadMultipleFiles', doc: 'userActions', status: 'upload failed' })
+        Sentry.captureMessage(info, { func: 'uploadMultipleFiles', doc: 'userActions', status: 'upload failed' })
         dispatch(cancelUploadingFile(files[i].ID))   
       }
     } catch (e) {

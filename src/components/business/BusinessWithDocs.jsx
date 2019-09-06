@@ -30,7 +30,7 @@ const checkIfNew = (docs, ID) => {
 }
 
 const BusinessWithDocs = React.memo((props) => {
-  const { userId, id, navigation, isConnected, client, designation, prep, rea, editedDocs, uploadingDocs, multipleUploadDocs, newDocs, docs, uploadingFile, subFolder, uploadMultipleFiles, uploadingMulti } = props;
+  const { userId, id, navigation, name, isConnected, client, designation, prep, rea, editedDocs, uploadingDocs, multipleUploadDocs, newDocs, docs, uploadingFile, subFolder, uploadMultipleFiles, uploadingMulti } = props;
   const [showPrep, setshowPrep] = useState(false);
   const [showRea, setshowRea] = useState(false);
   const [upLoading, setupLoading] = useState(false);

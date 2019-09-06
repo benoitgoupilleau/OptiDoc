@@ -12,7 +12,9 @@ import {
 export const getNews = () => dispatch => {
   const { user } = store.getState();
   return api.get('/api/news', { headers: { Authorization: `Bearer ${user.bearerToken}`}})
-    .then((res) => dispatch(setNews(res.data)))
+    .then((res) => {
+      if (res && res.data) return dispatch(setNews(res.data))
+    })
     .catch(e => {
       Sentry.captureException(e, { func: 'getNews', doc: 'newsActions' })
       return;
