@@ -2,7 +2,7 @@ const mainColor = '#120453';
 const secondColor = '#2873a9';
 const thirdColor = '#9d9ea0';
 const fourthColor = '#e1e1e2';
-const antiBackground= 'white'
+const antiBackground = 'white';
 
 export default {
   backgroundColor: thirdColor,
@@ -19,5 +19,5 @@ export default {
   warningBackground: '#ffba00',
   warningText: 'white',
   noticeBackground: mainColor,
-  noticeText: 'white',
+  noticeText: 'white'
 };

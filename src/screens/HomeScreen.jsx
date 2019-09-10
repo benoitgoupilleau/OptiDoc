@@ -3,17 +3,27 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import Orientation from 'react-native-orientation';
-import { Text, RefreshControl, ActivityIndicator, Dimensions } from 'react-native';
+import {
+  Text,
+  RefreshControl,
+  ActivityIndicator,
+  Dimensions
+} from 'react-native';
 
 import Logout from '../components/Logout';
-import HeaderTitle from '../components/HeaderTitle'
+import HeaderTitle from '../components/HeaderTitle';
 import News from '../components/news/News';
 import Main from '../components/Main';
 
-import { getNews, refreshNews } from '../redux/actions/news'
-import { getDocs, getModeles, getBusiness, getArbo } from '../redux/actions/business'
-import { downloadModels } from '../redux/actions/user'
-import { filterNews } from '../redux/selector/news'
+import { getNews, refreshNews } from '../redux/actions/news';
+import {
+  getDocs,
+  getModeles,
+  getBusiness,
+  getArbo
+} from '../redux/actions/business';
+import { downloadModels } from '../redux/actions/user';
+import { filterNews } from '../redux/selector/news';
 
 import Layout from '../constants/Layout';
 
@@ -25,67 +35,82 @@ const StyledScroll = styled.ScrollView`
   width: ${width};
 `;
 
-const HomeScreen = React.memo(({ token, refreshing, loaded, newsList, getNews, refreshNews, getBusiness, getDocs, docs, downloadedBusiness, editedDocs, getModeles, getArbo, modeleDownloaded, modeleDocs }) => {
-  const [updatingNews, setUpdatingNews] = useState(refreshing);
-  
-  useEffect(() => {
-    if (token !== '') {
-      getNews();
-      getBusiness();
-      getModeles()
-      getDocs(docs, downloadedBusiness, editedDocs);
-      getArbo()
-      if (modeleDownloaded !== 'in progress') {
-        downloadModels(modeleDocs);
+const HomeScreen = React.memo(
+  ({
+    token,
+    refreshing,
+    loaded,
+    newsList,
+    getNews,
+    refreshNews,
+    getBusiness,
+    getDocs,
+    docs,
+    downloadedBusiness,
+    editedDocs,
+    getModeles,
+    getArbo,
+    modeleDownloaded,
+    modeleDocs
+  }) => {
+    const [updatingNews, setUpdatingNews] = useState(refreshing);
+
+    useEffect(() => {
+      if (token !== '') {
+        getNews();
+        getBusiness();
+        getModeles();
+        getDocs(docs, downloadedBusiness, editedDocs);
+        getArbo();
+        if (modeleDownloaded !== 'in progress') {
+          downloadModels(modeleDocs);
+        }
       }
+    }, [token]);
+
+    useEffect(() => {
+      Orientation.lockToPortrait();
+    }, []);
+
+    useEffect(() => {
+      setUpdatingNews(refreshing);
+    }, [refreshing]);
+
+    const onRefresh = () => {
+      setUpdatingNews(true);
+      refreshNews();
+      getNews();
+    };
+
+    if (!loaded) {
+      return (
+        <Main>
+          <ActivityIndicator />
+        </Main>
+      );
     }
-  }, [token])
-
-  useEffect(() => {
-    Orientation.lockToPortrait();
-  }, [])
-
-  useEffect(() => {
-    setUpdatingNews(refreshing)
-  }, [refreshing])
-
-  const onRefresh = () => {
-    setUpdatingNews(true)
-    refreshNews();
-    getNews()
-  }
-
-  if (!loaded) {
+    if (newsList.length > 0) {
+      return (
+        <Main>
+          <StyledScroll
+            refreshControl={
+              <RefreshControl refreshing={updatingNews} onRefresh={onRefresh} />
+            }
+          >
+            {newsList.map(news => (
+              <News key={news.id} title={news.titre} content={news.contenu} />
+            ))}
+          </StyledScroll>
+        </Main>
+      );
+    }
     return (
       <Main>
-        <ActivityIndicator />
+        <Text>Aucune actualité à afficher</Text>
       </Main>
-    )
+    );
   }
-  if (newsList.length > 0) {
-    return (
-      <Main>
-        <StyledScroll
-          refreshControl={
-            <RefreshControl
-              refreshing={updatingNews}
-              onRefresh={onRefresh}
-            />
-          }
-        >
-          {newsList.map(news => (
-            <News key={news.id} title={news.titre} content={news.contenu} />
-          ))}
-        </StyledScroll>
-      </Main>
-    )
-  }
-  return (
-    <Main>
-      <Text>Aucune actualité à afficher</Text>
-    </Main>
-  );
-})
+);
 
 HomeScreen.navigationOptions = {
   headerTitle: <HeaderTitle />,
@@ -93,7 +118,7 @@ HomeScreen.navigationOptions = {
   headerStyle: {
     height: 70
   }
-}
+};
 
 HomeScreen.propTypes = {
   navigation: PropTypes.object.isRequired,
@@ -113,10 +138,9 @@ HomeScreen.propTypes = {
   docs: PropTypes.array.isRequired,
   modeleDownloaded: PropTypes.string.isRequired,
   token: PropTypes.string.isRequired
-}
+};
 
-
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   token: state.user.bearerToken,
   newsList: filterNews([...state.news.newsList]),
   loaded: state.news.loaded,
@@ -126,7 +150,18 @@ const mapStateToProps = (state) => ({
   downloadedBusiness: state.user.downloadedBusiness,
   docs: state.business.docs,
   modeleDocs: state.business.modeles,
-  modeleDownloaded: state.user.modeleDownloaded,
-})
+  modeleDownloaded: state.user.modeleDownloaded
+});
 
-export default connect(mapStateToProps, { getNews, refreshNews, getDocs, getModeles, getBusiness, downloadModels, getArbo })(HomeScreen);
+export default connect(
+  mapStateToProps,
+  {
+    getNews,
+    refreshNews,
+    getDocs,
+    getModeles,
+    getBusiness,
+    downloadModels,
+    getArbo
+  }
+)(HomeScreen);

@@ -10,17 +10,15 @@ const Wrapper = styled.View`
   justify-content: center;
 `;
 
-const Main = ({children}) => (
+const Main = ({ children }) => (
   <Wrapper>
     <OfflineNotice />
-    <Wrapper>
-      {children}
-    </Wrapper>
+    <Wrapper>{children}</Wrapper>
   </Wrapper>
 );
 
 Main.propTypes = {
   children: PropTypes.element.isRequired
-}
+};
 
 export default Main;

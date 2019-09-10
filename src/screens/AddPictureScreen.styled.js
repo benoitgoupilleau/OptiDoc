@@ -1,15 +1,14 @@
 import styled from 'styled-components/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import Colors from '../constants/Colors'
-import Layout from '../constants/Layout'
+import Colors from '../constants/Colors';
+import Layout from '../constants/Layout';
 
 export const Container = styled.View`
   padding: 10px 20px;
 `;
 
-export const Wrapper = styled.ScrollView`
-`;
+export const Wrapper = styled.ScrollView``;
 
 export const Title = styled.Text`
   color: ${Colors.secondColor};
@@ -21,7 +20,7 @@ export const Title = styled.Text`
 export const Section = styled.Text`
   font-size: ${Layout.font.large};
   font-weight: bold;
-`
+`;
 
 export const ButtonWrapper = styled.View`
   align-items: center;
@@ -29,7 +28,8 @@ export const ButtonWrapper = styled.View`
 
 export const StyledButton = styled.TouchableOpacity`
   align-items: center;
-  background-color: ${({ disabled }) => disabled ? Colors.thirdColor : Colors.mainColor};
+  background-color: ${({ disabled }) =>
+    disabled ? Colors.thirdColor : Colors.mainColor};
   height: 40px;
   margin: 10px 0;
   padding: ${Layout.space.small};
@@ -41,7 +41,6 @@ export const StyledText = styled.Text`
   color: white;
   font-size: ${Layout.font.small};
 `;
-
 
 export const FileNameInput = styled.TextInput`
   width: 100%;
@@ -72,7 +71,8 @@ export const PictureWrapper = styled.View`
 
 export const ImageFrame = styled.Image`
   width: ${({ screenWidth }) => screenWidth - 80}px;
-  height: ${({ width, height, screenWidth }) => ((screenWidth - 80) * height) / width}px;
+  height: ${({ width, height, screenWidth }) =>
+    ((screenWidth - 80) * height) / width}px;
 `;
 
 export const Icons = styled(Ionicons)`

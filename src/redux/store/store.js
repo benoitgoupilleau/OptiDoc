@@ -7,21 +7,23 @@ import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import createEncryptor from 'redux-persist-transform-encrypt';
 
 import newsReducer from '../reducers/news';
-import networkReducer from '../reducers/network'
+import networkReducer from '../reducers/network';
 import userReducer from '../reducers/user';
 import businessReducer from '../reducers/business';
-import Sentry from '../../services/sentry'
+import Sentry from '../../services/sentry';
 
-const composeEnhancers = ENV && ENV === 'dev' ? (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose) : compose;
+const composeEnhancers =
+  ENV && ENV === 'dev'
+    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+    : compose;
 
 const encryptor = createEncryptor({
   secretKey: PERSIST_KEY,
-  onError: function (error) {
-    Sentry.captureException(error, { func: 'encryptor', doc: 'store.js'})
-    console.error({ error, func: 'encryptor', doc: 'store.js' })
+  onError: function(error) {
+    Sentry.captureException(error, { func: 'encryptor', doc: 'store.js' });
     return;
   }
-})
+});
 
 const persistConfig = {
   key: 'root',
@@ -40,10 +42,9 @@ const rootReducer = combineReducers({
 
 const pReducer = persistReducer(persistConfig, rootReducer);
 
-export const store = createStore(pReducer, composeEnhancers(applyMiddleware(thunk)));
+export const store = createStore(
+  pReducer,
+  composeEnhancers(applyMiddleware(thunk))
+);
 
 export const persistor = persistStore(store);
-
-
-
-

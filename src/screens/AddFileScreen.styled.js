@@ -1,14 +1,13 @@
 import styled from 'styled-components/native';
 
-import Colors from '../constants/Colors'
-import Layout from '../constants/Layout'
+import Colors from '../constants/Colors';
+import Layout from '../constants/Layout';
 
 export const Container = styled.View`
   padding: 10px;
 `;
 
-export const Wrapper = styled.ScrollView`
-`;
+export const Wrapper = styled.ScrollView``;
 
 export const Title = styled.Text`
   color: ${Colors.secondColor};
@@ -20,11 +19,11 @@ export const Title = styled.Text`
 export const Section = styled.Text`
   font-size: ${Layout.font.medium};
   font-weight: bold;
-`
+`;
 export const Selector = styled.View`
   flex-direction: row;
   align-items: center;
-  width:100%;
+  width: 100%;
 `;
 
 export const Option = styled.TouchableOpacity`
@@ -52,7 +51,8 @@ export const ButtonWrapper = styled.View`
 
 export const StyledButton = styled.TouchableOpacity`
   align-items: center;
-  background-color: ${({ disabled }) => disabled ? Colors.thirdColor : Colors.mainColor};
+  background-color: ${({ disabled }) =>
+    disabled ? Colors.thirdColor : Colors.mainColor};
   height: 30px;
   margin: 10px 0;
   padding: ${Layout.space.small};

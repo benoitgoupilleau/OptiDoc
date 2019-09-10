@@ -2,14 +2,14 @@ import styled from 'styled-components/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Colors from '../../constants/Colors';
-import Layout from '../../constants/Layout'
+import Layout from '../../constants/Layout';
 
 export const SubArboWrapper = styled.View`
   align-items: center;
   flex-direction: row;
   margin-bottom: ${Layout.space.small};
   padding: ${Layout.space.small};
-`
+`;
 
 export const SubArboEl = styled.Text`
   color: ${Colors.secondColor};

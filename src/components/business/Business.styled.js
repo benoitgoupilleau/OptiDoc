@@ -16,7 +16,7 @@ export const MainSection = styled.View`
   flex-direction: row;
   justify-content: space-between;
   margin: ${Layout.space.medium};
-`
+`;
 
 export const Title = styled.Text`
   color: ${Colors.secondColor};

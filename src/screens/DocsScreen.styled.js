@@ -1,7 +1,7 @@
 import styled from 'styled-components/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import Layout from '../constants/Layout'
+import Layout from '../constants/Layout';
 
 export const StyledScroll = styled.ScrollView`
   background-color: #ededed;
@@ -20,7 +20,7 @@ export const LegendWrapper = styled.View`
   flex-flow: row wrap;
   flex-grow: 1;
   width: ${({ width }) => width - 40}px;
-`
+`;
 
 export const LegendItem = styled.View`
   flex-direction: row;

@@ -12,11 +12,11 @@ const TabBarIcon = React.memo(({ name, focused }) => (
     style={{ marginBottom: -3 }}
     color={focused ? Colors.tabIconSelected : Colors.tabIconDefault}
   />
-))
+));
 
 TabBarIcon.propTypes = {
   name: PropTypes.string.isRequired,
   focused: PropTypes.bool.isRequired
-}
+};
 
 export default TabBarIcon;

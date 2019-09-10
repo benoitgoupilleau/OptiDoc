@@ -1,8 +1,11 @@
 import React from 'react';
 
-import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
+import {
+  createStackNavigator,
+  createBottomTabNavigator
+} from 'react-navigation';
 
-import TabBarLabel from '../components/TabBarLabel'
+import TabBarLabel from '../components/TabBarLabel';
 import TabBarIcon from '../components/TabBarIcon';
 
 import HomeScreen from '../screens/HomeScreen';
@@ -13,24 +16,17 @@ import DocsScreen from '../screens/DocsScreen';
 import PdfScreen from '../screens/PdfScreen';
 
 const HomeStack = createStackNavigator({
-  Home: HomeScreen,
+  Home: HomeScreen
 });
 
 HomeStack.navigationOptions = {
+  // eslint-disable-next-line react/prop-types
   tabBarLabel: ({ focused }) => (
-    <TabBarLabel
-      focused={focused}
-      title="Actualités"
-    />
+    <TabBarLabel focused={focused} title="Actualités" />
   ),
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name="md-paper"
-    />
-  ),
+  // eslint-disable-next-line react/prop-types
+  tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-paper" />
 };
-
 
 const BusinessStack = createStackNavigator({
   Business: BusinessScreen,
@@ -41,28 +37,26 @@ const BusinessStack = createStackNavigator({
 });
 
 BusinessStack.navigationOptions = {
+  // eslint-disable-next-line react/prop-types
   tabBarLabel: ({ focused }) => (
-    <TabBarLabel
-      focused={focused}
-      title="Mes Affaires"
-    />
+    <TabBarLabel focused={focused} title="Mes Affaires" />
   ),
+  // eslint-disable-next-line react/prop-types
   tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name="md-folder-open"
-    />
-  ),
+    <TabBarIcon focused={focused} name="md-folder-open" />
+  )
 };
 
-
-export default createBottomTabNavigator({
-  HomeStack,
-  BusinessStack,
-}, {
-  tabBarOptions: {
-    style: {
-      height: 60,
+export default createBottomTabNavigator(
+  {
+    HomeStack,
+    BusinessStack
+  },
+  {
+    tabBarOptions: {
+      style: {
+        height: 60
+      }
     }
   }
-});
+);

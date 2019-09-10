@@ -4,9 +4,9 @@ import { connect } from 'react-redux';
 import { ActivityIndicator } from 'react-native';
 import Main from '../components/Main';
 
-import { checkAccessStorage } from '../utils/permissionsAndroid'
+import { checkAccessStorage } from '../utils/permissionsAndroid';
 
-const  AuthLoadingScreen = ({token, navigation }) => {
+const AuthLoadingScreen = ({ token, navigation }) => {
   checkAccessStorage();
   navigation.navigate(token !== '' ? 'App' : 'Auth');
   return (
@@ -14,15 +14,15 @@ const  AuthLoadingScreen = ({token, navigation }) => {
       <ActivityIndicator />
     </Main>
   );
-}
+};
 
 AuthLoadingScreen.propTypes = {
   navigation: PropTypes.object.isRequired,
-  token: PropTypes.string.isRequired,
-}
+  token: PropTypes.string.isRequired
+};
 
 const mapStateToProps = state => ({
-  token: state.user.bearerToken,
-})
+  token: state.user.bearerToken
+});
 
 export default connect(mapStateToProps)(AuthLoadingScreen);

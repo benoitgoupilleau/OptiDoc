@@ -1,7 +1,7 @@
 import styled from 'styled-components/native';
 
-import Colors from '../constants/Colors'
-import Layout from '../constants/Layout'
+import Colors from '../constants/Colors';
+import Layout from '../constants/Layout';
 
 export const Wrapper = styled.View`
   align-items: center;
@@ -15,4 +15,4 @@ export const Title = styled.Text`
   font-size: ${Layout.font.medium};
   padding-left: 5px;
   max-width: 400px;
-`
+`;

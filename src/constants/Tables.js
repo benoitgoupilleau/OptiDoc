@@ -26,4 +26,4 @@ export default {
     'Locked',
     'UpLoadedBy'
   ]
-}
+};

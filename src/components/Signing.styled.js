@@ -1,7 +1,7 @@
 import styled from 'styled-components/native';
 
-import Colors from '../constants/Colors'
-import Layout from '../constants/Layout'
+import Colors from '../constants/Colors';
+import Layout from '../constants/Layout';
 
 export const Wrapper = styled.View`
   max-width: 400px;
@@ -26,7 +26,8 @@ export const StyledInput = styled.TextInput`
 
 export const StyledButton = styled.TouchableOpacity`
   align-items: center;
-  background-color: ${({ disabled }) => disabled ? Colors.thirdColor : Colors.mainColor};
+  background-color: ${({ disabled }) =>
+    disabled ? Colors.thirdColor : Colors.mainColor};
   height: 50px;
   text-align: center;
   padding: ${Layout.space.medium};

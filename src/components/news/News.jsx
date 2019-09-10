@@ -13,6 +13,6 @@ const News = React.memo(({ title, content }) => (
 News.propTypes = {
   title: PropTypes.string.isRequired,
   content: PropTypes.string.isRequired
-}
+};
 
 export default News;

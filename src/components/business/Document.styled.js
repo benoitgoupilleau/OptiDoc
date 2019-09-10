@@ -23,8 +23,9 @@ export const StyledInput = styled.TextInput`
   padding: 0;
   color: gray;
   font-size: ${Layout.font.medium};
-  width: ${({ width }) => (width / 2)}px;
-  ${({ editable }) => editable && 'border-bottom-color: gray; border-bottom-width: 1px;'}
+  width: ${({ width }) => width / 2}px;
+  ${({ editable }) =>
+    editable && 'border-bottom-color: gray; border-bottom-width: 1px;'}
 `;
 
 export const IconsWrapper = styled.View`

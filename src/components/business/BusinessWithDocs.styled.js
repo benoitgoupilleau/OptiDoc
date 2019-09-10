@@ -17,7 +17,7 @@ export const MainSection = styled.View`
   flex-direction: row;
   justify-content: space-between;
   margin: ${Layout.space.medium};
-`
+`;
 
 export const Title = styled.Text`
   color: ${Colors.secondColor};
@@ -34,7 +34,7 @@ export const SectionWrapper = styled.View`
   flex-direction: row;
   margin-bottom: ${Layout.space.medium};
   padding: ${Layout.space.medium};
-`
+`;
 
 export const Section = styled.Text`
   color: ${Colors.mainColor};
