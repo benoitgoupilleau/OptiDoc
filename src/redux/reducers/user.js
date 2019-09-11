@@ -29,6 +29,7 @@ const defaultState = {
   userName: '',
   name: '',
   downloadedBusiness: [],
+  upForDownload: [],
   loadingBusiness: [],
   loadingFiles: [],
   fileToDownload: [],
@@ -48,7 +49,11 @@ export default (state = defaultState, action) => {
       let omitLoading = {};
       if (action.payload && action.payload.user) {
         omitLoading = {
-          ...omit(action.payload.user, ['loadingBusiness', 'modeleDownloaded'])
+          ...omit(action.payload.user, [
+            'loadingBusiness',
+            'modeleDownloaded',
+            'upForDownload'
+          ])
         };
       }
       const modeleDownloaded =
@@ -91,6 +96,7 @@ export default (state = defaultState, action) => {
         lockedSession: state.editedDocs.length > 0
       };
     case DOWNLOADING_BUSINESS: {
+      const currentUpForDownload = [...state.upForDownload];
       const indexToUpdate = state.loadingBusiness.findIndex(
         l => l.ID === action.ID
       );
@@ -104,6 +110,13 @@ export default (state = defaultState, action) => {
           },
           ...state.loadingBusiness.slice(indexToUpdate + 1)
         ];
+        if (action.upForDownload) {
+          return {
+            ...state,
+            loadingBusiness: newBusiness,
+            upForDownload: state.upForDownload.concat(action.upForDownload)
+          };
+        }
         return {
           ...state,
           loadingBusiness: newBusiness
@@ -117,6 +130,13 @@ export default (state = defaultState, action) => {
           totalDocBusiness: action.total
         }
       ];
+      if (action.upForDownload) {
+        return {
+          ...state,
+          loadingBusiness: currentBusiness,
+          upForDownload: currentUpForDownload.concat(action.upForDownload)
+        };
+      }
       return {
         ...state,
         loadingBusiness: currentBusiness
@@ -159,23 +179,27 @@ export default (state = defaultState, action) => {
       };
     }
     case DOWNLOADING_FILE: {
+      const currentUpForDownload = [...state.upForDownload];
       const currentFiles = state.loadingFiles.includes(action.ID)
         ? [...state.loadingFiles]
         : [...state.loadingFiles, action.ID];
       return {
         ...state,
-        loadingFiles: currentFiles
+        loadingFiles: currentFiles,
+        upForDownload: currentUpForDownload.filter(d => d !== action.ID)
       };
     }
     case CANCEL_DOWNLOAD_FILE: {
       const downloading = [...state.loadingFiles];
+      const currentUpForDownload = [...state.upForDownload];
       const indexToRemove = downloading.findIndex(el => el === action.ID);
       return {
         ...state,
         loadingFiles: [
           ...downloading.slice(0, indexToRemove),
           ...downloading.slice(indexToRemove + 1)
-        ]
+        ],
+        upForDownload: currentUpForDownload.filter(d => d !== action.ID)
       };
     }
     case FILE_DOWNLOADED: {

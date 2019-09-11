@@ -61,7 +61,9 @@ const BusinessWithDocs = React.memo(props => {
     uploadingFile,
     subFolder,
     uploadMultipleFiles,
-    uploadingMulti
+    uploadingMulti,
+    upForDownload,
+    loadingFiles
   } = props;
   const [showPrep, setshowPrep] = useState(false);
   const [showRea, setshowRea] = useState(false);
@@ -273,6 +275,8 @@ const BusinessWithDocs = React.memo(props => {
             .map(r => (
               <Document
                 key={r.ID}
+                isUpForDownload={upForDownload.includes(r.ID)}
+                isLoadingFile={loadingFiles.includes(r.ID)}
                 isNew={checkIfNew(editedDocs, r.ID)}
                 {...r}
                 type={Folder.rea}
@@ -349,6 +353,8 @@ BusinessWithDocs.propTypes = {
   multipleUploadDocs: PropTypes.array,
   uploadingMulti: PropTypes.func.isRequired,
   uploadMultipleFiles: PropTypes.func.isRequired,
+  upForDownload: PropTypes.array.isRequired,
+  loadingFiles: PropTypes.array.isRequired,
   docs: PropTypes.array,
   newDocs: PropTypes.array
 };
@@ -373,7 +379,9 @@ const mapStateToProps = (state, props) => ({
   ),
   docs: state.business.docs,
   newDocs: state.business.newDocs,
-  subFolder: state.business.subFolder
+  subFolder: state.business.subFolder,
+  upForDownload: state.user.upForDownload,
+  loadingFiles: state.user.loadingFiles
 });
 
 export default withNavigation(

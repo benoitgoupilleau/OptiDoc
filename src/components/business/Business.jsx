@@ -61,18 +61,27 @@ const Business = React.memo(
     };
 
     const displayIcon = () => {
-      if (loadingBusiness.findIndex(l => l.ID === id) > -1) {
+      if (loadingBusiness.some(l => l.ID === id)) {
         const dowloadingBusiness = loadingBusiness.find(l => l.ID === id);
         return (
-          <View>
-            {dowloadingBusiness.totalDocBusiness > 0 && (
-              <Text>
-                {dowloadingBusiness.nbDocBusiness}/
-                {dowloadingBusiness.totalDocBusiness}
-              </Text>
-            )}
-            <ActivityIndicator />
-          </View>
+          <IconView>
+            <View>
+              {dowloadingBusiness.totalDocBusiness > 0 && (
+                <Text>
+                  {dowloadingBusiness.nbDocBusiness}/
+                  {dowloadingBusiness.totalDocBusiness}
+                </Text>
+              )}
+              <ActivityIndicator />
+            </View>
+            <Ionicons
+              name={'md-arrow-dropright'}
+              size={Layout.icon.large}
+              style={{ paddingLeft: 30 }}
+              color={Colors.secondColor}
+              onPress={goToDocs}
+            />
+          </IconView>
         );
       } else if (downloadedBusiness.includes(id)) {
         return (
@@ -108,9 +117,12 @@ const Business = React.memo(
         <MainSection>
           <Title
             onPress={() => {
-              if (downloadedBusiness.includes(id)) {
+              if (
+                downloadedBusiness.includes(id) ||
+                loadingBusiness.some(l => l.ID === id)
+              ) {
                 return goToDocs();
-              } else if (!(loadingBusiness.findIndex(l => l.ID === id) > -1)) {
+              } else if (!loadingBusiness.some(l => l.ID === id)) {
                 return onDownload();
               }
               return;

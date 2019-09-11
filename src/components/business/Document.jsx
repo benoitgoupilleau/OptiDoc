@@ -63,7 +63,7 @@ const Document = React.memo(props => {
     Locked,
     userId,
     loadingBusiness,
-    loadingFiles,
+    isLoadingFile,
     fileToDownload,
     uploadingDocs,
     prep,
@@ -85,14 +85,15 @@ const Document = React.memo(props => {
     removePrepare,
     removeNewDoc,
     createFile,
-    updateDocName
+    updateDocName,
+    isUpForDownload
   } = props;
   const [isDownloaded, setIsDownloaded] = useState(true);
   const [localFileName, setlocalFileName] = useState(FileName);
 
   useEffect(() => {
     checkIfDownloaded();
-  }, [loadingFiles]);
+  }, [isLoadingFile]);
 
   const onEdit = async () => {
     const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
@@ -308,9 +309,6 @@ const Document = React.memo(props => {
       editedDocs.filter(e => e.ID === ID && !!e.editPath).length > 0;
     const isPrepared =
       editedDocs.filter(e => e.ID === ID && e.Prepared).length > 0;
-    const isDownloaded = await RNFS.exists(
-      `${rootDir}/${userId}/${Dossier1}/${Dossier2}/${ID}.${Extension}`
-    );
     if (isDownloaded) {
       const secondVersion = await RNFS.exists(
         `${EXTERNAL_PATH}${ID}(0).${Extension}`
@@ -360,22 +358,14 @@ const Document = React.memo(props => {
         });
       }
     }
-    if (!(loadingBusiness.findIndex(l => l.ID === Dossier1) > -1)) {
-      if (modeleDownloaded === 'in progress') {
-        return Alert.alert(
-          'Modèle en cours de téléchargement',
-          'Les fichiers modèles sont en cours de téléchargement. Merci de réessayer dans quelques instants',
-          [{ text: 'Ok' }]
-        );
-      } else {
-        onDownloadFile();
-      }
+    if (!isUpForDownload && !isLoadingFile) {
+      onDownloadFile();
+      return ToastAndroid.showWithGravity(
+        'Fichier en cours de téléchargement',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER
+      );
     }
-    return ToastAndroid.showWithGravity(
-      'Affaire en cours de téléchargement',
-      ToastAndroid.SHORT,
-      ToastAndroid.CENTER
-    );
   };
 
   const checkIfDownloaded = async () => {
@@ -385,8 +375,16 @@ const Document = React.memo(props => {
   };
 
   const displayLeftIcon = () => {
-    if (!isDownloaded || fileToDownload.includes(ID)) {
-      return loadingFiles.includes(ID) ? (
+    if (isUpForDownload) {
+      return (
+        <Icons
+          name={'md-time'}
+          size={Layout.icon.small}
+          color={Colors.thirdColor}
+        />
+      );
+    } else if (!isDownloaded || fileToDownload.includes(ID)) {
+      return isLoadingFile ? (
         <ActivityIndicator style={{ paddingLeft: 10, paddingRight: 10 }} />
       ) : (
         <Icons
@@ -505,7 +503,7 @@ Document.propTypes = {
   isNew: PropTypes.bool,
   Dossier2: PropTypes.string.isRequired,
   fileToDownload: PropTypes.array.isRequired,
-  loadingFiles: PropTypes.array.isRequired,
+  isLoadingFile: PropTypes.bool.isRequired,
   Reviewed: PropTypes.string.isRequired,
   Prepared: PropTypes.string.isRequired,
   Locked: PropTypes.string.isRequired,
@@ -516,7 +514,8 @@ Document.propTypes = {
   editPrepare: PropTypes.func.isRequired,
   removePrepare: PropTypes.func.isRequired,
   createFile: PropTypes.func.isRequired,
-  updateDocName: PropTypes.func.isRequired
+  updateDocName: PropTypes.func.isRequired,
+  isUpForDownload: PropTypes.bool.isRequired
 };
 
 Document.defaultProps = {
@@ -530,7 +529,6 @@ const mapStateToProps = state => ({
   editedDocs: state.user.editedDocs,
   uploadingDocs: state.user.uploadingDocs,
   fileToDownload: state.user.fileToDownload,
-  loadingFiles: state.user.loadingFiles,
   userId: state.user.userId,
   name: state.user.name,
   modeleDocs: state.business.modeles,

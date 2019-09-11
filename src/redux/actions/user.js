@@ -114,7 +114,7 @@ const fileDownloaded = ID => ({
 });
 
 export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
-  dispatch(downloading(businessId, 0, 0));
+  dispatch(downloading(businessId, 0, 0, prep, rea));
   const { user } = store.getState();
   const apiUrl = user.url;
   const total = prep.length + rea.length;
@@ -132,12 +132,14 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
             nbDownloading = nbDownloading + 1;
             dispatch(downloading(businessId, nbDownloading, total));
             if (!fileExists) {
+              dispatch(downloadingFile(prep[i].ID));
               await RNFetchBlob.config({
                 timeout: 60000,
                 path: `${destinationFolder}/${Folder.prep}/${prep[i].ID}.${prep[i].Extension}`
               }).fetch('GET', `${apiUrl}/api/pdffile/download/${prep[i].ID}`, {
                 Authorization: `Bearer ${user.bearerToken}`
               });
+              dispatch(fileDownloaded(prep[i].ID));
             }
           } catch (error) {
             Sentry.captureException(error, {
@@ -145,7 +147,7 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
               func: 'downloadFile',
               doc: 'userActions'
             });
-            return dispatch(cancelDownload(businessId));
+            dispatch(cancelDownloadOneFile(prep[i].ID));
           }
         }
       }
@@ -159,12 +161,14 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
             nbDownloading = nbDownloading + 1;
             dispatch(downloading(businessId, nbDownloading, total));
             if (!fileExists) {
+              dispatch(downloadingFile(rea[i].ID));
               await RNFetchBlob.config({
                 timeout: 60000,
                 path: `${destinationFolder}/${Folder.rea}/${rea[i].ID}.${rea[i].Extension}`
               }).fetch('GET', `${apiUrl}/api/pdffile/download/${rea[i].ID}`, {
                 Authorization: `Bearer ${user.bearerToken}`
               });
+              dispatch(fileDownloaded(rea[i].ID));
             }
           } catch (error) {
             Sentry.captureException(error, {
@@ -172,7 +176,7 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
               func: 'downloadFile',
               doc: 'userActions'
             });
-            return dispatch(cancelDownload(businessId));
+            dispatch(cancelDownloadOneFile(rea[i].ID));
           }
         }
       }
@@ -183,6 +187,13 @@ export const downloadBusiness = (userId, businessId, prep, rea) => dispatch => {
         func: 'downloadBusiness',
         doc: 'userActions'
       });
+      for (let i = 0; i < prep.length; i += 1) {
+        dispatch(cancelDownloadOneFile(prep[i].ID));
+      }
+      for (let i = 0; i < rea.length; i += 1) {
+        dispatch(cancelDownloadOneFile(rea[i].ID));
+      }
+      console.log({ e });
       return dispatch(cancelDownload(businessId));
     });
 };
@@ -192,12 +203,23 @@ const cancelDownload = ID => ({
   ID
 });
 
-const downloading = (ID, nb, total) => ({
-  type: DOWNLOADING_BUSINESS,
-  ID,
-  nb,
-  total
-});
+const downloading = (ID, nb, total, prep, rea) => {
+  if (prep && rea) {
+    return {
+      type: DOWNLOADING_BUSINESS,
+      ID,
+      nb,
+      total,
+      upForDownload: prep.map(d => d.ID).concat(rea.map(d => d.ID))
+    };
+  }
+  return {
+    type: DOWNLOADING_BUSINESS,
+    ID,
+    nb,
+    total
+  };
+};
 
 const businessDownloaded = ID => ({
   type: BUSINESS_DOWNLOADED,
