@@ -25,6 +25,7 @@ export const REFRESH_NEWS = 'REFRESH_NEWS';
 
 // Network actions
 export const UPDATE_NET_STATUS = 'UPDATE_NET_STATUS';
+export const SET_INTERVAL = 'SET_INTERVAL';
 
 // Business actions
 export const SET_DOCS = 'SET_DOCS';

@@ -51,12 +51,13 @@ const HomeScreen = React.memo(
     getModeles,
     getArbo,
     modeleDownloaded,
-    modeleDocs
+    modeleDocs,
+    isConnected
   }) => {
     const [updatingNews, setUpdatingNews] = useState(refreshing);
 
     useEffect(() => {
-      if (token !== '') {
+      if (token !== '' && isConnected) {
         getNews();
         getBusiness();
         getModeles();
@@ -77,9 +78,11 @@ const HomeScreen = React.memo(
     }, [refreshing]);
 
     const onRefresh = () => {
-      setUpdatingNews(true);
-      refreshNews();
-      getNews();
+      if (token !== '' && isConnected) {
+        setUpdatingNews(true);
+        refreshNews();
+        getNews();
+      }
     };
 
     if (!loaded) {
@@ -137,6 +140,7 @@ HomeScreen.propTypes = {
   downloadedBusiness: PropTypes.array.isRequired,
   docs: PropTypes.array.isRequired,
   modeleDownloaded: PropTypes.string.isRequired,
+  isConnected: PropTypes.bool.isRequired,
   token: PropTypes.string.isRequired
 };
 
@@ -150,7 +154,8 @@ const mapStateToProps = state => ({
   downloadedBusiness: state.user.downloadedBusiness,
   docs: state.business.docs,
   modeleDocs: state.business.modeles,
-  modeleDownloaded: state.user.modeleDownloaded
+  modeleDownloaded: state.user.modeleDownloaded,
+  isConnected: state.network.isConnected
 });
 
 export default connect(
