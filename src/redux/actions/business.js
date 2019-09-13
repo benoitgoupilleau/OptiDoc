@@ -16,6 +16,8 @@ import {
   UPDATE_DOC
 } from './types';
 
+import { downLoadNewFiles } from './user';
+
 import FilesToExclude from '../../constants/FilesToExclude';
 
 const identifyNewFiles = (downloadedAffaire, currentDocs, files) => {
@@ -37,11 +39,11 @@ const identifyNewFiles = (downloadedAffaire, currentDocs, files) => {
             currentBusinessFile[indexDoc].UpLoadedOn <
             newBusinessFile[j].UpLoadedOn
           ) {
-            fileToDownload.push(newBusinessFile[j].ID);
+            fileToDownload.push(newBusinessFile[j]);
           }
         }
       } else {
-        fileToDownload.push(newBusinessFile[j].ID);
+        fileToDownload.push(newBusinessFile[j]);
       }
     }
   }
@@ -53,7 +55,7 @@ export const getDocs = (
   downloadedAffaire = [],
   editedDocs = []
 ) => dispatch => {
-  const { user } = store.getState();
+  const { user, network } = store.getState();
   const apiUrl = user.url;
   return api
     .get(`${apiUrl}/api/documents/fromuser/${user.userId}`, {
@@ -70,7 +72,11 @@ export const getDocs = (
         files
       );
       if (fileToDownload.length > 0) {
-        dispatch(setDocsToDownload(fileToDownload));
+        if (network.isConnected) {
+          dispatch(downLoadNewFiles(fileToDownload));
+        } else {
+          dispatch(setDocsToDownload(fileToDownload.map(d => d.ID)));
+        }
       }
       return dispatch(setDocs(editedDocs, files));
     })

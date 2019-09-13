@@ -19,7 +19,8 @@ import {
   FILE_DOWNLOADED,
   DOWNLOADING_FILE,
   SET_DOCS_TO_DOWNLOAD,
-  MULTI_UPLOAD
+  MULTI_UPLOAD,
+  UP_FOR_DOWNLOAD
 } from '../actions/types';
 
 const defaultState = {
@@ -166,6 +167,13 @@ export default (state = defaultState, action) => {
           ...downloading.slice(0, indexToRemove),
           ...downloading.slice(indexToRemove + 1)
         ]
+      };
+    }
+    case UP_FOR_DOWNLOAD: {
+      const currentUpForDownload = [...state.upForDownload];
+      return {
+        ...state,
+        upForDownload: currentUpForDownload.concat(action.files)
       };
     }
     case MULTI_UPLOAD: {

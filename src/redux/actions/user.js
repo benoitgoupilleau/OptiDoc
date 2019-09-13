@@ -24,7 +24,8 @@ import {
   CANCEL_DOWNLOAD_FILE,
   FILE_DOWNLOADED,
   DOWNLOADING_FILE,
-  MULTI_UPLOAD
+  MULTI_UPLOAD,
+  UP_FOR_DOWNLOAD
 } from './types';
 
 import { removeNewDoc, addDoc } from './business';
@@ -97,6 +98,36 @@ export const downLoadOneFile = (
       return;
     });
 };
+
+export const downLoadNewFiles = files => async dispatch => {
+  dispatch(setUpToDownload(files.map(f => f.ID)));
+  const { user } = store.getState();
+  const apiUrl = user.url;
+  for (let i = 0; i < files.length; i++) {
+    dispatch(downloadingFile(files[i].ID));
+    const destinationFolder = `${rootDir}/${user.userId}/${files[i].Dossier1}`;
+    try {
+      await RNFetchBlob.config({
+        timeout: 60000,
+        path: `${destinationFolder}/${files[i].Dossier2}/${files[i].ID}.${files[i].Extension}`
+      }).fetch('GET', `${apiUrl}/api/pdffile/download/${files[i].ID}`, {
+        Authorization: `Bearer ${user.bearerToken}`
+      });
+      dispatch(fileDownloaded(files[i].ID));
+    } catch (error) {
+      Sentry.captureException(error, {
+        func: 'downLoadNewFiles',
+        doc: 'userActions'
+      });
+      dispatch(cancelDownloadOneFile(files[i].ID));
+    }
+  }
+};
+
+const setUpToDownload = files => ({
+  type: UP_FOR_DOWNLOAD,
+  files
+});
 
 const downloadingFile = ID => ({
   type: DOWNLOADING_FILE,

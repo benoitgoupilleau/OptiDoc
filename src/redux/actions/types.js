@@ -18,6 +18,7 @@ export const CANCEL_UPLOAD = 'CANCEL_UPLOAD';
 export const CANCEL_DOWNLOAD_FILE = 'CANCEL_DOWNLOAD_FILE';
 export const FILE_DOWNLOADED = 'FILE_DOWNLOADED';
 export const DOWNLOADING_FILE = 'DOWNLOADING_FILE';
+export const UP_FOR_DOWNLOAD = 'UP_FOR_DOWNLOAD';
 
 // News actions
 export const SET_NEWS = 'SET_NEWS';
