@@ -287,6 +287,17 @@ const Document = React.memo(props => {
     );
   };
 
+  const confirmOnDownload = () => {
+    Alert.alert(
+      'Confirmer le téléchargement du fichier',
+      'Voulez-vous retélécharger le document ?',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        { text: 'Oui', onPress: onDownloadFile }
+      ]
+    );
+  };
+
   const onDownloadFile = () => {
     if (isConnected) {
       downLoadOneFile(ID, Extension, type, Dossier1);
@@ -383,10 +394,12 @@ const Document = React.memo(props => {
           color={Colors.thirdColor}
         />
       );
-    } else if (!isDownloaded || fileToDownload.includes(ID)) {
-      return isLoadingFile ? (
+    } else if (isLoadingFile) {
+      return (
         <ActivityIndicator style={{ paddingLeft: 10, paddingRight: 10 }} />
-      ) : (
+      );
+    } else if (!isDownloaded || fileToDownload.includes(ID)) {
+      return (
         <Icons
           name={'md-cloud-download'}
           size={Layout.icon.small}
@@ -400,7 +413,7 @@ const Document = React.memo(props => {
 
   const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
   return (
-    <DocumentWrapper onPress={onOpenFile}>
+    <DocumentWrapper onPress={onOpenFile} onLongPress={confirmOnDownload}>
       <File>
         {displayLeftIcon()}
         {isNew ? (

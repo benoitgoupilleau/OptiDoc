@@ -18,6 +18,7 @@ import Folder from '../constants/Folder';
 import Colors from '../constants/Colors';
 
 import rootDir from '../services/rootDir';
+import Sentry from '../services/sentry';
 
 const Edit = styled.TouchableOpacity`
   align-items: center;
@@ -35,33 +36,8 @@ const PdfScreen = ({ userId, navigation, editFile }) => {
     Orientation.unlockAllOrientations();
     setTimeout(() => {
       setLoading(false);
-    }, 500);
+    }, 250);
   }, []);
-
-  const onPressEdit = async (
-    ID,
-    Extension,
-    Dossier1,
-    filePath,
-    isEdited,
-    Dossier3
-  ) => {
-    navigation.goBack();
-    if (isEdited) {
-      await openFile(ID, Extension);
-    } else {
-      editFile(
-        {
-          ID,
-          editPath: `${EXTERNAL_PATH}${ID}.${Extension}`,
-          affaire: Dossier1,
-          Extension,
-          Dossier3
-        },
-        filePath
-      );
-    }
-  };
 
   const isEdited = navigation.getParam('isEdited', false);
   const isModel = navigation.getParam('isModel', false);
@@ -80,6 +56,28 @@ const PdfScreen = ({ userId, navigation, editFile }) => {
     ? `${rootDir}/${Folder.modeleDocs}/${ID}.pdf`
     : `${rootDir}/${userId}/${Dossier1}/${type}/${ID}.${Extension}`;
 
+  const onPressEdit = async () => {
+    navigation.goBack();
+    if (isEdited) {
+      await openFile(ID, Extension);
+    } else {
+      editFile(
+        {
+          ID,
+          editPath: `${EXTERNAL_PATH}${ID}.${Extension}`,
+          affaire: Dossier1,
+          Extension,
+          Dossier3
+        },
+        filePath
+      );
+    }
+  };
+
+  const onError = error => {
+    Sentry.captureException(error, { func: 'PdfScreen', doc: ID });
+  };
+
   const source = { uri: filePath };
 
   if (loading) {
@@ -96,18 +94,7 @@ const PdfScreen = ({ userId, navigation, editFile }) => {
           Reviewed === 'N' &&
           Locked === 'N' &&
           (Prepared === 'N' || isPrepared) && (
-            <Edit
-              onPress={() =>
-                onPressEdit(
-                  ID,
-                  Extension,
-                  Dossier1,
-                  filePath,
-                  isEdited,
-                  Dossier3
-                )
-              }
-            >
+            <Edit onPress={onPressEdit}>
               <EditText>Modifier</EditText>
             </Edit>
           )}
@@ -118,6 +105,8 @@ const PdfScreen = ({ userId, navigation, editFile }) => {
             flex: 1,
             width: Dimensions.get('window').width
           }}
+          activityIndicator={<ActivityIndicator />}
+          onError={onError}
         />
       </View>
     </Main>

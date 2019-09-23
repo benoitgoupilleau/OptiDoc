@@ -209,9 +209,28 @@ const AddFileScreen = React.memo(
       }
     };
 
-    const forceDownload = () => {
-      if (modeleDownloaded !== 'in progress') {
-        forceDownloadModels(modeles);
+    const onClickForceDownload = () => {
+      if (modeleDownloaded === 'in progress') {
+        Alert.alert(
+          'Modèles en cours de téléchargement',
+          "Merci d'attendre la fin du téléchargement en cours",
+          [{ text: 'Ok' }]
+        );
+      } else {
+        Alert.alert(
+          'Confirmer le téléchargement',
+          'Etes-vous sûr de vouloir retélécharger les modèles?',
+          [
+            {
+              text: 'Annuler',
+              style: 'cancel'
+            },
+            {
+              text: 'Oui',
+              onPress: () => forceDownloadModels(modeles)
+            }
+          ]
+        );
       }
     };
 
@@ -232,7 +251,7 @@ const AddFileScreen = React.memo(
         <Wrapper>
           <Title>{clientName}</Title>
           <Section>Sélectionner un modèle</Section>
-          <StyledButton onPress={forceDownload}>
+          <StyledButton onPress={onClickForceDownload}>
             <StyledText>Retélécharger les modèles</StyledText>
           </StyledButton>
           <Selector>
@@ -321,11 +340,11 @@ AddFileScreen.propTypes = {
   modeleDownloaded: PropTypes.string.isRequired
 };
 
-const mapStateToProps = state => ({
-  modeles: state.business.modeles,
-  user: state.user,
-  userBusiness: state.business.business,
-  modeleDownloaded: state.user.modeleDownloaded
+const mapStateToProps = ({ business, user }) => ({
+  modeles: business.modeles,
+  user: user,
+  userBusiness: business.business,
+  modeleDownloaded: user.modeleDownloaded
 });
 
 export default connect(

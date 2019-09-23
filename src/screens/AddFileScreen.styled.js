@@ -57,7 +57,7 @@ export const StyledButton = styled.TouchableOpacity`
   margin: 10px 0;
   padding: ${Layout.space.small};
   text-align: center;
-  width: 200px;
+  width: 250px;
 `;
 
 export const StyledText = styled.Text`

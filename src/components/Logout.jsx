@@ -71,7 +71,14 @@ const Logout = React.memo(
           ]
         );
       } else {
-        signOutAsync();
+        Alert.alert(
+          'Etes-vous sûr de vouloir vous déconnecter ?',
+          'Une connexion internet est nécessaire pour pouvoir se reconnecter',
+          [
+            { text: 'Annuler', style: 'cancel' },
+            { text: 'Oui', onPress: signOutAsync }
+          ]
+        );
       }
     };
 
