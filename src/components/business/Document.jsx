@@ -371,11 +371,6 @@ const Document = React.memo(props => {
     }
     if (!isUpForDownload && !isLoadingFile) {
       onDownloadFile();
-      return ToastAndroid.showWithGravity(
-        'Fichier en cours de téléchargement',
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER
-      );
     }
   };
 
