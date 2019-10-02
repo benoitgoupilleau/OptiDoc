@@ -240,6 +240,9 @@ const BusinessWithDocs = React.memo(props => {
             .map(p => (
               <Document
                 key={p.ID}
+                isUpForDownload={upForDownload.includes(p.ID)}
+                isLoadingFile={loadingFiles.includes(p.ID)}
+                isNew={false}
                 {...p}
                 type={Folder.prep}
                 prep={prep}
@@ -249,7 +252,7 @@ const BusinessWithDocs = React.memo(props => {
         </SubArbo>
       ));
     }
-    return <React.Fragment></React.Fragment>;
+    return <></>;
   };
 
   const displayRea = () => {
@@ -287,7 +290,7 @@ const BusinessWithDocs = React.memo(props => {
         </SubArbo>
       ));
     }
-    return <React.Fragment></React.Fragment>;
+    return <></>;
   };
 
   const clientName = `${client} - ${designation}`;
