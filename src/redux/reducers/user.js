@@ -53,7 +53,8 @@ export default (state = defaultState, action) => {
           ...omit(action.payload.user, [
             'loadingBusiness',
             'modeleDownloaded',
-            'upForDownload'
+            'upForDownload',
+            'loadingFiles'
           ])
         };
       }
