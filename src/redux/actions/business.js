@@ -42,7 +42,7 @@ const identifyNewFiles = (downloadedAffaire, currentDocs, files) => {
             fileToDownload.push(newBusinessFile[j]);
           }
         }
-      } else {
+      } else if (currentBusinessFile.length === 0) {
         fileToDownload.push(newBusinessFile[j]);
       }
     }
