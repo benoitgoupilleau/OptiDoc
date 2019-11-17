@@ -11,6 +11,13 @@ import { store, persistor } from './src/redux/store/store';
 import { setupSentry } from './src/services/sentry';
 import { setRootDir } from './src/services/rootDir';
 
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({ 
+  dsn: 'https://fbc2d25a7f044e1980699785ab02c387@sentry.io/1405393', 
+});
+
+
 if (ENV !== 'dev') setupSentry();
 setRootDir();
 

@@ -1,14 +1,14 @@
-import { Sentry } from 'react-native-sentry';
+import * as Sentry from '@sentry/react-native';
 import { SENTRY_DSN } from 'react-native-dotenv';
 import DeviceInfo from 'react-native-device-info';
 
 export const setupSentry = () => {
-  Sentry.config(SENTRY_DSN).install();
+  Sentry.init({ dsn: SENTRY_DSN });
   addBuildContext();
 };
 
 const addBuildContext = () => {
-  Sentry.setTagsContext({
+  Sentry.setTags({
     appVersion: DeviceInfo.getVersion(),
     buildNumber: DeviceInfo.getBuildNumber(),
     deviceInfo: {
