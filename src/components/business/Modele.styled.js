@@ -13,7 +13,7 @@ export const ModeleWrapper = styled.TouchableOpacity`
 export const Title = styled.Text`
   font-size: ${Layout.font.small};
   max-width: ${({ width }) => Math.round(width / 2) - 75}px;
-  ${props => props.selected && 'color: black;'}
+  ${(props) => props.selected && 'color: black;'}
 `;
 
 export const Icons = styled(Ionicons)`

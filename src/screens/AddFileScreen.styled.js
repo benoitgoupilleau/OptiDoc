@@ -27,7 +27,7 @@ export const Selector = styled.View`
 `;
 
 export const Option = styled.TouchableOpacity`
-  width: 33%;
+  width: 25%;
   align-items: center;
   ${({ isSelected }) => isSelected && `background-color: ${Colors.thirdColor};`}
   border-bottom-color: ${Colors.thirdColor};
@@ -40,19 +40,13 @@ export const OptionText = styled.Text`
   padding: 5px 0;
 `;
 
-export const ModeleList = styled(Selector)`
-  margin: 10px 0;
-  flex-flow: row wrap;
-`;
-
 export const ButtonWrapper = styled.View`
   align-items: center;
 `;
 
 export const StyledButton = styled.TouchableOpacity`
   align-items: center;
-  background-color: ${({ disabled }) =>
-    disabled ? Colors.thirdColor : Colors.mainColor};
+  background-color: ${({ disabled }) => (disabled ? Colors.thirdColor : Colors.mainColor)};
   height: 30px;
   margin: 10px 0;
   padding: ${Layout.space.small};
