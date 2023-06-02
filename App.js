@@ -13,10 +13,10 @@ import { setRootDir } from './src/services/rootDir';
 
 import * as Sentry from '@sentry/react-native';
 
-Sentry.init({ 
-  dsn: 'https://fbc2d25a7f044e1980699785ab02c387@sentry.io/1405393', 
+Sentry.init({
+  dsn: 'https://8f17dcd28546422c963645d5457ff051@o132692.ingest.sentry.io/4504762494222336',
+  tracesSampleRate: 1.0,
 });
-
 
 if (ENV !== 'dev') setupSentry();
 setRootDir();
@@ -25,7 +25,7 @@ const App = () => (
   <Provider store={store}>
     <PersistGate loading={<ActivityIndicator />} persistor={persistor}>
       <AppNavigator
-        ref={navigatorRef => {
+        ref={(navigatorRef) => {
           NavigationService.setTopLevelNavigator(navigatorRef);
         }}
       />

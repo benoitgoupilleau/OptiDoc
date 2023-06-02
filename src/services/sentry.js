@@ -3,7 +3,7 @@ import { SENTRY_DSN } from 'react-native-dotenv';
 import DeviceInfo from 'react-native-device-info';
 
 export const setupSentry = () => {
-  Sentry.init({ dsn: SENTRY_DSN });
+  Sentry.init({ dsn: SENTRY_DSN, tracesSampleRate: 1.0 });
   addBuildContext();
 };
 
@@ -14,8 +14,8 @@ const addBuildContext = () => {
     deviceInfo: {
       systemName: DeviceInfo.getSystemName(),
       systemVersion: DeviceInfo.getSystemVersion(),
-      deviceName: DeviceInfo.getDeviceName()
-    }
+      deviceName: DeviceInfo.getDeviceName(),
+    },
   });
 };
 
