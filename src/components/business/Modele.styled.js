@@ -1,9 +1,10 @@
 import styled from 'styled-components/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { TouchableOpacity } from 'react-native';
 
 import Layout from '../../constants/Layout';
 
-export const ModeleWrapper = styled.TouchableOpacity`
+export const ModeleWrapper = styled(TouchableOpacity)`
   margin: ${Layout.space.small};
   flex-direction: row;
   justify-content: space-between;

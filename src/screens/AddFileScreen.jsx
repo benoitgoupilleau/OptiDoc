@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import RNFS from 'react-native-fs';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -21,23 +21,10 @@ import { addNewDoc } from '../redux/actions/business';
 import rootDir from '../services/rootDir';
 import { getDateFormat } from '../services/dateFormat';
 
-import {
-  Container,
-  Wrapper,
-  Title,
-  Section,
-  Selector,
-  Option,
-  OptionText,
-  ButtonWrapper,
-  StyledButton,
-  StyledText,
-  FileNameInput,
-} from './AddFileScreen.styled';
+import { Container, Wrapper, Title, Section, ButtonWrapper, StyledButton, StyledText, FileNameInput } from './AddFileScreen.styled';
 
 const AddFileScreen = React.memo(
   ({ navigation, user, userBusiness, modeleDownloaded, modeles, editFile, addNewDoc, downloadModels, forceDownloadModels }) => {
-    const [TypeModele, setTypeModele] = useState('HSE');
     const [ModeleID, setModeleID] = useState('');
     const [FileName, setFileName] = useState('');
     const [filePath, setFilePath] = useState('');
@@ -193,8 +180,7 @@ const AddFileScreen = React.memo(
       }
     };
 
-    const onPress = (type) => {
-      setTypeModele(type);
+    const onSelectTypeModele = () => {
       setFileName('');
       setFileNameFinal('');
     };
@@ -205,11 +191,6 @@ const AddFileScreen = React.memo(
         ID: modele.ID_Document,
         isModel: true,
       });
-
-    const selectedModels = useMemo(
-      () => modeles.filter((m) => m.TypeModele === TypeModele).sort((a, b) => (a.Designation.trim() > b.Designation.trim() ? 1 : -1)),
-      [modeles, TypeModele]
-    );
 
     const id_affaire = navigation.getParam('affaire', '');
     const business = userBusiness.find((b) => b.id === id_affaire);
@@ -223,26 +204,12 @@ const AddFileScreen = React.memo(
           <StyledButton onPress={onClickForceDownload}>
             <StyledText>Retélécharger les modèles</StyledText>
           </StyledButton>
-          <Selector>
-            <Option isSelected={TypeModele === 'HSE'} onPress={() => onPress('HSE')}>
-              <OptionText isSelected={TypeModele === 'HSE'}>HSE</OptionText>
-            </Option>
-            <Option isSelected={TypeModele === 'PV'} onPress={() => onPress('PV')}>
-              <OptionText isSelected={TypeModele === 'PV'}>PV Qualité</OptionText>
-            </Option>
-            <Option isSelected={TypeModele === 'DOCS'} onPress={() => onPress('DOCS')}>
-              <OptionText isSelected={TypeModele === 'DOCS'}>Docs Clients</OptionText>
-            </Option>
-            <Option isSelected={TypeModele === 'DMOS'} onPress={() => onPress('DMOS')}>
-              <OptionText isSelected={TypeModele === 'DMOS'}>DMOS</OptionText>
-            </Option>
-          </Selector>
           <ModeleSelect
-            key={TypeModele}
-            selectedModels={selectedModels}
+            modeles={modeles}
             FileName={FileName}
             handleSelectModele={handleSelectModele}
             onOpenFile={onOpenFile}
+            onSelectTypeModele={onSelectTypeModele}
           />
           <ButtonWrapper>
             <FileNameInput

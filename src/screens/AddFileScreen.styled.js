@@ -20,25 +20,6 @@ export const Section = styled.Text`
   font-size: ${Layout.font.medium};
   font-weight: bold;
 `;
-export const Selector = styled.View`
-  flex-direction: row;
-  align-items: center;
-  width: 100%;
-`;
-
-export const Option = styled.TouchableOpacity`
-  width: 25%;
-  align-items: center;
-  ${({ isSelected }) => isSelected && `background-color: ${Colors.thirdColor};`}
-  border-bottom-color: ${Colors.thirdColor};
-  border-bottom-width: 1px;
-  margin: 10px 0;
-`;
-
-export const OptionText = styled.Text`
-  ${({ isSelected }) => isSelected && `color: white;`}
-  padding: 5px 0;
-`;
 
 export const ButtonWrapper = styled.View`
   align-items: center;
