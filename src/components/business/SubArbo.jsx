@@ -21,7 +21,7 @@ const SubArbo = ({ title, children }) => {
           name={display ? 'md-arrow-dropdown' : 'md-arrow-dropright'}
           size={Layout.icon.default}
           color={Colors.secondColor}
-          onPress={this.toggleArbo}
+          onPress={toggleArbo}
         />
         <SubArboEl onPress={toggleArbo}>{title}</SubArboEl>
       </SubArboWrapper>
@@ -32,7 +32,7 @@ const SubArbo = ({ title, children }) => {
 
 SubArbo.propTypes = {
   title: PropTypes.string.isRequired,
-  children: PropTypes.any.isRequired
+  children: PropTypes.any.isRequired,
 };
 
 export default SubArbo;
