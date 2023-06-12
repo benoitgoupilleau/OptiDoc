@@ -13,7 +13,7 @@ import {
   ADD_DOC,
   SET_ARBO,
   SET_DOCS_TO_DOWNLOAD,
-  UPDATE_DOC
+  UPDATE_DOC,
 } from './types';
 
 import { downLoadNewFiles } from './user';
@@ -23,22 +23,13 @@ import FilesToExclude from '../../constants/FilesToExclude';
 const identifyNewFiles = (downloadedAffaire, currentDocs, files) => {
   const fileToDownload = [];
   for (let i = 0; i < downloadedAffaire.length; i++) {
-    const currentBusinessFile = currentDocs.filter(
-      c => c && c.Dossier1 === downloadedAffaire[i]
-    );
-    const newBusinessFile = files.filter(
-      c => c.Dossier1 === downloadedAffaire[i]
-    );
+    const currentBusinessFile = currentDocs.filter((c) => c && c.Dossier1 === downloadedAffaire[i]);
+    const newBusinessFile = files.filter((c) => c.Dossier1 === downloadedAffaire[i]);
     for (let j = 0; j < newBusinessFile.length; j++) {
       if (currentBusinessFile.length > 0) {
-        const indexDoc = currentBusinessFile.findIndex(
-          d => d.ID === newBusinessFile[j].ID
-        );
+        const indexDoc = currentBusinessFile.findIndex((d) => d.ID === newBusinessFile[j].ID);
         if (indexDoc > -1) {
-          if (
-            currentBusinessFile[indexDoc].UpLoadedOn <
-            newBusinessFile[j].UpLoadedOn
-          ) {
+          if (currentBusinessFile[indexDoc].UpLoadedOn < newBusinessFile[j].UpLoadedOn) {
             fileToDownload.push(newBusinessFile[j]);
           }
         }
@@ -50,154 +41,139 @@ const identifyNewFiles = (downloadedAffaire, currentDocs, files) => {
   return fileToDownload;
 };
 
-export const getDocs = (
-  currentDocs = [],
-  downloadedAffaire = [],
-  editedDocs = []
-) => dispatch => {
-  const { user, network } = store.getState();
-  const apiUrl = user.url;
-  return api
-    .get(`${apiUrl}/api/documents/fromuser/${user.userId}`, {
-      headers: { Authorization: `Bearer ${user.bearerToken}` }
-    })
-    .then(res => {
-      const files =
-        res && res.data
-          ? res.data.filter(d => !FilesToExclude.includes(d.Dossier3))
-          : [];
-      const fileToDownload = identifyNewFiles(
-        downloadedAffaire,
-        currentDocs,
-        files
-      );
-      if (fileToDownload.length > 0) {
-        if (network.isConnected) {
-          dispatch(downLoadNewFiles(fileToDownload));
-        } else {
-          dispatch(setDocsToDownload(fileToDownload.map(d => d.ID)));
+export const getDocs =
+  (currentDocs = [], downloadedAffaire = [], editedDocs = []) =>
+  (dispatch) => {
+    const { user, network } = store.getState();
+    const apiUrl = user.url;
+    return api
+      .get(`${apiUrl}/api/documents/fromuserYcSysDoc/${user.userId}`, {
+        headers: { Authorization: `Bearer ${user.bearerToken}` },
+      })
+      .then((res) => {
+        const files = res && res.data ? res.data.filter((d) => !FilesToExclude.includes(d.Dossier3)) : [];
+        const fileToDownload = identifyNewFiles(downloadedAffaire, currentDocs, files);
+        if (fileToDownload.length > 0) {
+          if (network.isConnected) {
+            dispatch(downLoadNewFiles(fileToDownload));
+          } else {
+            dispatch(setDocsToDownload(fileToDownload.map((d) => d.ID)));
+          }
         }
-      }
-      return dispatch(setDocs(editedDocs, files));
-    })
-    .catch(e => {
-      Sentry.captureException(e, { func: 'getDocs', doc: 'businessActions' });
-      return;
-    });
-};
+        return dispatch(setDocs(editedDocs, files));
+      })
+      .catch((e) => {
+        Sentry.captureException(e, { func: 'getDocs', doc: 'businessActions' });
+        return;
+      });
+  };
 
 const setDocs = (editedDocs, docs) => ({
   type: SET_DOCS,
   docs,
-  editedDocs
+  editedDocs,
 });
 
-const setDocsToDownload = fileToDownload => ({
+const setDocsToDownload = (fileToDownload) => ({
   type: SET_DOCS_TO_DOWNLOAD,
-  fileToDownload
+  fileToDownload,
 });
 
-export const addDoc = doc => ({
+export const addDoc = (doc) => ({
   type: ADD_DOC,
-  doc
+  doc,
 });
 
 export const updateDocName = (FileName, ID) => ({
   type: UPDATE_DOC,
   FileName,
-  ID
+  ID,
 });
 
-export const getModeles = () => dispatch => {
+export const getModeles = () => (dispatch) => {
   const { user } = store.getState();
   const apiUrl = user.url;
   return api
     .get(`${apiUrl}/api/modeles`, {
-      headers: { Authorization: `Bearer ${user.bearerToken}` }
+      headers: { Authorization: `Bearer ${user.bearerToken}` },
     })
-    .then(res => {
+    .then((res) => {
       if (res && res.data) return dispatch(setModeles(res.data));
     })
-    .catch(e => {
+    .catch((e) => {
       Sentry.captureException(e, {
         func: 'getModeles',
-        doc: 'businessActions'
+        doc: 'businessActions',
       });
       return;
     });
 };
 
-const setModeles = modeles => ({
+const setModeles = (modeles) => ({
   type: SET_MODELES,
-  modeles
+  modeles,
 });
 
-export const updatePrepared = (
-  fileId,
-  Prepared,
-  PreparedOn,
-  PreparedBy,
-  Revisable
-) => ({
+export const updatePrepared = (fileId, Prepared, PreparedOn, PreparedBy, Revisable) => ({
   type: UPDATE_PREPARE,
   fileId,
   Prepared,
   PreparedOn,
   PreparedBy,
-  Revisable
+  Revisable,
 });
 
-export const getBusiness = () => dispatch => {
+export const getBusiness = () => (dispatch) => {
   const { user } = store.getState();
   const apiUrl = user.url;
   return api
     .get(`${apiUrl}/api/affaires/fromuser/${user.userId}`, {
-      headers: { Authorization: `Bearer ${user.bearerToken}` }
+      headers: { Authorization: `Bearer ${user.bearerToken}` },
     })
-    .then(res => {
+    .then((res) => {
       if (res && res.data) return dispatch(setBusiness(res.data));
     })
-    .catch(e => {
+    .catch((e) => {
       Sentry.captureException(e, {
         func: 'getBusiness',
-        doc: 'businessActions'
+        doc: 'businessActions',
       });
       return;
     });
 };
 
-const setBusiness = business => ({
+const setBusiness = (business) => ({
   type: SET_BUSINESS,
-  business
+  business,
 });
 
-export const addNewDoc = doc => ({
+export const addNewDoc = (doc) => ({
   type: ADD_NEW_DOC,
-  doc
+  doc,
 });
 
-export const removeNewDoc = ID => ({
+export const removeNewDoc = (ID) => ({
   type: REMOVED_NEW_DOC,
-  ID
+  ID,
 });
 
-export const getArbo = () => dispatch => {
+export const getArbo = () => (dispatch) => {
   const { user } = store.getState();
   const apiUrl = user.url;
   return api
     .get(`${apiUrl}/api/arbo`, {
-      headers: { Authorization: `Bearer ${user.bearerToken}` }
+      headers: { Authorization: `Bearer ${user.bearerToken}` },
     })
-    .then(res => {
+    .then((res) => {
       if (res && res.data) return dispatch(setArbo(res.data));
     })
-    .catch(e => {
+    .catch((e) => {
       Sentry.captureException(e, { func: 'getArbo', doc: 'businessActions' });
       return;
     });
 };
 
-const setArbo = subFolder => ({
+const setArbo = (subFolder) => ({
   type: SET_ARBO,
-  subFolder
+  subFolder,
 });

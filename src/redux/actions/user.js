@@ -36,7 +36,7 @@ import rootDir from '../../services/rootDir';
 
 export const loginApi = (userName, MdP, url, successCallback, errorCallback) => (dispatch) =>
   api
-    .post(`${url}/api/login`, { login: userName, MdP: ';<=>' })
+    .post(`${url}/api/login`, { login: userName, MdP })
     .then((res) => {
       const { username, id_user, token } = res.data;
       successCallback();
@@ -133,100 +133,135 @@ const fileDownloaded = (ID) => ({
   ID,
 });
 
-export const downloadBusiness = (userId, businessId, prep, rea) => (dispatch) => {
-  dispatch(downloading(businessId, 0, 0, prep, rea));
-  const { user } = store.getState();
-  const apiUrl = user.url;
-  const total = prep.length + rea.length;
-  const destinationFolder = `${rootDir}/${userId}/${businessId}`;
-  return RNFS.mkdir(destinationFolder)
-    .then(async () => {
-      let nbDownloading = 0;
-      if (prep.length > 0) {
-        await RNFS.mkdir(`${destinationFolder}/${Folder.prep}`);
+export const downloadBusiness =
+  (userId, businessId, { prep, rea, sysDoc }) =>
+  (dispatch) => {
+    dispatch(downloading(businessId, 0, 0, { prep, rea, sysDoc }));
+    const { user } = store.getState();
+    const apiUrl = user.url;
+    const total = prep.length + rea.length + sysDoc.length;
+    const destinationFolder = `${rootDir}/${userId}/${businessId}`;
+    return RNFS.mkdir(destinationFolder)
+      .then(async () => {
+        let nbDownloading = 0;
+        if (prep.length > 0) {
+          await RNFS.mkdir(`${destinationFolder}/${Folder.prep}`);
+          for (let i = 0; i < prep.length; i += 1) {
+            try {
+              const fileExists = await RNFS.exists(`${destinationFolder}/${Folder.prep}/${prep[i].ID}.${prep[i].Extension}`);
+              nbDownloading = nbDownloading + 1;
+              dispatch(downloading(businessId, nbDownloading, total));
+              if (!fileExists) {
+                dispatch(downloadingFile(prep[i].ID));
+                await RNFetchBlob.config({
+                  timeout: 60000,
+                  path: `${destinationFolder}/${Folder.prep}/${prep[i].ID}.${prep[i].Extension}`,
+                }).fetch('GET', `${apiUrl}/api/pdffile/download/${prep[i].ID}`, {
+                  Authorization: `Bearer ${user.bearerToken}`,
+                });
+                dispatch(fileDownloaded(prep[i].ID));
+              }
+            } catch (error) {
+              Sentry.captureException(error, {
+                prepDoc: prep[i],
+                func: 'downloadFile',
+                doc: 'userActions',
+              });
+              dispatch(cancelDownloadOneFile(prep[i].ID));
+            }
+          }
+        }
+        if (rea.length > 0) {
+          await RNFS.mkdir(`${destinationFolder}/${Folder.rea}`);
+          for (let i = 0; i < rea.length; i += 1) {
+            try {
+              const fileExists = await RNFS.exists(`${destinationFolder}/${Folder.rea}/${rea[i].ID}.${rea[i].Extension}`);
+              nbDownloading = nbDownloading + 1;
+              dispatch(downloading(businessId, nbDownloading, total));
+              if (!fileExists) {
+                dispatch(downloadingFile(rea[i].ID));
+                await RNFetchBlob.config({
+                  timeout: 60000,
+                  path: `${destinationFolder}/${Folder.rea}/${rea[i].ID}.${rea[i].Extension}`,
+                }).fetch('GET', `${apiUrl}/api/pdffile/download/${rea[i].ID}`, {
+                  Authorization: `Bearer ${user.bearerToken}`,
+                });
+                dispatch(fileDownloaded(rea[i].ID));
+              }
+            } catch (error) {
+              Sentry.captureException(error, {
+                reaDoc: rea[i],
+                func: 'downloadFile',
+                doc: 'userActions',
+              });
+              dispatch(cancelDownloadOneFile(rea[i].ID));
+            }
+          }
+        }
+        if (sysDoc.length > 0) {
+          await RNFS.mkdir(`${destinationFolder}/${Folder.sysDoc}`);
+          for (let i = 0; i < sysDoc.length; i += 1) {
+            try {
+              const fileExists = await RNFS.exists(`${destinationFolder}/${Folder.sysDoc}/${sysDoc[i].ID}.${sysDoc[i].Extension}`);
+              nbDownloading = nbDownloading + 1;
+              dispatch(downloading(businessId, nbDownloading, total));
+              if (!fileExists) {
+                dispatch(downloadingFile(sysDoc[i].ID));
+                await RNFetchBlob.config({
+                  timeout: 60000,
+                  path: `${destinationFolder}/${Folder.sysDoc}/${sysDoc[i].ID}.${sysDoc[i].Extension}`,
+                }).fetch('GET', `${apiUrl}/api/pdffile/download/${sysDoc[i].ID}`, {
+                  Authorization: `Bearer ${user.bearerToken}`,
+                });
+                dispatch(fileDownloaded(sysDoc[i].ID));
+              }
+            } catch (error) {
+              Sentry.captureException(error, {
+                reaDoc: sysDoc[i],
+                func: 'downloadFile',
+                doc: 'userActions',
+              });
+              dispatch(cancelDownloadOneFile(rea[i].ID));
+            }
+          }
+        }
+        return dispatch(businessDownloaded(businessId));
+      })
+      .catch(async (e) => {
+        Sentry.captureException(e, {
+          func: 'downloadBusiness',
+          doc: 'userActions',
+        });
         for (let i = 0; i < prep.length; i += 1) {
-          try {
-            const fileExists = await RNFS.exists(`${destinationFolder}/${Folder.prep}/${prep[i].ID}.${prep[i].Extension}`);
-            nbDownloading = nbDownloading + 1;
-            dispatch(downloading(businessId, nbDownloading, total));
-            if (!fileExists) {
-              dispatch(downloadingFile(prep[i].ID));
-              await RNFetchBlob.config({
-                timeout: 60000,
-                path: `${destinationFolder}/${Folder.prep}/${prep[i].ID}.${prep[i].Extension}`,
-              }).fetch('GET', `${apiUrl}/api/pdffile/download/${prep[i].ID}`, {
-                Authorization: `Bearer ${user.bearerToken}`,
-              });
-              dispatch(fileDownloaded(prep[i].ID));
-            }
-          } catch (error) {
-            Sentry.captureException(error, {
-              prepDoc: prep[i],
-              func: 'downloadFile',
-              doc: 'userActions',
-            });
-            dispatch(cancelDownloadOneFile(prep[i].ID));
-          }
+          dispatch(cancelDownloadOneFile(prep[i].ID));
         }
-      }
-      if (rea.length > 0) {
-        await RNFS.mkdir(`${destinationFolder}/${Folder.rea}`);
         for (let i = 0; i < rea.length; i += 1) {
-          try {
-            const fileExists = await RNFS.exists(`${destinationFolder}/${Folder.rea}/${rea[i].ID}.${rea[i].Extension}`);
-            nbDownloading = nbDownloading + 1;
-            dispatch(downloading(businessId, nbDownloading, total));
-            if (!fileExists) {
-              dispatch(downloadingFile(rea[i].ID));
-              await RNFetchBlob.config({
-                timeout: 60000,
-                path: `${destinationFolder}/${Folder.rea}/${rea[i].ID}.${rea[i].Extension}`,
-              }).fetch('GET', `${apiUrl}/api/pdffile/download/${rea[i].ID}`, {
-                Authorization: `Bearer ${user.bearerToken}`,
-              });
-              dispatch(fileDownloaded(rea[i].ID));
-            }
-          } catch (error) {
-            Sentry.captureException(error, {
-              reaDoc: rea[i],
-              func: 'downloadFile',
-              doc: 'userActions',
-            });
-            dispatch(cancelDownloadOneFile(rea[i].ID));
-          }
+          dispatch(cancelDownloadOneFile(rea[i].ID));
         }
-      }
-      return dispatch(businessDownloaded(businessId));
-    })
-    .catch(async (e) => {
-      Sentry.captureException(e, {
-        func: 'downloadBusiness',
-        doc: 'userActions',
+        for (let i = 0; i < sysDoc.length; i += 1) {
+          dispatch(cancelDownloadOneFile(sysDoc[i].ID));
+        }
+        return dispatch(cancelDownload(businessId));
       });
-      for (let i = 0; i < prep.length; i += 1) {
-        dispatch(cancelDownloadOneFile(prep[i].ID));
-      }
-      for (let i = 0; i < rea.length; i += 1) {
-        dispatch(cancelDownloadOneFile(rea[i].ID));
-      }
-      console.log({ e });
-      return dispatch(cancelDownload(businessId));
-    });
-};
+  };
 
 const cancelDownload = (ID) => ({
   type: CANCEL_DOWNLOAD,
   ID,
 });
 
-const downloading = (ID, nb, total, prep, rea) => {
-  if (prep && rea) {
+const downloading = (ID, nb, total, docs) => {
+  if (docs) {
+    const { prep, rea, sysDoc } = docs;
     return {
       type: DOWNLOADING_BUSINESS,
       ID,
       nb,
       total,
-      upForDownload: prep.map((d) => d.ID).concat(rea.map((d) => d.ID)),
+      upForDownload: prep
+        .map((d) => d.ID)
+        .concat(rea.map((d) => d.ID))
+        .concat(sysDoc.map((d) => d.ID)),
     };
   }
   return {

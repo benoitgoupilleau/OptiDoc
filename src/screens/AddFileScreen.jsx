@@ -82,7 +82,7 @@ const AddFileScreen = React.memo(
                   Revisable: 'N',
                   Size: 0,
                   CreatedBy: user.name,
-                  Dossier2: 'Realisation',
+                  Dossier2: businessId === 'SysDoc' ? businessId : 'Realisation',
                   UpLoadedOn: '1900-01-01',
                   FileName: FileNameFinal,
                   CreatedOn,
@@ -194,7 +194,7 @@ const AddFileScreen = React.memo(
 
     const id_affaire = navigation.getParam('affaire', '');
     const business = userBusiness.find((b) => b.id === id_affaire);
-    const clientName = business ? `${business.client} - ${business.designation}` : id_affaire;
+    const clientName = business ? `${business.client ? `${business.client} - ` : ''}${business.designation}` : id_affaire;
     return (
       <Container>
         <OfflineNotice />

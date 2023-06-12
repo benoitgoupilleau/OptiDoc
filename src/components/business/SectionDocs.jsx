@@ -21,20 +21,20 @@ const checkIfNew = (docs, ID) => {
 };
 
 const SectionDocs = ({ id, docs, type, navigation, subFolder, upForDownload, loadingFiles, editedDocs }) => {
-  const [showDocs, setShowDocs] = useState(false);
+  const [showDocs, setShowDocs] = useState(type === Folder.sysDoc);
 
   const toggleDocs = () => {
     const toggle = !showDocs;
     setShowDocs(toggle);
   };
 
-  const documents = useMemo(() => (type === Folder.prep ? docs.prep : docs.rea), [type, docs]);
+  const documents = useMemo(() => (type === Folder.prep ? docs.prep : type === Folder.sysDoc ? docs.sysDoc : docs.rea), [type, docs]);
   const listArbo = useMemo(() => {
     const list = [];
     for (let i = 0; i < documents.length; i++) {
-      const indexArbo = list.findIndex((a) => a.nomDossier === documents[i].Dossier3 && a.etape === type);
+      const indexArbo = list.findIndex((a) => a.nomDossier === documents[i].Dossier3 && a.etape.toLowerCase() === type.toLowerCase());
       if (indexArbo === -1) {
-        const newArbo = subFolder.filter((s) => s.nomDossier === documents[i].Dossier3 && s.etape === type)[0];
+        const newArbo = subFolder.filter((s) => s.nomDossier === documents[i].Dossier3 && s.etape.toLowerCase() === type.toLowerCase())[0];
         list.push(newArbo);
       }
     }
@@ -45,13 +45,17 @@ const SectionDocs = ({ id, docs, type, navigation, subFolder, upForDownload, loa
   return (
     <>
       <SectionWrapper>
-        <Icons
-          name={showDocs ? 'md-arrow-dropdown' : 'md-arrow-dropright'}
-          size={Layout.icon.default}
-          color={Colors.mainColor}
-          onPress={toggleDocs}
-        />
-        <Section onPress={toggleDocs}>{sectionName}</Section>
+        {type !== Folder.sysDoc && (
+          <>
+            <Icons
+              name={showDocs ? 'md-caret-down-outline' : 'md-caret-forward'}
+              size={Layout.icon.default}
+              color={Colors.mainColor}
+              onPress={toggleDocs}
+            />
+            <Section onPress={toggleDocs}>{sectionName}</Section>
+          </>
+        )}
         {type === Folder.rea && (
           <IconView>
             <AddIcons
@@ -97,7 +101,7 @@ SectionDocs.propTypes = {
   id: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
   navigation: PropTypes.object.isRequired,
-  docs: PropTypes.shape({ prep: PropTypes.array, rea: PropTypes.array }).isRequired,
+  docs: PropTypes.shape({ prep: PropTypes.array, rea: PropTypes.array, sysDoc: PropTypes.array }).isRequired,
   subFolder: PropTypes.array.isRequired,
   upForDownload: PropTypes.array.isRequired,
   loadingFiles: PropTypes.array.isRequired,

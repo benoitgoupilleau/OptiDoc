@@ -18,7 +18,7 @@ const SubArbo = ({ title, children }) => {
     <View>
       <SubArboWrapper>
         <Icons
-          name={display ? 'md-arrow-dropdown' : 'md-arrow-dropright'}
+          name={display ? 'md-caret-down-outline' : 'md-caret-forward'}
           size={Layout.icon.default}
           color={Colors.secondColor}
           onPress={toggleArbo}

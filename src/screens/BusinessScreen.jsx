@@ -24,46 +24,41 @@ const StyledScroll = styled.ScrollView`
   width: ${width};
 `;
 
-const BusinessScreen = React.memo(
-  ({ userBusiness, docs, modeleDownloaded, downloadModels, modeleDocs }) => {
-    useEffect(() => {
-      Orientation.lockToPortrait();
-      if (modeleDownloaded !== 'in progress') {
-        downloadModels(modeleDocs);
-      }
-    }, []);
-    if (userBusiness.length > 0) {
-      return (
-        <Main>
-          <View>
-            <StyledScroll>
-              {userBusiness.map(b => (
-                <Business
-                  key={b.id}
-                  {...b}
-                  prep={docs[b.id].prep}
-                  rea={docs[b.id].rea}
-                />
-              ))}
-            </StyledScroll>
-          </View>
-        </Main>
-      );
+const BusinessScreen = React.memo(({ userBusiness, docs, modeleDownloaded, downloadModels, modeleDocs }) => {
+  useEffect(() => {
+    Orientation.lockToPortrait();
+    if (modeleDownloaded !== 'in progress') {
+      downloadModels(modeleDocs);
     }
+  }, []);
+  if (userBusiness.length > 0) {
     return (
       <Main>
-        <Text>Aucune affaire disponible</Text>
+        <View>
+          <StyledScroll>
+            {userBusiness
+              .filter((b) => b.id !== 'SysDoc')
+              .map((b) => (
+                <Business key={b.id} {...b} prep={docs[b.id].prep} rea={docs[b.id].rea} />
+              ))}
+          </StyledScroll>
+        </View>
       </Main>
     );
   }
-);
+  return (
+    <Main>
+      <Text>Aucune affaire disponible</Text>
+    </Main>
+  );
+});
 
 BusinessScreen.navigationOptions = {
   headerTitle: <HeaderTitle />,
   headerRight: <Logout />,
   headerStyle: {
-    height: 70
-  }
+    height: 70,
+  },
 };
 
 BusinessScreen.propTypes = {
@@ -71,7 +66,7 @@ BusinessScreen.propTypes = {
   docs: PropTypes.object.isRequired,
   modeleDownloaded: PropTypes.string.isRequired,
   modeleDocs: PropTypes.array.isRequired,
-  downloadModels: PropTypes.func.isRequired
+  downloadModels: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = ({ user, business }) => {
@@ -81,11 +76,8 @@ const mapStateToProps = ({ user, business }) => {
     userBusiness,
     docs,
     modeleDownloaded: user.modeleDownloaded,
-    modeleDocs: business.modeles
+    modeleDocs: business.modeles,
   };
 };
 
-export default connect(
-  mapStateToProps,
-  { downloadModels }
-)(BusinessScreen);
+export default connect(mapStateToProps, { downloadModels })(BusinessScreen);

@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import {
-  ActivityIndicator,
-  Dimensions,
-  Alert,
-  ToastAndroid
-} from 'react-native';
+import { ActivityIndicator, Dimensions, Alert, ToastAndroid } from 'react-native';
 import pick from 'lodash.pick';
 import RNFS from 'react-native-fs';
 import { EXTERNAL_PATH } from 'react-native-dotenv';
@@ -20,13 +15,9 @@ import {
   downLoadOneFile,
   editPrepare,
   removePrepare,
-  createFile
+  createFile,
 } from '../../redux/actions/user';
-import {
-  updatePrepared,
-  removeNewDoc,
-  updateDocName
-} from '../../redux/actions/business';
+import { updatePrepared, removeNewDoc, updateDocName } from '../../redux/actions/business';
 import { openFile } from '../../services/openfile';
 import Sentry from '../../services/sentry';
 
@@ -39,17 +30,9 @@ import rootDir from '../../services/rootDir';
 
 const { width } = Dimensions.get('window');
 
-import {
-  DocumentWrapper,
-  File,
-  Title,
-  StyledInput,
-  IconsWrapper,
-  EditIcons,
-  Icons
-} from './Document.styled';
+import { DocumentWrapper, File, Title, StyledInput, IconsWrapper, EditIcons, Icons } from './Document.styled';
 
-const Document = React.memo(props => {
+const Document = React.memo((props) => {
   const {
     name,
     navigation,
@@ -68,6 +51,7 @@ const Document = React.memo(props => {
     uploadingDocs,
     prep,
     rea,
+    sysDoc,
     editedDocs,
     FileName,
     Prepared,
@@ -86,7 +70,7 @@ const Document = React.memo(props => {
     removeNewDoc,
     createFile,
     updateDocName,
-    isUpForDownload
+    isUpForDownload,
   } = props;
   const [isDownloaded, setIsDownloaded] = useState(true);
   const [localFileName, setlocalFileName] = useState(FileName);
@@ -96,7 +80,7 @@ const Document = React.memo(props => {
   }, [isLoadingFile]);
 
   const onEdit = async () => {
-    const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
+    const isEdited = editedDocs.filter((e) => e.ID === ID).length > 0;
     if (isEdited) {
       await openFile(ID, Extension);
     } else {
@@ -109,11 +93,11 @@ const Document = React.memo(props => {
             editPath: `${EXTERNAL_PATH}${ID}.${Extension}`,
             affaire: Dossier1,
             Extension,
-            Dossier3
+            Dossier3,
           },
           filePath
         );
-      } else if (!(loadingBusiness.findIndex(l => l.ID === Dossier1) > -1)) {
+      } else if (!(loadingBusiness.findIndex((l) => l.ID === Dossier1) > -1)) {
         if (modeleDownloaded === 'in progress') {
           Alert.alert(
             'Modèle en cours de téléchargement',
@@ -122,13 +106,11 @@ const Document = React.memo(props => {
           );
         } else {
           if (isConnected) {
-            downloadBusiness(userId, Dossier1, prep, rea);
+            downloadBusiness(userId, Dossier1, { prep, rea, sysDoc });
           } else {
-            Alert.alert(
-              'Vous êtes en mode hors-ligne',
-              'Vous pourrez télécharger cette affaire une fois votre connexion rétablie',
-              [{ text: 'Ok' }]
-            );
+            Alert.alert('Vous êtes en mode hors-ligne', 'Vous pourrez télécharger cette affaire une fois votre connexion rétablie', [
+              { text: 'Ok' },
+            ]);
           }
         }
       }
@@ -141,25 +123,19 @@ const Document = React.memo(props => {
     const file = pick(props, Tables.docField);
     const userName = name;
     const now = new Date();
-    const date = `${now.getFullYear()}-${(now.getMonth() + 1).toLocaleString(
-      'fr-FR',
-      { minimumIntegerDigits: 2 }
-    )}-${now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 })}`;
+    const date = `${now.getFullYear()}-${(now.getMonth() + 1).toLocaleString('fr-FR', { minimumIntegerDigits: 2 })}-${now
+      .getDate()
+      .toLocaleString('fr-FR', { minimumIntegerDigits: 2 })}`;
     const fileToUpLoad = {
       ...file,
       UpLoadedOn: date,
       UpdatedOn: date,
       UpdatedBy: userName,
-      UpLoadedBy: userName
+      UpLoadedBy: userName,
     };
-    const secondVersion = await RNFS.exists(
-      `${EXTERNAL_PATH}${ID}(0).${Extension}`
-    );
+    const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${ID}(0).${Extension}`);
     if (secondVersion) {
-      await RNFS.copyFile(
-        `${EXTERNAL_PATH}${ID}(0).${Extension}`,
-        `${EXTERNAL_PATH}${ID}.${Extension}`
-      );
+      await RNFS.copyFile(`${EXTERNAL_PATH}${ID}(0).${Extension}`, `${EXTERNAL_PATH}${ID}.${Extension}`);
       await RNFS.unlink(`${EXTERNAL_PATH}${ID}(0).${Extension}`);
     }
     await RNFS.copyFile(filePath, destPath);
@@ -174,33 +150,21 @@ const Document = React.memo(props => {
   const onUpload = () => {
     if (isConnected) {
       if (Prepared === 'O') {
-        Alert.alert(
-          "Confirmer l'envoi",
-          'Etes-vous sûr de vouloir envoyer ce fichier ?',
-          [
-            {
-              text: 'Annuler',
-              style: 'cancel'
-            },
-            {
-              text: 'Oui',
-              onPress: () => confirmedOnUpload()
-            }
-          ]
-        );
+        Alert.alert("Confirmer l'envoi", 'Etes-vous sûr de vouloir envoyer ce fichier ?', [
+          {
+            text: 'Annuler',
+            style: 'cancel',
+          },
+          {
+            text: 'Oui',
+            onPress: () => confirmedOnUpload(),
+          },
+        ]);
       } else {
-        Alert.alert(
-          'Envoi impossible',
-          "Le fichier n'est pas coché comme 'Préparé'",
-          [{ text: 'Ok' }]
-        );
+        Alert.alert('Envoi impossible', "Le fichier n'est pas coché comme 'Préparé'", [{ text: 'Ok' }]);
       }
     } else {
-      Alert.alert(
-        'Connexion impossible',
-        'Vous pourrez envoyer votre fichier une fois votre connexion rétablie',
-        [{ text: 'Ok' }]
-      );
+      Alert.alert('Connexion impossible', 'Vous pourrez envoyer votre fichier une fois votre connexion rétablie', [{ text: 'Ok' }]);
     }
   };
 
@@ -209,7 +173,7 @@ const Document = React.memo(props => {
       now.getFullYear() +
       '-' +
       (now.getMonth() + 1).toLocaleString('fr-FR', {
-        minimumIntegerDigits: 2
+        minimumIntegerDigits: 2,
       }) +
       '-' +
       now.getDate().toLocaleString('fr-FR', { minimumIntegerDigits: 2 });
@@ -220,7 +184,7 @@ const Document = React.memo(props => {
       Prepared: true,
       affaire: Dossier1,
       Extension: Extension,
-      Dossier3: Dossier3
+      Dossier3: Dossier3,
     });
   };
 
@@ -234,26 +198,22 @@ const Document = React.memo(props => {
       updatePrepared(ID, newPrepared, PreparedOn, PreparedBy, Revisable);
       removePrepare(ID);
     } else {
-      Alert.alert(
-        'Confirmer la préparation',
-        'Etes-vous sûr de vouloir cocher ce fichier comme préparé ?',
-        [
-          {
-            text: 'Annuler',
-            style: 'cancel'
-          },
-          {
-            text: 'Oui',
-            onPress: () => confirmedOnPrepare(newPrepared, now)
-          }
-        ]
-      );
+      Alert.alert('Confirmer la préparation', 'Etes-vous sûr de vouloir cocher ce fichier comme préparé ?', [
+        {
+          text: 'Annuler',
+          style: 'cancel',
+        },
+        {
+          text: 'Oui',
+          onPress: () => confirmedOnPrepare(newPrepared, now),
+        },
+      ]);
     }
   };
 
   const removeFile = async () => {
     if (!isNew) {
-      const doc = editedDocs.filter(e => e.ID === ID)[0];
+      const doc = editedDocs.filter((e) => e.ID === ID)[0];
       if (doc.Prepared) {
         updatePrepared(ID, 'N', '1900-01-01', '');
       }
@@ -269,7 +229,7 @@ const Document = React.memo(props => {
       } catch (error) {
         Sentry.captureException(error, {
           func: 'removeWoPFile',
-          doc: 'Document.js'
+          doc: 'Document.js',
         });
         return;
       }
@@ -277,58 +237,37 @@ const Document = React.memo(props => {
   };
 
   const onCancel = () => {
-    Alert.alert(
-      'Etes-vous sûr de vouloir annuler les modifications ?',
-      'Les modifications seront perdues définitivement',
-      [
-        { text: 'Annuler', style: 'cancel' },
-        { text: 'Oui', onPress: removeFile }
-      ]
-    );
+    Alert.alert('Etes-vous sûr de vouloir annuler les modifications ?', 'Les modifications seront perdues définitivement', [
+      { text: 'Annuler', style: 'cancel' },
+      { text: 'Oui', onPress: removeFile },
+    ]);
   };
 
   const confirmOnDownload = () => {
-    Alert.alert(
-      'Confirmer le téléchargement du fichier',
-      'Voulez-vous retélécharger le document ?',
-      [
-        { text: 'Annuler', style: 'cancel' },
-        { text: 'Oui', onPress: onDownloadFile }
-      ]
-    );
+    Alert.alert('Confirmer le téléchargement du fichier', 'Voulez-vous retélécharger le document ?', [
+      { text: 'Annuler', style: 'cancel' },
+      { text: 'Oui', onPress: onDownloadFile },
+    ]);
   };
 
   const onDownloadFile = () => {
     if (isConnected) {
       downLoadOneFile(ID, Extension, type, Dossier1);
-      return ToastAndroid.showWithGravity(
-        'Fichier en cours de téléchargement',
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER
-      );
+      return ToastAndroid.showWithGravity('Fichier en cours de téléchargement', ToastAndroid.SHORT, ToastAndroid.CENTER);
     } else {
-      return Alert.alert(
-        'Vous êtes en mode hors-ligne',
-        'Vous pourrez télécharger cette affaire une fois votre connexion rétablie',
-        [{ text: 'Ok' }]
-      );
+      return Alert.alert('Vous êtes en mode hors-ligne', 'Vous pourrez télécharger cette affaire une fois votre connexion rétablie', [
+        { text: 'Ok' },
+      ]);
     }
   };
 
   const onOpenFile = async () => {
-    const isEdited =
-      editedDocs.filter(e => e.ID === ID && !!e.editPath).length > 0;
-    const isPrepared =
-      editedDocs.filter(e => e.ID === ID && e.Prepared).length > 0;
+    const isEdited = editedDocs.filter((e) => e.ID === ID && !!e.editPath).length > 0;
+    const isPrepared = editedDocs.filter((e) => e.ID === ID && e.Prepared).length > 0;
     if (isDownloaded) {
-      const secondVersion = await RNFS.exists(
-        `${EXTERNAL_PATH}${ID}(0).${Extension}`
-      );
+      const secondVersion = await RNFS.exists(`${EXTERNAL_PATH}${ID}(0).${Extension}`);
       if (secondVersion && isEdited) {
-        RNFS.copyFile(
-          `${EXTERNAL_PATH}${ID}(0).${Extension}`,
-          `${EXTERNAL_PATH}${ID}.${Extension}`
-        )
+        RNFS.copyFile(`${EXTERNAL_PATH}${ID}(0).${Extension}`, `${EXTERNAL_PATH}${ID}.${Extension}`)
           .then(() =>
             RNFS.unlink(`${EXTERNAL_PATH}${ID}(0).${Extension}`).then(() =>
               navigation.navigate('Pdf', {
@@ -342,14 +281,14 @@ const Document = React.memo(props => {
                 Prepared,
                 Reviewed,
                 isPrepared,
-                Locked
+                Locked,
               })
             )
           )
-          .catch(e => {
+          .catch((e) => {
             Sentry.captureException(e, {
               func: 'onOpenFile',
-              doc: 'Document.js'
+              doc: 'Document.js',
             });
             return;
           });
@@ -365,7 +304,7 @@ const Document = React.memo(props => {
           Prepared,
           Reviewed,
           isPrepared,
-          Locked
+          Locked,
         });
       }
     }
@@ -382,31 +321,16 @@ const Document = React.memo(props => {
 
   const displayLeftIcon = () => {
     if (isUpForDownload) {
-      return (
-        <Icons
-          name={'md-time'}
-          size={Layout.icon.small}
-          color={Colors.thirdColor}
-        />
-      );
+      return <Icons name={'md-time'} size={Layout.icon.small} color={Colors.thirdColor} />;
     } else if (isLoadingFile) {
-      return (
-        <ActivityIndicator style={{ paddingLeft: 10, paddingRight: 10 }} />
-      );
+      return <ActivityIndicator style={{ paddingLeft: 10, paddingRight: 10 }} />;
     } else if (!isDownloaded || fileToDownload.includes(ID)) {
-      return (
-        <Icons
-          name={'md-cloud-download'}
-          size={Layout.icon.small}
-          color={Colors.secondColor}
-          onPress={onDownloadFile}
-        />
-      );
+      return <Icons name={'md-cloud-download'} size={Layout.icon.small} color={Colors.secondColor} onPress={onDownloadFile} />;
     }
     return undefined;
   };
 
-  const isEdited = editedDocs.filter(e => e.ID === ID).length > 0;
+  const isEdited = editedDocs.filter((e) => e.ID === ID).length > 0;
   return (
     <DocumentWrapper onPress={onOpenFile} onLongPress={confirmOnDownload}>
       <File>
@@ -415,7 +339,7 @@ const Document = React.memo(props => {
           <StyledInput
             width={width}
             allowFontScaling
-            onChangeText={name => setlocalFileName(name)}
+            onChangeText={(name) => setlocalFileName(name)}
             placeholder="Nom du fichier"
             value={localFileName}
             editable={Prepared === 'N'}
@@ -429,56 +353,31 @@ const Document = React.memo(props => {
         <IconsWrapper>
           {isEdited && (
             <EditIcons>
-              <Icons
-                name="md-close"
-                size={Layout.icon.default}
-                color="red"
-                onPress={onCancel}
-              />
+              <Icons name="md-close" size={Layout.icon.default} color="red" onPress={onCancel} />
               {!uploadingDocs.includes(ID) ? (
-                <Icons
-                  name="md-cloud-upload"
-                  size={Layout.icon.default}
-                  color={Colors.secondColor}
-                  onPress={onUpload}
-                />
+                <Icons name="md-cloud-upload" size={Layout.icon.default} color={Colors.secondColor} onPress={onUpload} />
               ) : (
-                <ActivityIndicator
-                  style={{ paddingLeft: 5, paddingRight: 5 }}
-                />
+                <ActivityIndicator style={{ paddingLeft: 5, paddingRight: 5 }} />
               )}
               <Icons
                 name="md-checkbox-outline"
                 size={Layout.icon.default}
                 color={Prepared === 'O' ? 'green' : Colors.thirdColor}
-                onPress={
-                  Locked === 'O' || (Prepared === 'O' && !isEdited)
-                    ? () => {}
-                    : onPrepare
-                }
+                onPress={Locked === 'O' || (Prepared === 'O' && !isEdited) ? () => {} : onPrepare}
               />
             </EditIcons>
           )}
           {Locked === 'O' ? (
-            <Icons name="md-lock" size={Layout.icon.default} />
+            <Icons name="md-lock-closed" size={Layout.icon.default} />
           ) : Reviewed === 'O' || (Prepared === 'O' && !isEdited) ? (
-            <Icons
-              name="md-checkbox-outline"
-              size={Layout.icon.default}
-              color={'green'}
-              onPress={() => {}}
-            />
+            <Icons name="md-checkbox-outline" size={Layout.icon.default} color={'green'} onPress={() => {}} />
           ) : (
-            <Icons
-              name="md-create"
-              size={Layout.icon.default}
-              onPress={onEdit}
-            />
+            <Icons name="md-create" size={Layout.icon.default} onPress={onEdit} />
           )}
         </IconsWrapper>
       ) : (
         <IconsWrapper>
-          <Icons name="md-lock" size={Layout.icon.default} />
+          <Icons name="md-lock-closed" size={Layout.icon.default} />
         </IconsWrapper>
       )}
     </DocumentWrapper>
@@ -500,6 +399,7 @@ Document.propTypes = {
   userId: PropTypes.string.isRequired,
   prep: PropTypes.array.isRequired,
   rea: PropTypes.array.isRequired,
+  sysDoc: PropTypes.array.isRequired,
   modeleDocs: PropTypes.array.isRequired,
   editFile: PropTypes.func.isRequired,
   editedDocs: PropTypes.array.isRequired,
@@ -523,15 +423,15 @@ Document.propTypes = {
   removePrepare: PropTypes.func.isRequired,
   createFile: PropTypes.func.isRequired,
   updateDocName: PropTypes.func.isRequired,
-  isUpForDownload: PropTypes.bool.isRequired
+  isUpForDownload: PropTypes.bool.isRequired,
 };
 
 Document.defaultProps = {
   type: Folder.prep,
-  isNew: false
+  isNew: false,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   isConnected: state.network.isConnected,
   loadingBusiness: state.user.loadingBusiness,
   editedDocs: state.user.editedDocs,
@@ -540,25 +440,22 @@ const mapStateToProps = state => ({
   userId: state.user.userId,
   name: state.user.name,
   modeleDocs: state.business.modeles,
-  modeleDownloaded: state.user.modeleDownloaded
+  modeleDownloaded: state.user.modeleDownloaded,
 });
 
 export default withNavigation(
-  connect(
-    mapStateToProps,
-    {
-      downloadBusiness,
-      editFile,
-      uploadFile,
-      uploadingFile,
-      removeFromEdit,
-      downLoadOneFile,
-      updatePrepared,
-      editPrepare,
-      removePrepare,
-      removeNewDoc,
-      createFile,
-      updateDocName
-    }
-  )(Document)
+  connect(mapStateToProps, {
+    downloadBusiness,
+    editFile,
+    uploadFile,
+    uploadingFile,
+    removeFromEdit,
+    downLoadOneFile,
+    updatePrepared,
+    editPrepare,
+    removePrepare,
+    removeNewDoc,
+    createFile,
+    updateDocName,
+  })(Document)
 );

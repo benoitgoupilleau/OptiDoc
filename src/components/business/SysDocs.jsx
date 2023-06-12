@@ -5,11 +5,9 @@ import pick from 'lodash.pick';
 import { EXTERNAL_PATH } from 'react-native-dotenv';
 import { connect } from 'react-redux';
 import { View, Text, ActivityIndicator, Alert } from 'react-native';
-import { withNavigation } from 'react-navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import SectionDocs from './SectionDocs';
-import SectionDocsSimplified from './SectionDocsSimplified';
 import { uploadingFile, uploadMultipleFiles, uploadingMulti } from '../../redux/actions/user';
 
 import Colors from '../../constants/Colors';
@@ -19,20 +17,18 @@ import Tables from '../../constants/Tables';
 
 import rootDir from '../../services/rootDir';
 
-import { BusinessWrapper, MainSection, Title } from './BusinessWithDocs.styled';
-import { IconView, AddIcons } from './SectionDocs.styled';
+import BusinessIcons from './BusinessIcons';
 
-const BusinessWithDocs = React.memo((props) => {
+import { BusinessWrapper, MainSection, Title } from './BusinessWithDocs.styled';
+
+const SysDocs = React.memo((props) => {
   const {
     userId,
     id,
-    navigation,
     name,
     isConnected,
-    client,
     designation,
-    prep,
-    rea,
+    sysDoc,
     editedDocs,
     uploadingDocs,
     multipleUploadDocs,
@@ -41,7 +37,6 @@ const BusinessWithDocs = React.memo((props) => {
     uploadingFile,
     uploadMultipleFiles,
     uploadingMulti,
-    isSimplified,
   } = props;
   const [upLoading, setupLoading] = useState(false);
 
@@ -153,50 +148,25 @@ const BusinessWithDocs = React.memo((props) => {
     return null;
   };
 
-  const clientName = `${client ? `${client} - ` : ''}${designation}`;
   return (
     <BusinessWrapper>
       <MainSection>
-        <Title>{clientName}</Title>
+        <Title>{designation}</Title>
+        <BusinessIcons id={id} sysDoc={sysDoc} hideNav />
         {displayIcon()}
-        {isSimplified === 'O' && (
-          <IconView>
-            <AddIcons
-              name={'md-camera'}
-              size={Layout.icon.large}
-              color={Colors.mainColor}
-              onPress={() => navigation.navigate('AddPic', { affaire: id })}
-            />
-            <AddIcons
-              name={'md-add'}
-              size={Layout.icon.large}
-              color={Colors.mainColor}
-              onPress={() => navigation.navigate('AddDoc', { affaire: id })}
-            />
-          </IconView>
-        )}
       </MainSection>
-      {isSimplified === 'O' ? (
-        <SectionDocsSimplified id={id} docs={{ prep, rea }} />
-      ) : (
-        <>
-          <SectionDocs key={Folder.prep} id={id} docs={{ prep, rea }} type={Folder.prep} />
-          <SectionDocs key={Folder.rea} id={id} docs={{ prep, rea }} type={Folder.rea} />
-        </>
-      )}
+      <SectionDocs key={Folder.sysDoc} id={id} docs={{ prep: [], rea: [], sysDoc }} type={Folder.sysDoc} />
     </BusinessWrapper>
   );
 });
 
-BusinessWithDocs.propTypes = {
+SysDocs.propTypes = {
   id: PropTypes.string.isRequired,
   client: PropTypes.string.isRequired,
   designation: PropTypes.string.isRequired,
-  prep: PropTypes.array,
-  rea: PropTypes.array,
+  sysDoc: PropTypes.array,
   modeleDocs: PropTypes.array.isRequired,
   userId: PropTypes.string.isRequired,
-  navigation: PropTypes.object.isRequired,
   isConnected: PropTypes.bool.isRequired,
   editedDocs: PropTypes.array.isRequired,
   uploadingFile: PropTypes.func.isRequired,
@@ -210,9 +180,8 @@ BusinessWithDocs.propTypes = {
   isSimplified: PropTypes.string,
 };
 
-BusinessWithDocs.defaultProps = {
-  prep: [],
-  rea: [],
+SysDocs.defaultProps = {
+  sysDoc: [],
   multipleUploadDocs: [],
   docs: [],
   newDocs: [],
@@ -230,4 +199,4 @@ const mapStateToProps = (state, props) => ({
   newDocs: state.business.newDocs,
 });
 
-export default withNavigation(connect(mapStateToProps, { uploadingFile, uploadMultipleFiles, uploadingMulti })(BusinessWithDocs));
+export default connect(mapStateToProps, { uploadingFile, uploadMultipleFiles, uploadingMulti })(SysDocs);

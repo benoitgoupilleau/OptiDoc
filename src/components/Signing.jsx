@@ -11,7 +11,7 @@ import { loginApi } from '../redux/actions/user';
 
 import { Wrapper, Title, StyledInput, StyledButton, Message, StyledText } from './Signing.styled';
 
-const encoded = str => {
+const encoded = (str) => {
   const encodedChar = [];
   for (let i = 0; i < str.length; i++) {
     encodedChar.push(String.fromCharCode(str.charCodeAt(i) + 10));
@@ -60,7 +60,7 @@ const Signing = React.memo(({ url, userName, navigation, loginApi, lockedSession
       {sessionExpired && <Message type="error">Votre session a expiré. Merci de vous reconnecter</Message>}
       <StyledInput
         allowFontScaling
-        onChangeText={value => setApiUrl(value.trim())}
+        onChangeText={(value) => setApiUrl(value.trim())}
         placeholder="Url api"
         value={apiUrl}
         editable={!lockedSession}
@@ -68,7 +68,7 @@ const Signing = React.memo(({ url, userName, navigation, loginApi, lockedSession
       />
       <StyledInput
         allowFontScaling
-        onChangeText={userName => setUserName(userName)}
+        onChangeText={(userName) => setUserName(userName)}
         placeholder="Identifiant"
         value={localUserName}
         editable={!lockedSession}
@@ -76,7 +76,7 @@ const Signing = React.memo(({ url, userName, navigation, loginApi, lockedSession
       />
       <StyledInput
         allowFontScaling
-        onChangeText={password => setPassword(password)}
+        onChangeText={(password) => setPassword(password)}
         placeholder="Mot de passe"
         secureTextEntry
         value={password}
@@ -97,14 +97,14 @@ Signing.propTypes = {
   lockedSession: PropTypes.bool.isRequired,
   userName: PropTypes.string.isRequired,
   sessionExpired: PropTypes.bool.isRequired,
-  url: PropTypes.string.isRequired
+  url: PropTypes.string.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   url: state.user.url,
   userName: state.user.userName,
   lockedSession: state.user.lockedSession,
-  sessionExpired: state.user.sessionExpired
+  sessionExpired: state.user.sessionExpired,
 });
 
 export default withNavigation(connect(mapStateToProps, { loginApi })(Signing));

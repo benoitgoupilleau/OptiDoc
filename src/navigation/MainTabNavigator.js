@@ -1,9 +1,6 @@
 import React from 'react';
 
-import {
-  createStackNavigator,
-  createBottomTabNavigator
-} from 'react-navigation';
+import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
 
 import TabBarLabel from '../components/TabBarLabel';
 import TabBarIcon from '../components/TabBarIcon';
@@ -16,16 +13,14 @@ import DocsScreen from '../screens/DocsScreen';
 import PdfScreen from '../screens/PdfScreen';
 
 const HomeStack = createStackNavigator({
-  Home: HomeScreen
+  Home: HomeScreen,
 });
 
 HomeStack.navigationOptions = {
   // eslint-disable-next-line react/prop-types
-  tabBarLabel: ({ focused }) => (
-    <TabBarLabel focused={focused} title="Actualités" />
-  ),
+  tabBarLabel: ({ focused }) => <TabBarLabel focused={focused} title="Actualités" />,
   // eslint-disable-next-line react/prop-types
-  tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-paper" />
+  tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-newspaper-outline" />,
 };
 
 const BusinessStack = createStackNavigator({
@@ -33,30 +28,41 @@ const BusinessStack = createStackNavigator({
   Docs: DocsScreen,
   Pdf: PdfScreen,
   AddDoc: AddFileScreen,
-  AddPic: AddPictureScreen
+  AddPic: AddPictureScreen,
 });
 
 BusinessStack.navigationOptions = {
   // eslint-disable-next-line react/prop-types
-  tabBarLabel: ({ focused }) => (
-    <TabBarLabel focused={focused} title="Mes Affaires" />
-  ),
+  tabBarLabel: ({ focused }) => <TabBarLabel focused={focused} title="Mes Affaires" />,
   // eslint-disable-next-line react/prop-types
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon focused={focused} name="md-folder-open" />
-  )
+  tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-folder-open" />,
+};
+
+const SysDocStack = createStackNavigator({
+  Docs: DocsScreen,
+  Pdf: PdfScreen,
+  AddDoc: AddFileScreen,
+  AddPic: AddPictureScreen,
+});
+
+SysDocStack.navigationOptions = {
+  // eslint-disable-next-line react/prop-types
+  tabBarLabel: ({ focused }) => <TabBarLabel focused={focused} title="Système Documentaire" />,
+  // eslint-disable-next-line react/prop-types
+  tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-file-tray-full" />,
 };
 
 export default createBottomTabNavigator(
   {
     HomeStack,
-    BusinessStack
+    SysDocStack,
+    BusinessStack,
   },
   {
     tabBarOptions: {
       style: {
-        height: 60
-      }
-    }
+        height: 60,
+      },
+    },
   }
 );
